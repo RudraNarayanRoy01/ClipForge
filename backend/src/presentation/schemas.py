@@ -33,12 +33,16 @@ class ErrorResponse(BaseModel):
 # --- PROJECTS ---
 class ProjectCreate(BaseModel):
     name: str = Field(..., description="The name of the new clipping workspace.", json_schema_extra={"example": "My Awesome Podcast"})
+    description: Optional[str] = Field(None, description="Optional description of the project.")
 
 class ProjectResponse(BaseModel):
     id: uuid.UUID
     name: str
+    description: Optional[str] = None
     created_at: datetime
     status: str = Field(..., json_schema_extra={"example": "active"})
+    video_count: int = 0
+    thumbnail_path: Optional[str] = None
 
 class ProjectListResponse(BaseModel):
     data: List[ProjectResponse]

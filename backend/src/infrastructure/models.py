@@ -12,9 +12,14 @@ class ProjectModel(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str | None] = mapped_column(String, nullable=True)
+    storage_path: Mapped[str] = mapped_column(String, nullable=False)
+    status: Mapped[str] = mapped_column(String, default="EMPTY")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
-    status: Mapped[str] = mapped_column(String, default="created")
-    
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    video_count: Mapped[int] = mapped_column(Integer, default=0)
+    thumbnail_path: Mapped[str | None] = mapped_column(String, nullable=True)
+
     videos: Mapped[list["VideoAssetModel"]] = relationship("VideoAssetModel", back_populates="project", cascade="all, delete")
     clips: Mapped[list["ClipSegmentModel"]] = relationship("ClipSegmentModel", back_populates="project", cascade="all, delete")
 

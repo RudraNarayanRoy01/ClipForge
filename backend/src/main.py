@@ -30,6 +30,7 @@ else:
 
 # --- Lifecycle ---
 from .core.bootstrap import validate_startup
+from .infrastructure.database import engine, Base
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -39,6 +40,9 @@ async def lifespan(app: FastAPI):
     """
     # Startup: Initialize resources (DB pools, ML models, background tasks)
     logger.info("Starting AI Clipping Platform API...")
+    
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     
     # Run strict startup validation
     await validate_startup(app)
