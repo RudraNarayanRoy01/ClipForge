@@ -6,7 +6,7 @@ from ..domain.ports import (
     ITimelineContextRepository, IVideoProcessor
 )
 from ..domain.entities import TimelineContext, ClipSegment
-from ..infrastructure.repositories import AsyncSqliteProjectRepository
+from ..repositories.project_repository import ProjectRepository
 
 class GenerateClipsUseCase:
     """
@@ -18,7 +18,7 @@ class GenerateClipsUseCase:
         vision_analyzer: IVisionAnalyzer,
         llm_engine: ILLMReasoningEngine,
         timeline_repo: ITimelineContextRepository,
-        project_repo: AsyncSqliteProjectRepository, # Using the specific async adapter
+        project_repo: ProjectRepository, # Using the specific async adapter
         video_processor: IVideoProcessor
     ):
         self.audio = audio_analyzer

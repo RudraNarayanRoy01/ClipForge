@@ -32,6 +32,28 @@ else:
 from .core.bootstrap import validate_startup
 from .infrastructure.database import engine, Base
 
+async def run_migrations(conn):
+    """Run lightweight schema migrations for SQLite."""
+    columns = [
+        ('filename', 'VARCHAR', '""'),
+        ('original_filename', 'VARCHAR', '""'),
+        ('file_extension', 'VARCHAR', '""'),
+        ('mime_type', 'VARCHAR', '""'),
+        ('file_size_bytes', 'INTEGER', '0'),
+        ('duration_seconds', 'FLOAT', 'NULL'),
+        ('width', 'INTEGER', 'NULL'),
+        ('height', 'INTEGER', 'NULL'),
+        ('fps', 'FLOAT', 'NULL'),
+        ('storage_path', 'VARCHAR', '""'),
+    ]
+    for col_name, col_type, col_default in columns:
+        try:
+            from sqlalchemy import text
+            await conn.execute(text(f'ALTER TABLE video_assets ADD COLUMN {col_name} {col_type} DEFAULT {col_default}'))
+        except Exception as e:
+            if 'duplicate column name' not in str(e).lower():
+                logger.warning(f"Failed to add column {col_name}: {e}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
@@ -43,6 +65,8 @@ async def lifespan(app: FastAPI):
     
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Migrate DB
+        await run_migrations(conn)
     
     # Run strict startup validation
     await validate_startup(app)

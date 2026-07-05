@@ -56,8 +56,15 @@ class VideoAssetResponse(BaseModel):
     id: uuid.UUID
     project_id: uuid.UUID
     file_path: str
-    duration: float = Field(..., description="Duration of the video in seconds.")
-    resolution: Dict[str, int] = Field(..., json_schema_extra={"example": {"width": 1920, "height": 1080}})
+    filename: str
+    original_filename: str
+    file_extension: str
+    mime_type: str
+    file_size_bytes: int
+    duration_seconds: Optional[float] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    fps: Optional[float] = None
     created_at: datetime
 
 # --- CLIPS ---

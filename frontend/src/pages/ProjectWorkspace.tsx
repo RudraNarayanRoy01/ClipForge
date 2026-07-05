@@ -1,30 +1,37 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, Loader2, FolderOpen } from 'lucide-react';
+import { ArrowLeft, Loader2, FolderOpen, Video } from 'lucide-react';
 import { Project } from '../components/ProjectCard';
+import { VideoUploader } from '../components/VideoUploader';
+import { VideoCard } from '../components/VideoCard';
 
 export default function ProjectWorkspace() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
+  const [videos, setVideos] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProjectAndVideos = async () => {
       try {
-        const res = await axios.get(`/api/v1/projects/${id}`);
-        setProject(res.data);
+        const [projectRes, videosRes] = await Promise.all([
+          axios.get(`/api/v1/projects/${id}`),
+          axios.get(`/api/v1/projects/${id}/videos`)
+        ]);
+        setProject(projectRes.data);
+        setVideos(videosRes.data);
       } catch (err: any) {
-        setError(err.response?.data?.error?.message || err.message || 'Failed to fetch project');
+        setError(err.response?.data?.error?.message || err.message || 'Failed to fetch project details');
       } finally {
         setIsLoading(false);
       }
     };
     
     if (id) {
-      fetchProject();
+      fetchProjectAndVideos();
     }
   }, [id]);
 
@@ -75,27 +82,55 @@ export default function ProjectWorkspace() {
         </div>
       </header>
       
-      <main className="flex-1 flex items-center justify-center p-8">
-        <div className="bg-[var(--panel)] p-10 rounded-2xl border border-[var(--border)] max-w-2xl w-full text-center shadow-2xl relative overflow-hidden">
+      <main className="flex-1 p-8 max-w-5xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-50"></div>
-          
-          <div className="w-20 h-20 bg-black/40 rounded-2xl border border-[var(--border)] flex items-center justify-center mx-auto mb-6 shadow-inner text-[var(--accent)]">
-            <FolderOpen size={40} />
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-[var(--panel)] p-6 rounded-2xl border border-[var(--border)] shadow-xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-50"></div>
+              
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <Video className="text-[var(--accent)]" size={20} />
+                Project Videos
+              </h2>
+              
+              {videos.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 border border-dashed border-gray-800 rounded-xl bg-black/20">
+                  <FolderOpen size={48} className="mx-auto mb-4 opacity-50" />
+                  <p>No videos imported yet.</p>
+                  <p className="text-sm mt-1">Upload a video to get started.</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                  {videos.map(video => (
+                    <VideoCard 
+                      key={video.id} 
+                      video={video} 
+                      onDelete={(id) => setVideos(prev => prev.filter(v => v.id !== id))} 
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           
-          <h2 className="text-3xl font-bold text-white mb-2">{project.name}</h2>
-          {project.description && (
-            <p className="text-gray-400 mb-8 max-w-md mx-auto">{project.description}</p>
-          )}
-          
-          <div className="bg-black/30 rounded-xl p-6 mb-8 border border-gray-800/50 backdrop-blur-sm inline-block">
-            <p className="text-lg font-medium text-blue-300">
-              This workspace will be expanded in Sprint 2.2.
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Future updates will include video uploading, AI multimodal analysis, and timeline editing.
-            </p>
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-[var(--panel)] p-6 rounded-2xl border border-[var(--border)] shadow-xl">
+              <h3 className="text-lg font-medium text-white mb-4">Import Video</h3>
+              <VideoUploader 
+                projectId={project.id} 
+                onUploadSuccess={(video) => setVideos(prev => [video, ...prev])} 
+              />
+            </div>
+            
+            <div className="bg-black/30 rounded-xl p-6 border border-gray-800/50 backdrop-blur-sm">
+              <p className="text-sm font-medium text-blue-300">
+                Sprint 2.2 Foundation
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                Videos are stored locally. AI processing and timeline generation will be introduced in upcoming sprints.
+              </p>
+            </div>
           </div>
           
         </div>

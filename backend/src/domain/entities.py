@@ -113,7 +113,17 @@ class VideoAsset:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
     project_id: uuid.UUID = field(default_factory=uuid.uuid4) # Should link to Project
     file_path: str = ""
-    duration: float = 0.0
+    filename: str = ""
+    original_filename: str = ""
+    file_extension: str = ""
+    mime_type: str = ""
+    file_size_bytes: int = 0
+    duration: float = 0.0 # Keeping for backward compatibility
+    duration_seconds: Optional[float] = None
+    width: Optional[int] = None
+    height: Optional[int] = None
+    fps: Optional[float] = None
+    storage_path: str = ""
     resolution: Resolution = field(default_factory=lambda: Resolution(1920, 1080))
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 

@@ -1,15 +1,30 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from typing import List
 import uuid
 
 from ..schemas import AnalyzeVideoRequest, JobAcceptedResponse, ClipListResponse
-# In a real app we'd import the DI container or dependencies here
-# from ...application.use_cases import GenerateClipsUseCase
+from ...services.video_service import VideoService
+from ...repositories.project_repository import ProjectRepository
+from ...repositories.video_repository import VideoRepository
+from ...infrastructure.ffmpeg_processor import FfmpegVideoProcessor
+from ...infrastructure.database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(
     prefix="/videos",
     tags=["Videos"]
 )
+
+def get_video_service(db: AsyncSession = Depends(get_db)) -> VideoService:
+    video_repo = VideoRepository(db)
+    project_repo = ProjectRepository(db)
+    video_processor = FfmpegVideoProcessor()
+    return VideoService(video_repo, project_repo, video_processor)
+
+@router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete Video")
+async def delete_video(video_id: str, service: VideoService = Depends(get_video_service)):
+    """Delete a video and its physical file."""
+    await service.delete_video(video_id)
 
 @router.get("/{video_id}/clips", response_model=ClipListResponse, tags=["Clips"], summary="Get Video Clips")
 async def get_clips_for_video(video_id: uuid.UUID, skip: int = 0, limit: int = 50):
@@ -24,18 +39,6 @@ async def analyze_video(video_id: uuid.UUID, request: AnalyzeVideoRequest):
     
     In Milestone 2, this will inject the Mock dependencies and execute the Use Case.
     """
-    # Pseudocode for wiring:
-    # use_case = GenerateClipsUseCase(
-    #     audio_analyzer=MockAudioAnalyzer(),
-    #     vision_analyzer=MockVisionAnalyzer(),
-    #     llm_engine=MockLLMReasoningEngine(),
-    #     timeline_repo=SqliteTimelineContextRepository(),
-    #     project_repo=SqliteProjectRepository(),
-    #     video_processor=MockVideoProcessor()
-    # )
-    # # Normally we run this via a BackgroundTask or Celery
-    # use_case.execute(project_id, video_id, "dummy_path.mp4")
-    
     return JobAcceptedResponse(
         job_id=uuid.uuid4(),
         message=f"Mock AI Pipeline started for {video_id} with profile {request.pipeline_profile}."

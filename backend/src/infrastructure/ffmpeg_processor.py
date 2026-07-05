@@ -1,5 +1,6 @@
 import os
 import subprocess
+import json
 from typing import List
 from ..domain.ports import IVideoProcessor
 from ..domain.entities import ClipSegment
@@ -79,3 +80,58 @@ class FfmpegVideoProcessor(IVideoProcessor):
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode != 0:
             raise RuntimeError(f"FFmpeg clip rendering failed: {result.stderr}")
+
+    def get_video_metadata(self, video_path: str) -> dict:
+        """
+        Extracts duration, width, height, and fps using ffprobe.
+        """
+        if not os.path.exists(video_path):
+            raise FileNotFoundError(f"Video not found: {video_path}")
+            
+        command = [
+            "ffprobe",
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",
+            video_path
+        ]
+        
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise RuntimeError(f"FFprobe metadata extraction failed: {result.stderr}")
+            
+        data = json.loads(result.stdout)
+        
+        metadata = {
+            "duration_seconds": None,
+            "width": None,
+            "height": None,
+            "fps": None
+        }
+        
+        # Format duration
+        if "format" in data and "duration" in data["format"]:
+            try:
+                metadata["duration_seconds"] = float(data["format"]["duration"])
+            except ValueError:
+                pass
+                
+        # Stream properties
+        if "streams" in data:
+            for stream in data["streams"]:
+                if stream.get("codec_type") == "video":
+                    metadata["width"] = stream.get("width")
+                    metadata["height"] = stream.get("height")
+                    
+                    # fps is often like "30000/1001" or "30/1"
+                    r_frame_rate = stream.get("r_frame_rate", "0/0")
+                    try:
+                        num, den = r_frame_rate.split("/")
+                        if int(den) > 0:
+                            metadata["fps"] = float(num) / float(den)
+                    except (ValueError, ZeroDivisionError):
+                        pass
+                    break # just need the first video stream
+                    
+        return metadata

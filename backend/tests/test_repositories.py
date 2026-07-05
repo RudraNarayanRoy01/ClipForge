@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy import text
 
 from src.infrastructure.database import Base
-from src.infrastructure.repositories import AsyncSqliteProjectRepository
+from src.repositories.project_repository import ProjectRepository
 from src.domain.entities import Project, ClipSegment, TimeRange
 
 # Use an in-memory SQLite database for testing with aiosqlite
@@ -28,8 +28,8 @@ async def db_session():
         await conn.run_sync(Base.metadata.drop_all)
 
 @pytest.mark.asyncio
-async def test_save_and_get_project(db_session):
-    repo = AsyncSqliteProjectRepository(db_session)
+async def test_save_and_get_project(db_session: AsyncSession):
+    repo = ProjectRepository(db_session)
     
     # Create Domain Entity
     new_project = Project(name="Test Podcast")
@@ -45,8 +45,8 @@ async def test_save_and_get_project(db_session):
     assert retrieved.status == "created"
 
 @pytest.mark.asyncio
-async def test_save_and_get_clips(db_session):
-    repo = AsyncSqliteProjectRepository(db_session)
+async def test_save_and_get_clips(db_session: AsyncSession):
+    repo = ProjectRepository(db_session)
     
     project_id = uuid.uuid4()
     video_id = uuid.uuid4()
