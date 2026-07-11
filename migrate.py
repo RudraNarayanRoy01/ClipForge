@@ -25,5 +25,32 @@ else:
                 print(f'Column {col_name} already exists')
             else:
                 print(f'Error adding {col_name}: {e}')
+                
+    # Add campaigns table
+    try:
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS campaigns (
+                id VARCHAR PRIMARY KEY,
+                title VARCHAR DEFAULT "Untitled Campaign",
+                source VARCHAR DEFAULT "",
+                brand VARCHAR DEFAULT "",
+                campaign_url VARCHAR DEFAULT "",
+                platforms JSON DEFAULT "[]",
+                deadline DATETIME,
+                payout VARCHAR DEFAULT "",
+                reward_type VARCHAR DEFAULT "",
+                rules_json JSON,
+                summary_json JSON,
+                worth_it_score_json JSON,
+                raw_content VARCHAR DEFAULT "",
+                confidence_score FLOAT DEFAULT 0.0,
+                created_at DATETIME,
+                status VARCHAR DEFAULT "imported"
+            )
+        ''')
+        print("Ensured campaigns table exists")
+    except sqlite3.OperationalError as e:
+        print(f"Error creating campaigns table: {e}")
+        
     conn.commit()
     conn.close()

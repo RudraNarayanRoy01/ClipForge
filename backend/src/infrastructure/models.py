@@ -1,11 +1,12 @@
 import uuid
-from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, JSON, Enum as SQLEnum
 from typing import Any
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
+from ..domain.campaign_entities import CampaignStatus
 
 class ProjectModel(Base):
     __tablename__ = "projects"
@@ -86,3 +87,26 @@ class TimelineContextModel(Base):
     topics_json: Mapped[list] = mapped_column(JSON, default=list)
     
     video: Mapped["VideoAssetModel"] = relationship("VideoAssetModel", back_populates="timeline_context")
+
+class CampaignModel(Base):
+    __tablename__ = "campaigns"
+    
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    title: Mapped[str] = mapped_column(String, default="Untitled Campaign")
+    source: Mapped[str] = mapped_column(String, default="")
+    brand: Mapped[str] = mapped_column(String, default="")
+    campaign_url: Mapped[str] = mapped_column(String, default="")
+    platforms: Mapped[list[str]] = mapped_column(JSON, default=list)
+    deadline: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    payout: Mapped[str] = mapped_column(String, default="")
+    reward_type: Mapped[str] = mapped_column(String, default="")
+    
+    rules_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    summary_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    worth_it_score_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    
+    raw_content: Mapped[str] = mapped_column(String, default="")
+    confidence_score: Mapped[float] = mapped_column(Float, default=0.0)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    status: Mapped[CampaignStatus] = mapped_column(SQLEnum(CampaignStatus), default=CampaignStatus.IMPORTED)

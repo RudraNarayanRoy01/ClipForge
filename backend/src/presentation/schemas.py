@@ -97,3 +97,58 @@ class JobAcceptedResponse(BaseModel):
 class AnalyzeVideoRequest(BaseModel):
     pipeline_profile: str = Field(default="full_multimodal", description="Profile determining which ML models to run.", json_schema_extra={"example": "fast_audio_only"})
     target_length_seconds: int = Field(default=60, ge=15, le=180, description="Desired approximate length of generated clips.")
+
+# --- CAMPAIGNS ---
+class CampaignImportRequest(BaseModel):
+    content_type: str = Field(..., description="Type of the campaign source (e.g., text, url, pdf)", json_schema_extra={"example": "url"})
+    source: str = Field(..., description="The content or URL of the campaign", json_schema_extra={"example": "https://example.com/campaign"})
+
+class CampaignRulesSchema(BaseModel):
+    allowed_regions: List[str]
+    video_duration_min: Optional[int]
+    video_duration_max: Optional[int]
+    aspect_ratio: Optional[str]
+    resolution_requirements: Optional[str]
+    caption_requirements: Optional[str]
+    hashtags: List[str]
+    required_audio: Optional[str]
+    content_restrictions: List[str]
+    rejection_reasons: List[str]
+    additional_notes: Optional[str]
+
+class CampaignSummarySchema(BaseModel):
+    about: str
+    requirements: str
+    restrictions: str
+    deadline: Optional[str]
+    payout: Optional[str]
+    main_risks: str
+
+class WorthItScoreSchema(BaseModel):
+    estimated_roi: int
+    estimated_effort: int
+    campaign_complexity: int
+    submission_risk: int
+    overall_score: int
+
+class CampaignResponse(BaseModel):
+    id: uuid.UUID
+    title: str
+    source: str
+    brand: str
+    campaign_url: str
+    platforms: List[str]
+    deadline: Optional[datetime]
+    payout: str
+    reward_type: str
+    status: str
+    confidence_score: float
+    created_at: datetime
+    
+    rules: Optional[CampaignRulesSchema] = None
+    summary: Optional[CampaignSummarySchema] = None
+    worth_it_score: Optional[WorthItScoreSchema] = None
+
+class CampaignListResponse(BaseModel):
+    data: List[CampaignResponse]
+    meta: PaginationMeta
