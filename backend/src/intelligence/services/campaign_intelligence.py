@@ -1,15 +1,27 @@
 import json
+import logging
+import re
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Type, TypeVar
 import typing
 import dataclasses
 from src.domain.ports import ICampaignIntelligence
 from src.domain.campaign_entities import (
     Campaign, CampaignRules, CampaignSummary, WorthItScore,
-    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment
+    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment,
+    PlanningValidationError, PlanningConfidenceError, PlanningGenerationError, PromptSanitizationError
 )
 from src.intelligence.providers.capabilities import IStructuredOutput
 
+logger = logging.getLogger(__name__)
+
+# Constants
+MIN_EXECUTION_CONFIDENCE = 0.70
+MIN_SUITABILITY_CONFIDENCE = 0.65
+PLANNING_VERSION = "1.1.0"
+MAX_PROMPT_LENGTH = 50000
+
+# Schemas remain exactly the same
 class ExtractionRulesSchema(BaseModel):
     allowed_regions: List[str] = Field(default_factory=list)
     video_duration_min: Optional[int] = None
@@ -86,19 +98,111 @@ class SuitabilityAssessmentSchema(BaseModel):
     confidence: float
     recommendation: str
 
+T = TypeVar("T", bound=BaseModel)
+
 class CampaignIntelligenceService(ICampaignIntelligence):
     def __init__(self, structured_llm: IStructuredOutput):
         self.llm = structured_llm
 
+    def _sanitize_text(self, text: str) -> str:
+        """Sanitizes prompt text to prevent obvious injection and control char issues."""
+        if not text:
+            return ""
+        # Remove dangerous control characters (keep tabs, newlines, carriage returns)
+        sanitized = re.sub(r'[\x00-\x08\x0b-\x0c\x0e-\x1f\x7f]', '', text)
+        
+        # Prevent very basic prompt injection phrases
+        lower_text = sanitized.lower()
+        if "ignore previous instructions" in lower_text or "system override" in lower_text:
+            raise PromptSanitizationError("Detected potential prompt injection attempt.")
+            
+        # Limit length
+        if len(sanitized) > MAX_PROMPT_LENGTH:
+            sanitized = sanitized[:MAX_PROMPT_LENGTH] + "\n...[TRUNCATED]"
+            
+        return sanitized
+
+    async def _generate_with_retry(self, prompt: str, schema: Type[T], max_retries: int = 3) -> T:
+        import time
+        attempt = 0
+        last_exception = None
+        while attempt < max_retries:
+            attempt += 1
+            start_time = time.time()
+            try:
+                result_base = await self.llm.generate_object(prompt, schema)
+                duration = time.time() - start_time
+                logger.info(
+                    "LLM Generation successful",
+                    extra={
+                        "planner_model": self.llm.__class__.__name__,
+                        "planning_version": PLANNING_VERSION,
+                        "generation_duration_sec": round(duration, 2),
+                        "attempt": attempt,
+                        "schema": schema.__name__
+                    }
+                )
+                return typing.cast(T, result_base)
+            except Exception as e:
+                duration = time.time() - start_time
+                last_exception = e
+                logger.warning(
+                    f"LLM Generation failed on attempt {attempt}: {e}",
+                    extra={
+                        "planner_model": self.llm.__class__.__name__,
+                        "planning_version": PLANNING_VERSION,
+                        "generation_duration_sec": round(duration, 2),
+                        "attempt": attempt,
+                        "schema": schema.__name__
+                    }
+                )
+                # Retry transient LLM failures.
+        
+        logger.error(f"Exhausted {max_retries} retries for {schema.__name__}")
+        raise PlanningGenerationError(f"Failed to generate {schema.__name__} after {max_retries} attempts. Last error: {last_exception}")
+
+    # --- Builders ---
+    def _build_execution_plan_prompt(self, campaign: Campaign) -> str:
+        rules_text = json.dumps(dataclasses.asdict(campaign.rules)) if campaign.rules else "{}"
+        summary_text = json.dumps(dataclasses.asdict(campaign.summary)) if campaign.summary else "{}"
+        return (
+            "You are a Principal Social Media Editor. Generate an Execution Plan for this campaign.\n"
+            "Make deterministic decisions based on the requirements.\n"
+            f"\n\nCAMPAIGN RULES:\n{self._sanitize_text(rules_text)}"
+            f"\n\nCAMPAIGN SUMMARY:\n{self._sanitize_text(summary_text)}"
+        )
+
+    def _build_clip_strategy_prompt(self, plan: CampaignExecutionPlan) -> str:
+        plan_text = json.dumps(dataclasses.asdict(plan))
+        return (
+            "You are a Principal Social Media Editor. Generate a detailed Clip Strategy.\n"
+            f"\n\nEXECUTION PLAN:\n{plan_text}"
+        )
+
+    def _build_prompt_template_prompt(self, plan: CampaignExecutionPlan, strategy: CampaignClipStrategy) -> str:
+        plan_text = json.dumps(dataclasses.asdict(plan))
+        strategy_text = json.dumps(dataclasses.asdict(strategy))
+        return (
+            "You are a Principal Prompt Engineer. Generate the exact prompts the Video Intelligence Engine will use.\n"
+            f"\n\nEXECUTION PLAN:\n{plan_text}"
+            f"\n\nCLIP STRATEGY:\n{strategy_text}"
+        )
+
+    def _build_suitability_prompt(self, campaign: Campaign) -> str:
+        rules_text = json.dumps(dataclasses.asdict(campaign.rules)) if campaign.rules else "{}"
+        return (
+            "Analyze the campaign and assess its suitability for automated video clipping.\n"
+            f"\n\nCAMPAIGN RULES:\n{self._sanitize_text(rules_text)}"
+        )
+
+    # --- Legacy methods from previous batches ---
     async def extract_rules(self, text: str) -> CampaignRules:
         prompt = (
             "Extract the campaign rules from the following text. "
             "If a value is not explicitly stated, do not guess; leave it null/empty. "
-            f"\n\nTEXT:\n{text}"
+            f"\n\nTEXT:\n{self._sanitize_text(text)}"
         )
-        
-        result_base = await self.llm.generate_object(prompt, ExtractionRulesSchema)
-        result = typing.cast(ExtractionRulesSchema, result_base)
+        result = await self._generate_with_retry(prompt, ExtractionRulesSchema)
         return CampaignRules(
             allowed_regions=result.allowed_regions,
             video_duration_min=result.video_duration_min,
@@ -117,11 +221,9 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         prompt = (
             "Generate a concise campaign summary from the following text. "
             "Focus on the main objectives, rules, and risks. "
-            f"\n\nTEXT:\n{text}"
+            f"\n\nTEXT:\n{self._sanitize_text(text)}"
         )
-        
-        result_base = await self.llm.generate_object(prompt, ExtractionSummarySchema)
-        result = typing.cast(ExtractionSummarySchema, result_base)
+        result = await self._generate_with_retry(prompt, ExtractionSummarySchema)
         return CampaignSummary(
             about=result.about,
             requirements=result.requirements,
@@ -132,15 +234,14 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         )
 
     async def calculate_worth_it_score(self, text: str, rules: CampaignRules) -> WorthItScore:
+        rules_str = json.dumps(dataclasses.asdict(rules))
         prompt = (
             "Analyze the campaign and calculate a 'Worth-It' score out of 100 for each category. "
             "Consider the requirements, restrictions, and payout. Higher ROI is better. "
-            f"\n\nRULES EXTRACTED:\n{json.dumps(rules.__dict__)}"
-            f"\n\nRAW TEXT:\n{text}"
+            f"\n\nRULES EXTRACTED:\n{rules_str}"
+            f"\n\nRAW TEXT:\n{self._sanitize_text(text)}"
         )
-        
-        result_base = await self.llm.generate_object(prompt, ExtractionScoreSchema)
-        result = typing.cast(ExtractionScoreSchema, result_base)
+        result = await self._generate_with_retry(prompt, ExtractionScoreSchema)
         return WorthItScore(
             estimated_roi=result.estimated_roi,
             estimated_effort=result.estimated_effort,
@@ -149,16 +250,29 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             overall_score=result.overall_score
         )
 
+    # --- Hardened Planning Methods ---
+    def _validate_execution_plan(self, result: ExecutionPlanSchema) -> None:
+        if not (result.minimum_clip_length <= result.recommended_clip_length <= result.maximum_clip_length):
+            raise PlanningValidationError("Clip length bounds are illogical: min <= recommended <= max violated.")
+        if result.estimated_clip_count <= 0:
+            raise PlanningValidationError("estimated_clip_count must be > 0.")
+        if result.estimated_editing_time_minutes < 0:
+            raise PlanningValidationError("estimated_editing_time_minutes cannot be negative.")
+        if not (0.0 <= result.confidence_score <= 1.0):
+            raise PlanningValidationError("confidence_score must be between 0.0 and 1.0")
+            
+        if result.confidence_score < MIN_EXECUTION_CONFIDENCE:
+            raise PlanningConfidenceError(
+                message=f"Execution plan confidence {result.confidence_score} is below threshold {MIN_EXECUTION_CONFIDENCE}",
+                confidence=result.confidence_score,
+                planner_model=self.llm.__class__.__name__,
+                planning_version=PLANNING_VERSION
+            )
+
     async def generate_execution_plan(self, campaign: Campaign) -> CampaignExecutionPlan:
-        prompt = (
-            "You are a Principal Social Media Editor. Generate an Execution Plan for this campaign.\n"
-            "Make deterministic decisions based on the requirements.\n"
-            f"\n\nCAMPAIGN RULES:\n{json.dumps(dataclasses.asdict(campaign.rules) if campaign.rules else {})}"
-            f"\n\nCAMPAIGN SUMMARY:\n{json.dumps(dataclasses.asdict(campaign.summary) if campaign.summary else {})}"
-        )
-        
-        result_base = await self.llm.generate_object(prompt, ExecutionPlanSchema)
-        result = typing.cast(ExecutionPlanSchema, result_base)
+        prompt = self._build_execution_plan_prompt(campaign)
+        result = await self._generate_with_retry(prompt, ExecutionPlanSchema)
+        self._validate_execution_plan(result)
         
         return CampaignExecutionPlan(
             campaign_id=campaign.id,
@@ -181,17 +295,22 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             estimated_clip_count=result.estimated_clip_count,
             estimated_editing_time_minutes=result.estimated_editing_time_minutes,
             confidence_score=result.confidence_score,
-            planner_model=self.llm.__class__.__name__
+            planning_version=PLANNING_VERSION,
+            planner_model=self.llm.__class__.__name__,
+            planning_confidence=result.confidence_score,
+            generation_reason="automated_planning_engine"
         )
 
+    def _validate_clip_strategy(self, result: ClipStrategySchema) -> None:
+        if not result.hook_priorities:
+            raise PlanningValidationError("hook_priorities cannot be empty.")
+        if not result.scene_priorities:
+            raise PlanningValidationError("scene_priorities cannot be empty.")
+
     async def generate_clip_strategy(self, campaign: Campaign, plan: CampaignExecutionPlan) -> CampaignClipStrategy:
-        prompt = (
-            "You are a Principal Social Media Editor. Generate a detailed Clip Strategy.\n"
-            f"\n\nEXECUTION PLAN:\n{json.dumps(dataclasses.asdict(plan))}"
-        )
-        
-        result_base = await self.llm.generate_object(prompt, ClipStrategySchema)
-        result = typing.cast(ClipStrategySchema, result_base)
+        prompt = self._build_clip_strategy_prompt(plan)
+        result = await self._generate_with_retry(prompt, ClipStrategySchema)
+        self._validate_clip_strategy(result)
         
         return CampaignClipStrategy(
             hook_priorities=result.hook_priorities,
@@ -206,15 +325,14 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             audio_focus=result.audio_focus
         )
 
+    def _validate_prompt_template(self, result: PromptTemplateSchema) -> None:
+        if not result.system_prompt or not result.reasoning_prompt:
+            raise PlanningValidationError("Prompt templates cannot have empty system or reasoning prompts.")
+
     async def generate_prompt_template(self, campaign: Campaign, plan: CampaignExecutionPlan, strategy: CampaignClipStrategy) -> CampaignPromptTemplate:
-        prompt = (
-            "You are a Principal Prompt Engineer. Generate the exact prompts the Video Intelligence Engine will use.\n"
-            f"\n\nEXECUTION PLAN:\n{json.dumps(dataclasses.asdict(plan))}"
-            f"\n\nCLIP STRATEGY:\n{json.dumps(dataclasses.asdict(strategy))}"
-        )
-        
-        result_base = await self.llm.generate_object(prompt, PromptTemplateSchema)
-        result = typing.cast(PromptTemplateSchema, result_base)
+        prompt = self._build_prompt_template_prompt(plan, strategy)
+        result = await self._generate_with_retry(prompt, PromptTemplateSchema)
+        self._validate_prompt_template(result)
         
         return CampaignPromptTemplate(
             system_prompt=result.system_prompt,
@@ -224,14 +342,24 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             metadata_prompt=result.metadata_prompt
         )
 
+    def _validate_suitability_assessment(self, result: SuitabilityAssessmentSchema) -> None:
+        if not (0 <= result.campaign_match_score <= 100):
+            raise PlanningValidationError("campaign_match_score must be between 0 and 100")
+        if not (0 <= result.estimated_success_probability <= 100):
+            raise PlanningValidationError("estimated_success_probability must be between 0 and 100")
+            
+        if result.confidence < MIN_SUITABILITY_CONFIDENCE:
+            raise PlanningConfidenceError(
+                message=f"Suitability confidence {result.confidence} is below threshold {MIN_SUITABILITY_CONFIDENCE}",
+                confidence=result.confidence,
+                planner_model=self.llm.__class__.__name__,
+                planning_version=PLANNING_VERSION
+            )
+
     async def assess_suitability(self, campaign: Campaign) -> CampaignSuitabilityAssessment:
-        prompt = (
-            "Analyze the campaign and assess its suitability for automated video clipping.\n"
-            f"\n\nCAMPAIGN RULES:\n{json.dumps(dataclasses.asdict(campaign.rules) if campaign.rules else {})}"
-        )
-        
-        result_base = await self.llm.generate_object(prompt, SuitabilityAssessmentSchema)
-        result = typing.cast(SuitabilityAssessmentSchema, result_base)
+        prompt = self._build_suitability_prompt(campaign)
+        result = await self._generate_with_retry(prompt, SuitabilityAssessmentSchema)
+        self._validate_suitability_assessment(result)
         
         return CampaignSuitabilityAssessment(
             campaign_match_score=result.campaign_match_score,

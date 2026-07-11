@@ -142,6 +142,26 @@ class DuplicateCampaignError(Exception):
         self.duplicate_id = duplicate_id
         self.reason = reason
 
+class PlanningValidationError(Exception):
+    """Raised when AI-generated planning output fails business rule validation."""
+    pass
+
+class PlanningConfidenceError(Exception):
+    """Raised when the AI planner's confidence score is below the required threshold."""
+    def __init__(self, message: str, confidence: float, planner_model: str, planning_version: str):
+        super().__init__(message)
+        self.confidence = confidence
+        self.planner_model = planner_model
+        self.planning_version = planning_version
+
+class PlanningGenerationError(Exception):
+    """Raised when the AI planner fails to generate a valid plan after maximum retries."""
+    pass
+
+class PromptSanitizationError(Exception):
+    """Raised when the prompt contains dangerous control characters or severe injection attempts."""
+    pass
+
 @dataclass
 class CampaignImportHistory:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
