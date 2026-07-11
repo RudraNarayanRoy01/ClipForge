@@ -2,9 +2,9 @@ import uuid
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from ..domain.entities import Project, ClipSegment, VideoAsset, TimeRange, Resolution, GeneratedCaption
+from src.domain.entities import Project, ClipSegment, VideoAsset, TimeRange, Resolution, GeneratedCaption
 # We technically need an async port interface, but we will adapt the existing one conceptually
-from .models import ProjectModel, ClipSegmentModel
+from src.infrastructure.models import ProjectModel, ClipSegmentModel
 
 class AsyncSqliteProjectRepository:
     def __init__(self, db_session: AsyncSession):

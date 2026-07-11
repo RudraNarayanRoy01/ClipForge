@@ -1,4 +1,12 @@
 {
   "venvPath": "backend",
-  "venv": ".venv"
+  "venv": ".venv",
+  "exclude": [
+    "**/__pycache__",
+    ".agents",
+    ".vscode",
+    "backend/.venv",
+    "**/__pyrefly_virtual__"
+  ],
+  "reportMissingTypeStubs": false
 }

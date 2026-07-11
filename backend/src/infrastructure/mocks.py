@@ -1,7 +1,7 @@
 import uuid
 from typing import List
-from ..domain.ports import IAudioAnalyzer, IVisionAnalyzer, ILLMReasoningEngine
-from ..domain.entities import (
+from src.domain.ports import IAudioAnalyzer, IVisionAnalyzer, ILLMReasoningEngine
+from src.domain.entities import (
     WordLevelTimestamp, SpeakerSegment, EnergySegment, SilenceSegment,
     SceneBoundary, FaceBoundingBox, EmotionSegment, GestureEvent,
     ObjectDetection, OCREvent, TopicSegment, TimelineContext, ClipSegment,

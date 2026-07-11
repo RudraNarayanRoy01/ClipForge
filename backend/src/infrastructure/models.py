@@ -5,8 +5,8 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .database import Base
-from ..domain.campaign_entities import CampaignStatus
+from src.infrastructure.database import Base
+from src.domain.campaign_entities import CampaignStatus
 
 class ProjectModel(Base):
     __tablename__ = "projects"
@@ -110,3 +110,14 @@ class CampaignModel(Base):
     
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     status: Mapped[CampaignStatus] = mapped_column(SQLEnum(CampaignStatus), default=CampaignStatus.IMPORTED)
+
+class CampaignImportHistoryModel(Base):
+    __tablename__ = "campaign_import_history"
+    
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    campaign_id: Mapped[str | None] = mapped_column(String, ForeignKey("campaigns.id"), nullable=True)
+    import_timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    source_type: Mapped[str] = mapped_column(String, default="")
+    processing_status: Mapped[str] = mapped_column(String, default="started")
+    processing_duration_ms: Mapped[int] = mapped_column(Integer, default=0)
+    duplicate_status: Mapped[str] = mapped_column(String, default="none")

@@ -1,9 +1,9 @@
 import os
 import subprocess
 import json
-from typing import List
-from ..domain.ports import IVideoProcessor
-from ..domain.entities import ClipSegment
+from typing import List, Dict, Optional, Union
+from src.domain.ports import IVideoProcessor
+from src.domain.entities import ClipSegment
 
 class FfmpegVideoProcessor(IVideoProcessor):
     """
@@ -103,7 +103,7 @@ class FfmpegVideoProcessor(IVideoProcessor):
             
         data = json.loads(result.stdout)
         
-        metadata = {
+        metadata: Dict[str, Optional[Union[float, int]]] = {
             "duration_seconds": None,
             "width": None,
             "height": None,

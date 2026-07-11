@@ -3,9 +3,9 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ..domain.entities import VideoAsset
-from ..domain.ports import IVideoRepository
-from ..infrastructure.models import VideoAssetModel
+from src.domain.entities import VideoAsset
+from src.domain.ports import IVideoRepository
+from src.infrastructure.models import VideoAssetModel
 
 class VideoRepository(IVideoRepository):
     def __init__(self, db_session: AsyncSession):

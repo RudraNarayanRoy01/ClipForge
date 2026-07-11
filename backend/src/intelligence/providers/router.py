@@ -1,6 +1,6 @@
 from typing import List, Type, Any
-from .local.gemma4 import Gemma4LocalProvider
-from .capabilities import IReasoning
+from src.intelligence.providers.local.gemma4 import Gemma4LocalProvider
+from src.intelligence.providers.capabilities import IReasoning
 
 class CapabilityRouter:
     def __init__(self):

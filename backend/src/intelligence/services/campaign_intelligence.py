@@ -2,9 +2,9 @@ import json
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import typing
-from ...domain.ports import ICampaignIntelligence
-from ...domain.campaign_entities import CampaignRules, CampaignSummary, WorthItScore
-from ..providers.capabilities import IStructuredOutput
+from src.domain.ports import ICampaignIntelligence
+from src.domain.campaign_entities import CampaignRules, CampaignSummary, WorthItScore
+from src.intelligence.providers.capabilities import IStructuredOutput
 
 class ExtractionRulesSchema(BaseModel):
     allowed_regions: List[str] = Field(default_factory=list)

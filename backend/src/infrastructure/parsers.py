@@ -1,7 +1,7 @@
 import httpx
 import json
 from urllib.parse import urlparse
-from ..domain.ports import ICampaignParser
+from src.domain.ports import ICampaignParser
 
 class TextCampaignParser(ICampaignParser):
     async def parse(self, source: str, content_type: str) -> str:
@@ -41,11 +41,83 @@ class UrlCampaignParser(ICampaignParser):
             except httpx.RequestError as e:
                 raise ValueError(f"Failed to fetch campaign URL: {str(e)}")
 
+import os
+import pymupdf
+import email
+from email import policy
+
 class PdfCampaignParser(ICampaignParser):
+    def __init__(self, max_bytes: int = 5 * 1024 * 1024):
+        self.max_bytes = max_bytes
+
     async def parse(self, source: str, content_type: str) -> str:
-        # Not implemented since project doesn't have a PDF parser installed currently.
-        # This keeps the architecture clean and open for PyMuPDF or pdfplumber later.
-        raise NotImplementedError("PDF parsing is not yet supported in this environment.")
+        if not os.path.exists(source):
+            raise ValueError(f"PDF file not found: {source}")
+            
+        file_size = os.path.getsize(source)
+        if file_size > self.max_bytes:
+            raise ValueError("PDF file exceeds size limits")
+            
+        try:
+            text_content = []
+            with pymupdf.open(source) as doc:
+                for page in doc:
+                    text_content.append(page.get_text())
+            return "\n".join(text_content)
+        except Exception as e:
+            raise ValueError(f"Failed to parse PDF: {str(e)}")
+
+class EmailCampaignParser(ICampaignParser):
+    def __init__(self, max_bytes: int = 5 * 1024 * 1024):
+        self.max_bytes = max_bytes
+
+    async def parse(self, source: str, content_type: str) -> str:
+        if not os.path.exists(source):
+            raise ValueError(f"Email file not found: {source}")
+            
+        if os.path.getsize(source) > self.max_bytes:
+            raise ValueError("Email file exceeds size limits")
+            
+        try:
+            with open(source, 'rb') as f:
+                msg = email.message_from_binary_file(f, policy=policy.default)
+            
+            text_content = ""
+            if msg.is_multipart():
+                for part in msg.walk():
+                    ctype = part.get_content_type()
+                    cdisp = str(part.get("Content-Disposition"))
+                    if ctype == "text/plain" and "attachment" not in cdisp:
+                        payload = part.get_payload(decode=True)
+                        if isinstance(payload, bytes):
+                            text_content += payload.decode(part.get_content_charset() or 'utf-8', errors='replace')
+            else:
+                payload = msg.get_payload(decode=True)
+                if isinstance(payload, bytes):
+                    text_content = payload.decode(msg.get_content_charset() or 'utf-8', errors='replace')
+                
+            return text_content
+        except Exception as e:
+            raise ValueError(f"Failed to parse email: {str(e)}")
+
+class ExportedTextCampaignParser(ICampaignParser):
+    def __init__(self, max_bytes: int = 5 * 1024 * 1024):
+        self.max_bytes = max_bytes
+
+    async def parse(self, source: str, content_type: str) -> str:
+        if os.path.exists(source) and os.path.isfile(source):
+            if os.path.getsize(source) > self.max_bytes:
+                raise ValueError(f"{content_type} file exceeds size limits")
+            try:
+                with open(source, 'r', encoding='utf-8', errors='replace') as f:
+                    return f.read()
+            except Exception as e:
+                raise ValueError(f"Failed to read exported text file: {str(e)}")
+        
+        if len(source.encode('utf-8')) > self.max_bytes:
+            raise ValueError(f"{content_type} text exceeds size limits")
+            
+        return source
 
 class CampaignParserFactory(ICampaignParser):
     """Router for parsers based on content type"""
@@ -54,6 +126,9 @@ class CampaignParserFactory(ICampaignParser):
             "text": TextCampaignParser(),
             "url": UrlCampaignParser(),
             "pdf": PdfCampaignParser(),
+            "email": EmailCampaignParser(),
+            "discord": ExportedTextCampaignParser(),
+            "telegram": ExportedTextCampaignParser(),
         }
         
     async def parse(self, source: str, content_type: str) -> str:

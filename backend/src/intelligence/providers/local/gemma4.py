@@ -1,6 +1,6 @@
 from typing import List, Type, Any
 from pydantic import BaseModel
-from ..capabilities import IReasoning, IStructuredOutput, IToolCalling
+from src.intelligence.providers.capabilities import IReasoning, IStructuredOutput, IToolCalling
 
 class BaseProvider:
     provider_id: str

@@ -72,3 +72,20 @@ class CampaignNotFoundError(Exception):
     def __init__(self, campaign_id: str):
         super().__init__(f"Campaign {campaign_id} not found")
         self.campaign_id = campaign_id
+
+class DuplicateCampaignError(Exception):
+    """Raised when a campaign is determined to be a duplicate."""
+    def __init__(self, duplicate_id: str, reason: str):
+        super().__init__(f"Duplicate campaign detected (ID: {duplicate_id}): {reason}")
+        self.duplicate_id = duplicate_id
+        self.reason = reason
+
+@dataclass
+class CampaignImportHistory:
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    campaign_id: Optional[uuid.UUID] = None
+    import_timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    source_type: str = ""
+    processing_status: str = "started"
+    processing_duration_ms: int = 0
+    duplicate_status: str = "none"

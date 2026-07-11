@@ -4,9 +4,9 @@ import shutil
 from typing import List
 from fastapi import UploadFile, HTTPException
 
-from ..domain.entities import VideoAsset
-from ..domain.ports import IVideoRepository, IVideoProcessor
-from ..repositories.project_repository import ProjectRepository
+from src.domain.entities import VideoAsset
+from src.domain.ports import IVideoRepository, IVideoProcessor
+from src.repositories.project_repository import ProjectRepository
 
 ALLOWED_EXTENSIONS = {'.mp4', '.mov', '.mkv', '.avi', '.webm'}
 

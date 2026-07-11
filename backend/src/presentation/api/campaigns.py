@@ -1,21 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 import uuid
 from typing import List
+import os
+import tempfile
 
-from ..schemas import (
+from src.presentation.schemas import (
     CampaignImportRequest, CampaignResponse, CampaignListResponse,
     CampaignRulesSchema, CampaignSummarySchema, WorthItScoreSchema,
-    PaginationMeta
+    PaginationMeta, CampaignImportHistoryListResponse, CampaignImportHistoryResponse
 )
-from ...application.campaign_use_cases import ImportCampaignUseCase, GetCampaignsUseCase, GetCampaignUseCase
-from ...infrastructure.campaign_repository import CampaignRepository
-from ...infrastructure.parsers import CampaignParserFactory
-from ...intelligence.services.campaign_intelligence import CampaignIntelligenceService
-from ...intelligence.providers.router import CapabilityRouter
-from ...intelligence.providers.capabilities import IStructuredOutput
-from ...domain.ports import ICampaignRepository
-from ...domain.campaign_entities import Campaign, CampaignNotFoundError
-from ...infrastructure.database import get_db
+from src.application.campaign_use_cases import ImportCampaignUseCase, GetCampaignsUseCase, GetCampaignUseCase, GetImportHistoryUseCase
+from src.application.normalization_service import TextNormalizationService
+from src.infrastructure.campaign_repository import CampaignRepository
+from src.infrastructure.parsers import CampaignParserFactory
+from src.intelligence.services.campaign_intelligence import CampaignIntelligenceService
+from src.intelligence.providers.router import CapabilityRouter
+from src.intelligence.providers.capabilities import IStructuredOutput
+from src.domain.ports import ICampaignRepository
+from src.domain.campaign_entities import Campaign, CampaignNotFoundError, DuplicateCampaignError
+from src.infrastructure.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
@@ -32,16 +35,19 @@ def get_campaign_repository(db: AsyncSession = Depends(get_db)) -> ICampaignRepo
 
 def get_import_campaign_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> ImportCampaignUseCase:
     parser = CampaignParserFactory()
-    # In a real DI container this would be injected globally, but we follow the existing pattern here
     structured_llm = CapabilityRouter().resolve([IStructuredOutput])
     intelligence = CampaignIntelligenceService(structured_llm)
-    return ImportCampaignUseCase(parser, intelligence, repo)
+    normalizer = TextNormalizationService()
+    return ImportCampaignUseCase(parser, intelligence, repo, normalizer)
 
 def get_campaigns_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> GetCampaignsUseCase:
     return GetCampaignsUseCase(repo)
 
 def get_campaign_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> GetCampaignUseCase:
     return GetCampaignUseCase(repo)
+
+def get_import_history_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> GetImportHistoryUseCase:
+    return GetImportHistoryUseCase(repo)
 
 # --- Mappers ---
 def map_campaign_to_response(campaign: Campaign) -> CampaignResponse:
@@ -75,17 +81,84 @@ async def import_campaign(
     The AI Engine will extract rules, generate a summary, and compute a Worth-It score.
     """
     try:
-        # Use Case handles the parsing, LLM extraction, and persistence
-        campaign = await use_case.execute(source=request.source, content_type=request.content_type)
+        campaign = await use_case.execute(source=request.source, content_type=request.content_type, force_import=request.force_import)
         return map_campaign_to_response(campaign)
+    except DuplicateCampaignError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail={"message": str(e), "duplicate_id": e.duplicate_id})
     except ValueError as e:
-        # Catch specific ValueErrors (like unsupported type or invalid URL)
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except NotImplementedError as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except Exception as e:
         logger.error(f"Error importing campaign: {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred during import.")
+
+@router.post("/upload", response_model=CampaignResponse, status_code=status.HTTP_201_CREATED, summary="Upload Campaign File")
+async def upload_campaign(
+    file: UploadFile = File(...),
+    content_type: str = Form(..., description="E.g., pdf, email, discord, telegram"),
+    force_import: bool = Form(False),
+    use_case: ImportCampaignUseCase = Depends(get_import_campaign_use_case)
+):
+    """Upload a campaign file directly."""
+    temp_path = None
+    try:
+        # Save uploaded file to temp
+        fd, temp_path = tempfile.mkstemp()
+        with os.fdopen(fd, 'wb') as f:
+            content = await file.read()
+            f.write(content)
+            
+        campaign = await use_case.execute(source=temp_path, content_type=content_type, force_import=force_import)
+        return map_campaign_to_response(campaign)
+    except DuplicateCampaignError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail={"message": str(e), "duplicate_id": e.duplicate_id})
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+    except NotImplementedError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error uploading campaign: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An unexpected error occurred during upload.")
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except:
+                pass
+
+@router.get("/history", response_model=CampaignImportHistoryListResponse, summary="Get Import History")
+async def get_import_history(
+    skip: int = 0,
+    limit: int = 50,
+    use_case: GetImportHistoryUseCase = Depends(get_import_history_use_case)
+):
+    """List all campaign import history records."""
+    if limit > 100:
+        limit = 100
+        
+    histories = await use_case.execute(limit=limit, skip=skip)
+    
+    data = []
+    for h in histories:
+        data.append(CampaignImportHistoryResponse(
+            id=h.id,
+            campaign_id=h.campaign_id,
+            import_timestamp=h.import_timestamp,
+            source_type=h.source_type,
+            processing_status=h.processing_status,
+            processing_duration_ms=h.processing_duration_ms,
+            duplicate_status=h.duplicate_status
+        ))
+        
+    return CampaignImportHistoryListResponse(
+        data=data,
+        meta=PaginationMeta(
+            total_count=len(data),
+            skip=skip,
+            limit=limit
+        )
+    )
 
 @router.get("/", response_model=CampaignListResponse, summary="List Campaigns")
 async def list_campaigns(

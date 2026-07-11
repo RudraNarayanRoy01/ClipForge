@@ -1,12 +1,12 @@
 import uuid
 import asyncio
 from typing import List
-from ..domain.ports import (
+from src.domain.ports import (
     IAudioAnalyzer, IVisionAnalyzer, ILLMReasoningEngine, 
     ITimelineContextRepository, IVideoProcessor
 )
-from ..domain.entities import TimelineContext, ClipSegment
-from ..repositories.project_repository import ProjectRepository
+from src.domain.entities import TimelineContext, ClipSegment
+from src.domain.ports import IProjectRepository
 
 class GenerateClipsUseCase:
     """
@@ -18,7 +18,7 @@ class GenerateClipsUseCase:
         vision_analyzer: IVisionAnalyzer,
         llm_engine: ILLMReasoningEngine,
         timeline_repo: ITimelineContextRepository,
-        project_repo: ProjectRepository, # Using the specific async adapter
+        project_repo: IProjectRepository,
         video_processor: IVideoProcessor
     ):
         self.audio = audio_analyzer

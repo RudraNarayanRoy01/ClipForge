@@ -1,6 +1,6 @@
-from typing import List, Optional, TypeVar, Type
-from backend.src.intelligence.timeline.models import SemanticEvent
-from backend.src.infrastructure.timeline.store import TemporalStore
+from typing import List, Optional, TypeVar, Type, Callable
+from src.intelligence.timeline.models import SemanticEvent
+from src.infrastructure.timeline.store import TemporalStore
 
 T = TypeVar('T', bound=SemanticEvent)
 
@@ -8,7 +8,7 @@ class TemporalQueryBuilder:
     def __init__(self, store: TemporalStore, stream_id: str):
         self.store = store
         self.stream_id = stream_id
-        self._filters = []
+        self._filters: List[Callable[[SemanticEvent], bool]] = []
 
     def during(self, start_time_ms: int, end_time_ms: int) -> 'TemporalQueryBuilder':
         self._filters.append(lambda e: e.start_time_ms >= start_time_ms and e.end_time_ms <= end_time_ms)

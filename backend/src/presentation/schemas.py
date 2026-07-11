@@ -102,6 +102,7 @@ class AnalyzeVideoRequest(BaseModel):
 class CampaignImportRequest(BaseModel):
     content_type: str = Field(..., description="Type of the campaign source (e.g., text, url, pdf)", json_schema_extra={"example": "url"})
     source: str = Field(..., description="The content or URL of the campaign", json_schema_extra={"example": "https://example.com/campaign"})
+    force_import: bool = Field(default=False, description="Whether to bypass duplicate detection")
 
 class CampaignRulesSchema(BaseModel):
     allowed_regions: List[str]
@@ -151,4 +152,17 @@ class CampaignResponse(BaseModel):
 
 class CampaignListResponse(BaseModel):
     data: List[CampaignResponse]
+    meta: PaginationMeta
+
+class CampaignImportHistoryResponse(BaseModel):
+    id: uuid.UUID
+    campaign_id: Optional[uuid.UUID]
+    import_timestamp: datetime
+    source_type: str
+    processing_status: str
+    processing_duration_ms: int
+    duplicate_status: str
+
+class CampaignImportHistoryListResponse(BaseModel):
+    data: List[CampaignImportHistoryResponse]
     meta: PaginationMeta

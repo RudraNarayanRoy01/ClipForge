@@ -2,13 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 import uuid
 from typing import List
 
-from ..schemas import ProjectCreate, ProjectResponse, ProjectListResponse, VideoAssetResponse
-from ...services.project_service import ProjectService
-from ...services.video_service import VideoService
-from ...repositories.project_repository import ProjectRepository
-from ...repositories.video_repository import VideoRepository
-from ...infrastructure.ffmpeg_processor import FfmpegVideoProcessor
-from ...infrastructure.database import get_db
+from src.presentation.schemas import ProjectCreate, ProjectResponse, ProjectListResponse, VideoAssetResponse
+from src.services.project_service import ProjectService
+from src.services.video_service import VideoService
+from src.repositories.project_repository import ProjectRepository
+from src.repositories.video_repository import VideoRepository
+from src.infrastructure.ffmpeg_processor import FfmpegVideoProcessor
+from src.infrastructure.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(

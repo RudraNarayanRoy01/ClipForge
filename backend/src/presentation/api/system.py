@@ -3,7 +3,7 @@ import shutil
 from datetime import datetime, timezone
 from fastapi import APIRouter, Request
 
-from ..schemas import HealthResponse
+from src.presentation.schemas import HealthResponse
 
 router = APIRouter(
     tags=["System"]

@@ -3,9 +3,9 @@ from typing import Sequence, Optional
 from datetime import datetime, timezone
 from fastapi import HTTPException
 
-from ..infrastructure.models import ProjectModel
-from ..repositories.project_repository import ProjectRepository
-from ..presentation.schemas import ProjectCreate
+from src.infrastructure.models import ProjectModel
+from src.repositories.project_repository import ProjectRepository
+from src.presentation.schemas import ProjectCreate
 
 class ProjectService:
     def __init__(self, repository: ProjectRepository):

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from typing import List
 import uuid
 
-from ..schemas import (
+from src.presentation.schemas import (
     ClipResponse, ClipListResponse, ClipUpdate, JobAcceptedResponse
 )
 

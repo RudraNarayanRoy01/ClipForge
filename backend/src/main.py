@@ -1,12 +1,12 @@
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Any, Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 import os
 
-from .presentation.api.v1 import api_router
+from src.presentation.api.v1 import api_router
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +17,8 @@ APP_DESCRIPTION = "Local-first REST API for multimodal video analysis and clip g
 APP_VERSION = "1.0.0"
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
+CORS_ORIGIN_REGEX: Optional[str]
 
 if ENVIRONMENT == "development":
     # Development: Allow all localhost ports to gracefully handle Vite port-hopping
@@ -29,8 +31,8 @@ else:
     CORS_ORIGIN_REGEX = None
 
 # --- Lifecycle ---
-from .core.bootstrap import validate_startup
-from .infrastructure.database import engine, Base
+from src.core.bootstrap import validate_startup
+from src.infrastructure.database import engine, Base
 
 async def run_migrations(conn):
     """Run lightweight schema migrations for SQLite."""
@@ -94,7 +96,7 @@ def configure_middleware(app: FastAPI) -> None:
 
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from .presentation.schemas import ErrorResponse, ErrorDetail
+from src.presentation.schemas import ErrorResponse, ErrorDetail
 
 def configure_exception_handlers(app: FastAPI) -> None:
     """Configures global exception handlers to enforce strict API contracts."""

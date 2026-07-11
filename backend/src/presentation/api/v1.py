@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from . import project, clips, videos, system, jobs, campaigns
+from src.presentation.api import project, clips, videos, system, jobs, campaigns
 
 api_router = APIRouter()
 
