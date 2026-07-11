@@ -17,9 +17,38 @@ async def validate_startup(app: FastAPI):
     logger.info("[SUCCESS] Configuration verified.")
 
     # 2. Database & Repositories
-    # Mocking a connection check
-    logger.info("[SUCCESS] Database connection established.")
-    logger.info("[SUCCESS] Repositories initialized.")
+    try:
+        from alembic.config import Config
+        from alembic.script import ScriptDirectory
+        from alembic.runtime.migration import MigrationContext
+        import sqlalchemy as sa
+        from src.infrastructure.database import DATABASE_URL
+        
+        # Using a sync engine specifically for checking Alembic status
+        sync_url = DATABASE_URL.replace("+aiosqlite", "")
+        sync_engine = sa.create_engine(sync_url)
+        
+        alembic_cfg = Config("alembic.ini")
+        script = ScriptDirectory.from_config(alembic_cfg)
+        
+        with sync_engine.begin() as conn:
+            context = MigrationContext.configure(conn)
+            current_rev = context.get_current_revision()
+            head_rev = script.get_current_head()
+            
+            if current_rev != head_rev:
+                raise RuntimeError(
+                    f"Database schema out of date.\n"
+                    f"Current Version: {current_rev}\n"
+                    f"Expected Version: {head_rev}\n"
+                    f"Migration Required: Please run 'alembic upgrade head' inside the backend directory."
+                )
+        logger.info("[SUCCESS] Database schema verified.")
+    except RuntimeError:
+        raise
+    except Exception as e:
+        logger.error(f"[FAILED] Database validation failed: {str(e)}")
+        raise RuntimeError(f"Database validation failed: {e}")
 
     # 3. Router Registration
     try:

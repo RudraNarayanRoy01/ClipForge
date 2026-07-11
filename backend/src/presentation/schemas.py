@@ -15,6 +15,9 @@ class HealthResponse(BaseModel):
     whisper: str
     ffmpeg: str
     queue: str
+    schema_version: str
+    expected_version: str
+    migration_pending: bool
     timestamp: datetime
 
 class PaginationMeta(BaseModel):

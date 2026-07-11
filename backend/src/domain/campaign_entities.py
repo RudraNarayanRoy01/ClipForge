@@ -34,6 +34,64 @@ class CampaignSummary:
     deadline: Optional[str] = None
     payout: Optional[str] = None
 
+@dataclass(frozen=True)
+class CampaignExecutionPlan:
+    campaign_id: uuid.UUID
+    target_platform: str
+    recommended_clip_length: int
+    minimum_clip_length: int
+    maximum_clip_length: int
+    preferred_hook_style: str
+    preferred_editing_style: str
+    caption_style: str
+    call_to_action: str
+    crop_strategy: str
+    subtitle_style: str
+    required_emotions: List[str]
+    required_topics: List[str]
+    priority_scene_types: List[str]
+    required_audio_style: str
+    brand_voice: str
+    virality_focus: str
+    estimated_clip_count: int
+    estimated_editing_time_minutes: int
+    confidence_score: float
+    planning_version: str = "1.0.0"
+    planner_model: str = "unknown"
+    generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    planning_confidence: float = 0.0
+    generation_reason: str = "initial_planning"
+
+@dataclass(frozen=True)
+class CampaignClipStrategy:
+    hook_priorities: List[str]
+    scene_priorities: List[str]
+    speech_characteristics: List[str]
+    emotion_targets: List[str]
+    energy_targets: List[str]
+    pacing: str
+    transition_style: str
+    camera_motion_preference: str
+    visual_focus: str
+    audio_focus: str
+
+@dataclass(frozen=True)
+class CampaignPromptTemplate:
+    system_prompt: str
+    reasoning_prompt: str
+    ranking_prompt: str
+    render_prompt: str
+    metadata_prompt: str
+
+@dataclass(frozen=True)
+class CampaignSuitabilityAssessment:
+    campaign_match_score: int
+    estimated_success_probability: int
+    missing_requirements: List[str]
+    risk_flags: List[str]
+    confidence: float
+    recommendation: str
+
 from enum import Enum
 
 class CampaignStatus(str, Enum):
@@ -59,6 +117,10 @@ class Campaign:
     rules: Optional[CampaignRules] = None
     summary: Optional[CampaignSummary] = None
     worth_it_score: Optional[WorthItScore] = None
+    execution_plan: Optional[CampaignExecutionPlan] = None
+    clip_strategy: Optional[CampaignClipStrategy] = None
+    prompt_template: Optional[CampaignPromptTemplate] = None
+    suitability_assessment: Optional[CampaignSuitabilityAssessment] = None
     
     # Raw extracted content, kept separate from normalized rules
     raw_content: str = ""

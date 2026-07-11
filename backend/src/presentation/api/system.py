@@ -15,6 +15,29 @@ def check_ffmpeg() -> str:
     """Check if ffmpeg is available in the system PATH."""
     return "ok" if shutil.which("ffmpeg") else "not_found"
 
+def get_schema_version() -> tuple[str, str, bool]:
+    try:
+        from alembic.config import Config
+        from alembic.script import ScriptDirectory
+        from alembic.runtime.migration import MigrationContext
+        import sqlalchemy as sa
+        from src.infrastructure.database import DATABASE_URL
+        
+        sync_url = DATABASE_URL.replace("+aiosqlite", "")
+        sync_engine = sa.create_engine(sync_url)
+        alembic_cfg = Config("alembic.ini")
+        script = ScriptDirectory.from_config(alembic_cfg)
+        
+        with sync_engine.begin() as conn:
+            context = MigrationContext.configure(conn)
+            current_rev = context.get_current_revision() or "none"
+            head_rev = script.get_current_head() or "none"
+            migration_pending = current_rev != head_rev
+            return current_rev, head_rev, migration_pending
+    except Exception:
+        return "unknown", "unknown", False
+
+
 @router.get("/health", response_model=HealthResponse, summary="System Health Check")
 async def health_check(request: Request):
     """
@@ -36,6 +59,8 @@ async def health_check(request: Request):
     statuses = [database_status, ollama_status, gemma_status, whisper_status, ffmpeg_status, queue_status]
     overall_status = "ok" if all(s == "ok" for s in statuses) else "degraded"
     
+    current_rev, head_rev, migration_pending = get_schema_version()
+    
     return HealthResponse(
         status=overall_status,
         message="AI Clipping Platform Backend is ready.",
@@ -47,5 +72,8 @@ async def health_check(request: Request):
         whisper=whisper_status,
         ffmpeg=ffmpeg_status,
         queue=queue_status,
+        schema_version=current_rev,
+        expected_version=head_rev,
+        migration_pending=migration_pending,
         timestamp=datetime.now(timezone.utc)
     )

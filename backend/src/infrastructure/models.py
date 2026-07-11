@@ -105,6 +105,11 @@ class CampaignModel(Base):
     summary_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     worth_it_score_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     
+    execution_plan_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    clip_strategy_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    prompt_template_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    suitability_assessment_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    
     raw_content: Mapped[str] = mapped_column(String, default="")
     confidence_score: Mapped[float] = mapped_column(Float, default=0.0)
     

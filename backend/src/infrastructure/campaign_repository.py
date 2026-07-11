@@ -6,8 +6,10 @@ import typing
 import dataclasses
 
 from src.domain.campaign_entities import (
-    Campaign, CampaignRules, CampaignSummary, WorthItScore, CampaignStatus, CampaignNotFoundError, CampaignImportHistory
+    Campaign, CampaignRules, CampaignSummary, WorthItScore, CampaignStatus, CampaignNotFoundError, CampaignImportHistory,
+    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment
 )
+from datetime import datetime
 from src.domain.ports import ICampaignRepository
 from src.infrastructure.models import CampaignModel, CampaignImportHistoryModel
 
@@ -36,6 +38,18 @@ class CampaignRepository(ICampaignRepository):
         db_campaign.rules_json = dataclasses.asdict(campaign.rules) if campaign.rules else None
         db_campaign.summary_json = dataclasses.asdict(campaign.summary) if campaign.summary else None
         db_campaign.worth_it_score_json = dataclasses.asdict(campaign.worth_it_score) if campaign.worth_it_score else None
+        
+        if campaign.execution_plan:
+            ep_dict = dataclasses.asdict(campaign.execution_plan)
+            ep_dict['campaign_id'] = str(ep_dict['campaign_id'])
+            ep_dict['generated_at'] = ep_dict['generated_at'].isoformat()
+            db_campaign.execution_plan_json = ep_dict
+        else:
+            db_campaign.execution_plan_json = None
+            
+        db_campaign.clip_strategy_json = dataclasses.asdict(campaign.clip_strategy) if campaign.clip_strategy else None
+        db_campaign.prompt_template_json = dataclasses.asdict(campaign.prompt_template) if campaign.prompt_template else None
+        db_campaign.suitability_assessment_json = dataclasses.asdict(campaign.suitability_assessment) if campaign.suitability_assessment else None
         
         db_campaign.raw_content = campaign.raw_content
         db_campaign.confidence_score = campaign.confidence_score
@@ -117,10 +131,12 @@ class CampaignRepository(ICampaignRepository):
             h = CampaignImportHistory(
                 id=uuid.UUID(str(db_h.id)),
                 campaign_id=uuid.UUID(str(db_h.campaign_id)) if db_h.campaign_id else None,
-                import_timestamp=db_h.import_timestamp,
+                # Explicit cast because Pyright struggles with Mapped[datetime] descriptor resolution
+                import_timestamp=typing.cast(datetime, db_h.import_timestamp),
                 source_type=str(db_h.source_type),
                 processing_status=str(db_h.processing_status),
-                processing_duration_ms=int(db_h.processing_duration_ms),
+                # Explicit cast for the same reason
+                processing_duration_ms=typing.cast(int, db_h.processing_duration_ms),
                 duplicate_status=str(db_h.duplicate_status)
             )
             histories.append(h)
@@ -136,6 +152,22 @@ class CampaignRepository(ICampaignRepository):
         score_json = typing.cast(typing.Dict[str, typing.Any], db_campaign.worth_it_score_json)
         score = WorthItScore(**score_json) if score_json else None
         
+        execution_plan_json = typing.cast(typing.Dict[str, typing.Any], db_campaign.execution_plan_json)
+        execution_plan = None
+        if execution_plan_json:
+            execution_plan_json['campaign_id'] = uuid.UUID(execution_plan_json['campaign_id'])
+            execution_plan_json['generated_at'] = datetime.fromisoformat(execution_plan_json['generated_at'])
+            execution_plan = CampaignExecutionPlan(**execution_plan_json)
+            
+        clip_strategy_json = typing.cast(typing.Dict[str, typing.Any], db_campaign.clip_strategy_json)
+        clip_strategy = CampaignClipStrategy(**clip_strategy_json) if clip_strategy_json else None
+        
+        prompt_template_json = typing.cast(typing.Dict[str, typing.Any], db_campaign.prompt_template_json)
+        prompt_template = CampaignPromptTemplate(**prompt_template_json) if prompt_template_json else None
+        
+        suitability_assessment_json = typing.cast(typing.Dict[str, typing.Any], db_campaign.suitability_assessment_json)
+        suitability_assessment = CampaignSuitabilityAssessment(**suitability_assessment_json) if suitability_assessment_json else None
+        
         return Campaign(
             id=uuid.UUID(str(db_campaign.id)),
             title=str(db_campaign.title),
@@ -149,6 +181,10 @@ class CampaignRepository(ICampaignRepository):
             rules=rules,
             summary=summary,
             worth_it_score=score,
+            execution_plan=execution_plan,
+            clip_strategy=clip_strategy,
+            prompt_template=prompt_template,
+            suitability_assessment=suitability_assessment,
             raw_content=str(db_campaign.raw_content),
             confidence_score=float(db_campaign.confidence_score),
             created_at=db_campaign.created_at,
