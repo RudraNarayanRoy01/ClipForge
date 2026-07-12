@@ -38,7 +38,7 @@ class PlanningPipelineService:
         self.assess_suitability_uc = assess_suitability_uc
         self.persist_results_uc = persist_results_uc
 
-    async def run_pipeline(self, campaign_id: uuid.UUID) -> PlanningPipelineResult:
+    async def run_pipeline(self, campaign_id: uuid.UUID, force_regenerate: bool = False) -> PlanningPipelineResult:
         pipeline_start_time = time.time()
         
         try:
@@ -52,6 +52,19 @@ class PlanningPipelineService:
         # Load or initialize the result
         result = await self.repository.get_planning_result(campaign_id)
         
+        if force_regenerate and result.pipeline_status != PipelineStatus.NOT_STARTED:
+            result = PlanningPipelineResult(
+                campaign_id=campaign_id,
+                planner_model="unknown",
+                planning_version="unknown",
+                version=result.version + 1
+            )
+            logger.info("Forcing Pipeline Regeneration", extra={"campaign_id": str(campaign_id), "new_version": result.version})
+        else:
+            if result.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.RUNNING):
+                logger.info("Pipeline Skipped", extra={"campaign_id": str(campaign_id), "status": result.pipeline_status.value})
+                return result
+
         logger.info(
             "Pipeline Started",
             extra={
@@ -60,10 +73,6 @@ class PlanningPipelineService:
                 "initial_status": result.pipeline_status.value
             }
         )
-
-        if result.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.RUNNING):
-            logger.info("Pipeline Skipped", extra={"campaign_id": str(campaign_id), "status": result.pipeline_status.value})
-            return result
 
         if result.pipeline_status in (PipelineStatus.NOT_STARTED, PipelineStatus.FAILED):
             result.pipeline_status = PipelineStatus.RUNNING

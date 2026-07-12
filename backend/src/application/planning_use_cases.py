@@ -75,4 +75,46 @@ class RunPlanningPipelineUseCase:
         self.pipeline_service = pipeline_service
 
     async def execute(self, campaign_id: uuid.UUID) -> PlanningPipelineResult:
-        return await self.pipeline_service.run_pipeline(campaign_id)
+        return await self.pipeline_service.run_pipeline(campaign_id, force_regenerate=False)
+
+class RegeneratePlanningUseCase:
+    """
+    Forces the regeneration of the full planning pipeline for a campaign.
+    """
+    def __init__(self, pipeline_service: 'PlanningPipelineService'):
+        self.pipeline_service = pipeline_service
+
+    async def execute(self, campaign_id: uuid.UUID) -> PlanningPipelineResult:
+        return await self.pipeline_service.run_pipeline(campaign_id, force_regenerate=True)
+
+from typing import List
+
+class GetPlanningResultUseCase:
+    """
+    Retrieves the latest planning result for a campaign.
+    """
+    def __init__(self, repository: ICampaignRepository):
+        self.repository = repository
+
+    async def execute(self, campaign_id: uuid.UUID) -> PlanningPipelineResult:
+        return await self.repository.get_planning_result(campaign_id)
+
+class ListPlanningHistoryUseCase:
+    """
+    Retrieves the full history of planning results for a campaign.
+    """
+    def __init__(self, repository: ICampaignRepository):
+        self.repository = repository
+
+    async def execute(self, campaign_id: uuid.UUID) -> List[PlanningPipelineResult]:
+        return await self.repository.get_planning_history(campaign_id)
+
+class DeletePlanningResultUseCase:
+    """
+    Deletes all planning results associated with a campaign.
+    """
+    def __init__(self, repository: ICampaignRepository):
+        self.repository = repository
+
+    async def execute(self, campaign_id: uuid.UUID) -> None:
+        await self.repository.delete_planning_result(campaign_id)

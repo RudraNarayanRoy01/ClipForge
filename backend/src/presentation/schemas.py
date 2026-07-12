@@ -169,3 +169,82 @@ class CampaignImportHistoryResponse(BaseModel):
 class CampaignImportHistoryListResponse(BaseModel):
     data: List[CampaignImportHistoryResponse]
     meta: PaginationMeta
+
+# --- PLANNING ---
+class ExecutionPlanSchema(BaseModel):
+    campaign_id: uuid.UUID
+    target_platform: str
+    recommended_clip_length: int
+    minimum_clip_length: int
+    maximum_clip_length: int
+    preferred_hook_style: str
+    preferred_editing_style: str
+    caption_style: str
+    call_to_action: str
+    crop_strategy: str
+    subtitle_style: str
+    required_emotions: List[str]
+    required_topics: List[str]
+    priority_scene_types: List[str]
+    required_audio_style: str
+    brand_voice: str
+    virality_focus: str
+    estimated_clip_count: int
+    estimated_editing_time_minutes: int
+    confidence_score: float
+    planning_version: str
+    planner_model: str
+    generated_at: datetime
+    planning_confidence: float
+    generation_reason: str
+
+class ClipStrategySchema(BaseModel):
+    hook_priorities: List[str]
+    scene_priorities: List[str]
+    speech_characteristics: List[str]
+    emotion_targets: List[str]
+    energy_targets: List[str]
+    pacing: str
+    transition_style: str
+    camera_motion_preference: str
+    visual_focus: str
+    audio_focus: str
+
+class PromptTemplateSchema(BaseModel):
+    system_prompt: str
+    reasoning_prompt: str
+    ranking_prompt: str
+    render_prompt: str
+    metadata_prompt: str
+
+class SuitabilityAssessmentSchema(BaseModel):
+    campaign_match_score: int
+    estimated_success_probability: int
+    missing_requirements: List[str]
+    risk_flags: List[str]
+    confidence: float
+    recommendation: str
+
+class PlanningResponse(BaseModel):
+    id: uuid.UUID
+    campaign_id: uuid.UUID
+    planner_model: str
+    planning_version: str
+    version: int
+    pipeline_status: str
+    validation_status: str
+    overall_confidence: float
+    execution_duration_ms: int
+    generated_at: datetime
+    
+    execution_plan: Optional[ExecutionPlanSchema] = None
+    clip_strategy: Optional[ClipStrategySchema] = None
+    prompt_template: Optional[PromptTemplateSchema] = None
+    suitability_assessment: Optional[SuitabilityAssessmentSchema] = None
+
+class PlanningHistoryResponse(BaseModel):
+    data: List[PlanningResponse]
+    meta: PaginationMeta
+
+class PlanningRequest(BaseModel):
+    force_regenerate: bool = Field(default=False, description="Force regeneration of the planning pipeline.")

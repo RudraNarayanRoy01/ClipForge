@@ -111,9 +111,11 @@ class ValidationStatus(str, Enum):
 
 @dataclass
 class PlanningPipelineResult:
-    campaign_id: uuid.UUID
-    planner_model: str
-    planning_version: str
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    campaign_id: uuid.UUID = field(default_factory=uuid.uuid4)
+    planner_model: str = "unknown"
+    planning_version: str = "1.0.0"
+    version: int = 1
     pipeline_status: PipelineStatus = PipelineStatus.NOT_STARTED
     validation_status: ValidationStatus = ValidationStatus.PENDING
     overall_confidence: float = 0.0

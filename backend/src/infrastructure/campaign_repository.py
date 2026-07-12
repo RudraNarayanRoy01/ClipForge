@@ -144,12 +144,14 @@ class CampaignRepository(ICampaignRepository):
         return histories
         
     async def save_planning_result(self, result: PlanningPipelineResult) -> None:
-        db_result = await self.db.execute(select(PlanningPipelineResultModel).filter(PlanningPipelineResultModel.campaign_id == str(result.campaign_id)))
+        db_result = await self.db.execute(select(PlanningPipelineResultModel).filter(PlanningPipelineResultModel.id == str(result.id)))
         db_planning = db_result.scalars().first()
         
         if not db_planning:
-            db_planning = PlanningPipelineResultModel(campaign_id=str(result.campaign_id))
+            db_planning = PlanningPipelineResultModel(id=str(result.id), campaign_id=str(result.campaign_id))
             self.db.add(db_planning)
+            
+        db_planning.version = result.version
             
         db_planning.planner_model = result.planner_model
         db_planning.planning_version = result.planning_version
@@ -174,7 +176,11 @@ class CampaignRepository(ICampaignRepository):
         await self.db.commit()
 
     async def get_planning_result(self, campaign_id: uuid.UUID) -> PlanningPipelineResult:
-        result = await self.db.execute(select(PlanningPipelineResultModel).filter(PlanningPipelineResultModel.campaign_id == str(campaign_id)))
+        result = await self.db.execute(
+            select(PlanningPipelineResultModel)
+            .filter(PlanningPipelineResultModel.campaign_id == str(campaign_id))
+            .order_by(PlanningPipelineResultModel.version.desc())
+        )
         db_planning = result.scalars().first()
         
         if not db_planning:
@@ -198,9 +204,11 @@ class CampaignRepository(ICampaignRepository):
         suitability_assessment = CampaignSuitabilityAssessment(**suitability_assessment_json) if suitability_assessment_json else None
         
         return PlanningPipelineResult(
+            id=uuid.UUID(str(db_planning.id)),
             campaign_id=uuid.UUID(str(db_planning.campaign_id)),
             planner_model=str(db_planning.planner_model),
             planning_version=str(db_planning.planning_version),
+            version=int(db_planning.version),
             pipeline_status=db_planning.pipeline_status if isinstance(db_planning.pipeline_status, PipelineStatus) else PipelineStatus(db_planning.pipeline_status),
             validation_status=db_planning.validation_status if isinstance(db_planning.validation_status, ValidationStatus) else ValidationStatus(db_planning.validation_status),
             overall_confidence=float(db_planning.overall_confidence),
@@ -211,7 +219,60 @@ class CampaignRepository(ICampaignRepository):
             prompt_template=prompt_template,
             suitability_assessment=suitability_assessment
         )
+
+    async def get_planning_history(self, campaign_id: uuid.UUID) -> List[PlanningPipelineResult]:
+        result = await self.db.execute(
+            select(PlanningPipelineResultModel)
+            .filter(PlanningPipelineResultModel.campaign_id == str(campaign_id))
+            .order_by(PlanningPipelineResultModel.version.desc())
+        )
+        db_plannings = result.scalars().all()
         
+        history = []
+        for db_planning in db_plannings:
+            execution_plan_json = typing.cast(typing.Dict[str, typing.Any], db_planning.execution_plan_json)
+            execution_plan = None
+            if execution_plan_json:
+                execution_plan_json['campaign_id'] = uuid.UUID(execution_plan_json['campaign_id'])
+                execution_plan_json['generated_at'] = datetime.fromisoformat(execution_plan_json['generated_at'])
+                execution_plan = CampaignExecutionPlan(**execution_plan_json)
+                
+            clip_strategy_json = typing.cast(typing.Dict[str, typing.Any], db_planning.clip_strategy_json)
+            clip_strategy = CampaignClipStrategy(**clip_strategy_json) if clip_strategy_json else None
+            
+            prompt_template_json = typing.cast(typing.Dict[str, typing.Any], db_planning.prompt_template_json)
+            prompt_template = CampaignPromptTemplate(**prompt_template_json) if prompt_template_json else None
+            
+            suitability_assessment_json = typing.cast(typing.Dict[str, typing.Any], db_planning.suitability_assessment_json)
+            suitability_assessment = CampaignSuitabilityAssessment(**suitability_assessment_json) if suitability_assessment_json else None
+            
+            p = PlanningPipelineResult(
+                id=uuid.UUID(str(db_planning.id)),
+                campaign_id=uuid.UUID(str(db_planning.campaign_id)),
+                planner_model=str(db_planning.planner_model),
+                planning_version=str(db_planning.planning_version),
+                version=int(db_planning.version),
+                pipeline_status=db_planning.pipeline_status if isinstance(db_planning.pipeline_status, PipelineStatus) else PipelineStatus(db_planning.pipeline_status),
+                validation_status=db_planning.validation_status if isinstance(db_planning.validation_status, ValidationStatus) else ValidationStatus(db_planning.validation_status),
+                overall_confidence=float(db_planning.overall_confidence),
+                execution_duration_ms=int(db_planning.execution_duration_ms),
+                generated_at=db_planning.generated_at,
+                execution_plan=execution_plan,
+                clip_strategy=clip_strategy,
+                prompt_template=prompt_template,
+                suitability_assessment=suitability_assessment
+            )
+            history.append(p)
+        return history
+
+    async def delete_planning_result(self, campaign_id: uuid.UUID) -> None:
+        result = await self.db.execute(
+            select(PlanningPipelineResultModel)
+            .filter(PlanningPipelineResultModel.campaign_id == str(campaign_id))
+        )
+        for row in result.scalars().all():
+            await self.db.delete(row)
+        await self.db.commit()        
     def _map_to_domain(self, db_campaign: typing.Any) -> Campaign:
         rules_json = typing.cast(typing.Dict[str, typing.Any], db_campaign.rules_json)
         rules = CampaignRules(**rules_json) if rules_json else None

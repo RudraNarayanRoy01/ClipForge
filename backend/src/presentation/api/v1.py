@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.presentation.api import project, clips, videos, system, jobs, campaigns
+from src.presentation.api import project, clips, videos, system, jobs, campaigns, planning
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(clips.router)
 api_router.include_router(videos.router)
 api_router.include_router(jobs.router)
 api_router.include_router(campaigns.router)
+api_router.include_router(planning.router)

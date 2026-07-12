@@ -130,8 +130,9 @@ class CampaignImportHistoryModel(Base):
 class PlanningPipelineResultModel(Base):
     __tablename__ = "planning_pipeline_results"
     
-    # We use campaign_id as primary key to ensure one result per campaign (1:1)
-    campaign_id: Mapped[str] = mapped_column(String, ForeignKey("campaigns.id"), primary_key=True)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    campaign_id: Mapped[str] = mapped_column(String, ForeignKey("campaigns.id"), nullable=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
     planner_model: Mapped[str] = mapped_column(String, default="")
     planning_version: Mapped[str] = mapped_column(String, default="")
     pipeline_status: Mapped[PipelineStatus] = mapped_column(SQLEnum(PipelineStatus), default=PipelineStatus.NOT_STARTED)
