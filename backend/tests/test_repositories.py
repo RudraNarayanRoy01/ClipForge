@@ -32,7 +32,7 @@ async def test_save_and_get_project(db_session: AsyncSession):
     repo = AsyncSqliteProjectRepository(db_session)
     
     # Create Domain Entity
-    new_project = Project(name="Test Podcast")
+    new_project = Project(name="Test Podcast", storage_path="/tmp/test_podcast")
     
     # Save to DB
     await repo.save_project(new_project)

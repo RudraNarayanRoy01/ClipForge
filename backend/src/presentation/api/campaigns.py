@@ -14,6 +14,12 @@ from src.application.normalization_service import TextNormalizationService
 from src.infrastructure.campaign_repository import CampaignRepository
 from src.infrastructure.parsers import CampaignParserFactory
 from src.intelligence.services.campaign_intelligence import CampaignIntelligenceService
+from src.application.planning_use_cases import (
+    GenerateExecutionPlanUseCase, GenerateClipStrategyUseCase,
+    GeneratePromptTemplateUseCase, AssessCampaignSuitabilityUseCase,
+    PersistPlanningResultsUseCase, RunPlanningPipelineUseCase
+)
+from src.application.planning_pipeline_service import PlanningPipelineService
 from src.intelligence.providers.router import CapabilityRouter
 from src.intelligence.providers.capabilities import IStructuredOutput
 from src.domain.ports import ICampaignRepository
@@ -33,13 +39,17 @@ router = APIRouter(
 def get_campaign_repository(db: AsyncSession = Depends(get_db)) -> ICampaignRepository:
     return CampaignRepository(db)
 
-def get_import_campaign_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> ImportCampaignUseCase:
-    parser = CampaignParserFactory()
+def get_campaign_intelligence() -> CampaignIntelligenceService:
     structured_llm = CapabilityRouter().resolve([IStructuredOutput])
-    intelligence = CampaignIntelligenceService(structured_llm)
+    return CampaignIntelligenceService(structured_llm)
+
+def get_import_campaign_use_case(
+    repo: ICampaignRepository = Depends(get_campaign_repository),
+    intelligence: CampaignIntelligenceService = Depends(get_campaign_intelligence)
+) -> ImportCampaignUseCase:
+    parser = CampaignParserFactory()
     normalizer = TextNormalizationService()
     return ImportCampaignUseCase(parser, intelligence, repo, normalizer)
-
 def get_campaigns_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> GetCampaignsUseCase:
     return GetCampaignsUseCase(repo)
 
@@ -48,6 +58,24 @@ def get_campaign_use_case(repo: ICampaignRepository = Depends(get_campaign_repos
 
 def get_import_history_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> GetImportHistoryUseCase:
     return GetImportHistoryUseCase(repo)
+
+def get_planning_pipeline_service(
+    repo: ICampaignRepository = Depends(get_campaign_repository),
+    intelligence: CampaignIntelligenceService = Depends(get_campaign_intelligence)
+) -> PlanningPipelineService:
+    return PlanningPipelineService(
+        repository=repo,
+        generate_execution_plan_uc=GenerateExecutionPlanUseCase(intelligence),
+        generate_clip_strategy_uc=GenerateClipStrategyUseCase(intelligence),
+        generate_prompt_template_uc=GeneratePromptTemplateUseCase(intelligence),
+        assess_suitability_uc=AssessCampaignSuitabilityUseCase(intelligence),
+        persist_results_uc=PersistPlanningResultsUseCase(repo)
+    )
+
+def get_run_planning_pipeline_use_case(
+    pipeline_service: PlanningPipelineService = Depends(get_planning_pipeline_service)
+) -> RunPlanningPipelineUseCase:
+    return RunPlanningPipelineUseCase(pipeline_service)
 
 # --- Mappers ---
 def map_campaign_to_response(campaign: Campaign) -> CampaignResponse:

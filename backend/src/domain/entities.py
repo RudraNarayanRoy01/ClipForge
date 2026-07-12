@@ -106,6 +106,7 @@ class Project:
     name: str = "Untitled Project"
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     status: str = "created"
+    storage_path: str = ""
 
 @dataclass
 class VideoAsset:

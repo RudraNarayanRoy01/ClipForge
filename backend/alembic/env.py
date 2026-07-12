@@ -58,8 +58,17 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    section = config.get_section(config.config_ini_section, {})
+    if os.environ.get("DB_PATH"):
+        section["sqlalchemy.url"] = f"sqlite:///{os.environ.get('DB_PATH')}"
+        
+    # Alembic needs a sync driver, so we remove +aiosqlite if it's there
+    url = section.get("sqlalchemy.url", "")
+    if "+aiosqlite" in url:
+        section["sqlalchemy.url"] = url.replace("+aiosqlite", "")
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

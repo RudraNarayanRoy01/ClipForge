@@ -58,7 +58,8 @@ class ITimelineContextRepository(Protocol):
 # --- CAMPAIGN INTELLIGENCE PORTS ---
 from src.domain.campaign_entities import (
     Campaign, CampaignRules, CampaignSummary, WorthItScore, CampaignImportHistory,
-    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment
+    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment,
+    PlanningPipelineResult
 )
 
 class ICampaignNormalizationService(Protocol):
@@ -88,4 +89,6 @@ class ICampaignRepository(Protocol):
     async def find_potential_duplicates(self, campaign_url: str, title: str, brand: str) -> List[Campaign]: ...
     async def save_import_history(self, history: CampaignImportHistory) -> None: ...
     async def get_import_history(self, limit: int = 50, skip: int = 0) -> List[CampaignImportHistory]: ...
-
+    
+    async def save_planning_result(self, result: PlanningPipelineResult) -> None: ...
+    async def get_planning_result(self, campaign_id: uuid.UUID) -> PlanningPipelineResult: ...

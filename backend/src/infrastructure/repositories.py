@@ -19,12 +19,14 @@ class AsyncSqliteProjectRepository:
                 id=str(project.id),
                 name=project.name,
                 created_at=project.created_at,
-                status=project.status
+                status=project.status,
+                storage_path=project.storage_path
             )
             self.db.add(db_project)
         else:
             db_project.name = project.name
             db_project.status = project.status
+            db_project.storage_path = project.storage_path
             
         await self.db.commit()
 
@@ -39,7 +41,8 @@ class AsyncSqliteProjectRepository:
             id=uuid.UUID(db_project.id),
             name=db_project.name,
             created_at=db_project.created_at,
-            status=db_project.status
+            status=db_project.status,
+            storage_path=db_project.storage_path
         )
 
     async def save_clips(self, clips: List[ClipSegment]) -> None:

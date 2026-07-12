@@ -94,6 +94,75 @@ class CampaignSuitabilityAssessment:
 
 from enum import Enum
 
+class PipelineStatus(str, Enum):
+    NOT_STARTED = "not_started"
+    RUNNING = "running"
+    EXECUTION_PLAN_COMPLETE = "execution_plan_complete"
+    CLIP_STRATEGY_COMPLETE = "clip_strategy_complete"
+    PROMPT_TEMPLATE_COMPLETE = "prompt_template_complete"
+    SUITABILITY_COMPLETE = "suitability_complete"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+class ValidationStatus(str, Enum):
+    PENDING = "pending"
+    VALID = "valid"
+    INVALID = "invalid"
+
+@dataclass
+class PlanningPipelineResult:
+    campaign_id: uuid.UUID
+    planner_model: str
+    planning_version: str
+    pipeline_status: PipelineStatus = PipelineStatus.NOT_STARTED
+    validation_status: ValidationStatus = ValidationStatus.PENDING
+    overall_confidence: float = 0.0
+    execution_duration_ms: int = 0
+    generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    execution_plan: Optional[CampaignExecutionPlan] = None
+    clip_strategy: Optional[CampaignClipStrategy] = None
+    prompt_template: Optional[CampaignPromptTemplate] = None
+    suitability_assessment: Optional[CampaignSuitabilityAssessment] = None
+
+    def validate_consistency(self) -> None:
+        """
+        Ensures the pipeline result state is internally consistent.
+        Rejects invalid combinations of status and data.
+        """
+        if self.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.EXECUTION_PLAN_COMPLETE) and not self.execution_plan:
+            from src.domain.errors import ValidationError
+            raise ValidationError("Execution plan is missing but status implies it is complete.")
+            
+        if self.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.CLIP_STRATEGY_COMPLETE) and not self.clip_strategy:
+            from src.domain.errors import ValidationError
+            raise ValidationError("Clip strategy is missing but status implies it is complete.")
+            
+        if self.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.PROMPT_TEMPLATE_COMPLETE) and not self.prompt_template:
+            from src.domain.errors import ValidationError
+            raise ValidationError("Prompt template is missing but status implies it is complete.")
+            
+        if self.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.SUITABILITY_COMPLETE) and not self.suitability_assessment:
+            from src.domain.errors import ValidationError
+            raise ValidationError("Suitability assessment is missing but status implies it is complete.")
+
+    def compute_overall_confidence(self) -> None:
+        """
+        Deterministically aggregates overall confidence based on execution_plan and suitability_assessment.
+        If either is missing, defaults to 0.0 or the available one.
+        """
+        confidences = []
+        if self.execution_plan and hasattr(self.execution_plan, 'confidence_score'):
+            confidences.append(self.execution_plan.confidence_score)
+        if self.suitability_assessment and hasattr(self.suitability_assessment, 'confidence'):
+            confidences.append(self.suitability_assessment.confidence)
+            
+        if confidences:
+            self.overall_confidence = sum(confidences) / len(confidences)
+        else:
+            self.overall_confidence = 0.0
+
+
 class CampaignStatus(str, Enum):
     IMPORTED = "imported"
     PROCESSING = "processing"

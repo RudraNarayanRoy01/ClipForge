@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.database import Base
-from src.domain.campaign_entities import CampaignStatus
+from src.domain.campaign_entities import CampaignStatus, PipelineStatus, ValidationStatus
 
 class ProjectModel(Base):
     __tablename__ = "projects"
@@ -126,3 +126,21 @@ class CampaignImportHistoryModel(Base):
     processing_status: Mapped[str] = mapped_column(String, default="started")
     processing_duration_ms: Mapped[int] = mapped_column(Integer, default=0)
     duplicate_status: Mapped[str] = mapped_column(String, default="none")
+
+class PlanningPipelineResultModel(Base):
+    __tablename__ = "planning_pipeline_results"
+    
+    # We use campaign_id as primary key to ensure one result per campaign (1:1)
+    campaign_id: Mapped[str] = mapped_column(String, ForeignKey("campaigns.id"), primary_key=True)
+    planner_model: Mapped[str] = mapped_column(String, default="")
+    planning_version: Mapped[str] = mapped_column(String, default="")
+    pipeline_status: Mapped[PipelineStatus] = mapped_column(SQLEnum(PipelineStatus), default=PipelineStatus.NOT_STARTED)
+    validation_status: Mapped[ValidationStatus] = mapped_column(SQLEnum(ValidationStatus), default=ValidationStatus.PENDING)
+    overall_confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    execution_duration_ms: Mapped[int] = mapped_column(Integer, default=0)
+    generated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    execution_plan_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    clip_strategy_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    prompt_template_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    suitability_assessment_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
