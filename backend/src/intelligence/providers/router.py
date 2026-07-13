@@ -1,13 +1,21 @@
-from typing import List, Type, Any
+from typing import List, Type, Any, Optional
 from src.intelligence.providers.local.gemma4 import Gemma4LocalProvider
-from src.intelligence.providers.capabilities import IReasoning
+from src.intelligence.providers.factory import ProviderFactory
 
 class CapabilityRouter:
-    def __init__(self):
-        # In a real scenario, this would be injected and populated by plugin loader
-        self._providers = [
-            Gemma4LocalProvider()
-        ]
+    def __init__(self, factory: Optional[ProviderFactory] = None):
+        """
+        Legacy capability router. 
+        Adapted to optionally accept modern ProviderFactory via DI.
+        """
+        self._providers = []
+        
+        # If modern factory is injected, resolve the modern provider
+        if factory:
+            self._providers.append(factory.create_provider())
+            
+        # Always include the legacy mock provider for backward compatibility
+        self._providers.append(Gemma4LocalProvider())
 
     def resolve(self, requires: List[Type]) -> Any:
         # Find first provider that implements all required protocols
@@ -18,5 +26,5 @@ class CapabilityRouter:
         
         raise ValueError(f"No provider found satisfying capabilities: {requires}")
 
-# Example usage
+# Example usage (Legacy)
 router = CapabilityRouter()
