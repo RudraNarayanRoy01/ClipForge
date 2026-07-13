@@ -1,6 +1,8 @@
 from typing import Protocol, List, Any, AsyncGenerator, Type, runtime_checkable
 from pydantic import BaseModel
 
+from src.intelligence.schemas.ai_models import AIRequest, AIResponse
+
 @runtime_checkable
 class IReasoning(Protocol):
     async def generate_text(self, prompt: str, context: list) -> str:
@@ -19,4 +21,13 @@ class IVision(Protocol):
 @runtime_checkable
 class IToolCalling(Protocol):
     async def execute_with_tools(self, prompt: str, tools: List[Any]) -> Any:
+        ...
+
+@runtime_checkable
+class IAIProvider(Protocol):
+    """
+    Unified contract for all future AI Providers.
+    Replaces fragmented modality interfaces by operating exclusively on AIRequest -> AIResponse.
+    """
+    async def generate(self, request: AIRequest) -> AIResponse:
         ...
