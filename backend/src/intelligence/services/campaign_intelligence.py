@@ -192,11 +192,8 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         )
 
     def _build_suitability_prompt(self, campaign: Campaign) -> str:
-        rules_text = json.dumps(dataclasses.asdict(campaign.rules)) if campaign.rules else "{}"
-        return (
-            "Analyze the campaign and assess its suitability for automated video clipping.\n"
-            f"\n\nCAMPAIGN RULES:\n{self._sanitize_text(rules_text)}"
-        )
+        # Migrated to PromptManager: campaign_intelligence/assess_suitability.md
+        pass
 
     # --- Legacy methods from previous batches ---
     async def extract_rules(self, text: str) -> CampaignRules:
@@ -398,8 +395,28 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             )
 
     async def assess_suitability(self, campaign: Campaign) -> CampaignSuitabilityAssessment:
-        prompt = self._build_suitability_prompt(campaign)
-        result = await self._generate_with_retry(prompt, SuitabilityAssessmentSchema)
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
+            
+        rules_text = json.dumps(dataclasses.asdict(campaign.rules)) if campaign.rules else "{}"
+        
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/assess_suitability",
+            template_variables={
+                "rules_text": self._sanitize_text(rules_text)
+            },
+            response_schema=SuitabilityAssessmentSchema
+        )
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to assess suitability: {str(e)}") from e
+            
+        result = response.structured_output
+        if not result or not isinstance(result, SuitabilityAssessmentSchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for suitability assessment.")
+            
         self._validate_suitability_assessment(result)
         
         return CampaignSuitabilityAssessment(
