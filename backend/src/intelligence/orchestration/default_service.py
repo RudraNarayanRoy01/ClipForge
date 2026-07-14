@@ -1,7 +1,11 @@
+import re
+from pydantic import ValidationError
+
 from src.intelligence.interfaces.ai_service import IAIService
 from src.intelligence.schemas.ai_models import AIExecutionCommand, AIResponse, AIRequest
 from src.intelligence.prompts.manager import PromptManager
 from src.intelligence.providers.factory import ProviderFactory
+from src.intelligence.exceptions.ai import AIResponseValidationError
 
 class DefaultAIService(IAIService):
     """
@@ -33,5 +37,26 @@ class DefaultAIService(IAIService):
         # 3. Resolve the active provider via ProviderFactory
         provider = self._provider_factory.create_provider()
         
-        # 4. Execute and return response
-        return await provider.generate(request)
+        # 4. Execute request
+        response = await provider.generate(request)
+        
+        # 5. Canonical structured output validation
+        if command.response_schema:
+            try:
+                # If provider natively returned a pre-parsed data structure (e.g., via Tool Calling/JSON Mode)
+                if isinstance(response.structured_output, (dict, list)):
+                    response.structured_output = command.response_schema.model_validate(response.structured_output)
+                elif response.text:
+                    text = response.text.strip()
+                    # Defensively strip markdown formatting (case-insensitive for language identifier)
+                    text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.IGNORECASE)
+                    text = re.sub(r'\s*```$', '', text)
+                    response.structured_output = command.response_schema.model_validate_json(text.strip())
+                else:
+                    raise AIResponseValidationError("Provider returned empty response when structured output was expected.")
+            except ValidationError as e:
+                raise AIResponseValidationError(f"Failed to validate provider output against schema: {e}") from e
+            except (ValueError, TypeError) as e:
+                raise AIResponseValidationError(f"Failed to parse provider output as JSON: {e}") from e
+                
+        return response
