@@ -170,20 +170,12 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         pass
 
     def _build_clip_strategy_prompt(self, plan: CampaignExecutionPlan) -> str:
-        plan_text = json.dumps(dataclasses.asdict(plan))
-        return (
-            "You are a Principal Social Media Editor. Generate a detailed Clip Strategy.\n"
-            f"\n\nEXECUTION PLAN:\n{plan_text}"
-        )
+        # Migrated to PromptManager: campaign_intelligence/generate_clip_strategy.md
+        pass
 
     def _build_prompt_template_prompt(self, plan: CampaignExecutionPlan, strategy: CampaignClipStrategy) -> str:
-        plan_text = json.dumps(dataclasses.asdict(plan))
-        strategy_text = json.dumps(dataclasses.asdict(strategy))
-        return (
-            "You are a Principal Prompt Engineer. Generate the exact prompts the Video Intelligence Engine will use.\n"
-            f"\n\nEXECUTION PLAN:\n{plan_text}"
-            f"\n\nCLIP STRATEGY:\n{strategy_text}"
-        )
+        # Migrated to PromptManager: campaign_intelligence/generate_prompt_template.md
+        pass
 
     def _build_suitability_prompt(self, campaign: Campaign) -> str:
         # Migrated to PromptManager: campaign_intelligence/assess_suitability.md
@@ -362,8 +354,28 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             raise PlanningValidationError("scene_priorities cannot be empty.")
 
     async def generate_clip_strategy(self, campaign: Campaign, plan: CampaignExecutionPlan) -> CampaignClipStrategy:
-        prompt = self._build_clip_strategy_prompt(plan)
-        result = await self._generate_with_retry(prompt, ClipStrategySchema)
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
+            
+        plan_text = json.dumps(dataclasses.asdict(plan))
+        
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/generate_clip_strategy",
+            template_variables={
+                "plan_text": plan_text
+            },
+            response_schema=ClipStrategySchema
+        )
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to generate clip strategy: {str(e)}") from e
+            
+        result = response.structured_output
+        if not result or not isinstance(result, ClipStrategySchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for clip strategy.")
+            
         self._validate_clip_strategy(result)
         
         return CampaignClipStrategy(
@@ -384,8 +396,30 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             raise PlanningValidationError("Prompt templates cannot have empty system or reasoning prompts.")
 
     async def generate_prompt_template(self, campaign: Campaign, plan: CampaignExecutionPlan, strategy: CampaignClipStrategy) -> CampaignPromptTemplate:
-        prompt = self._build_prompt_template_prompt(plan, strategy)
-        result = await self._generate_with_retry(prompt, PromptTemplateSchema)
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
+            
+        plan_text = json.dumps(dataclasses.asdict(plan))
+        strategy_text = json.dumps(dataclasses.asdict(strategy))
+        
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/generate_prompt_template",
+            template_variables={
+                "plan_text": plan_text,
+                "strategy_text": strategy_text
+            },
+            response_schema=PromptTemplateSchema
+        )
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to generate prompt template: {str(e)}") from e
+            
+        result = response.structured_output
+        if not result or not isinstance(result, PromptTemplateSchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for prompt template.")
+            
         self._validate_prompt_template(result)
         
         return CampaignPromptTemplate(
