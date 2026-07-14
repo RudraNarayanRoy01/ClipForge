@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import logging
 from typing import List, Any
 from src.media.interfaces import IMediaProcessor
@@ -51,7 +52,64 @@ class FFmpegMediaProcessor(IMediaProcessor):
     def get_metadata(self, file_path: str) -> MediaMetadata:
         """Retrieves metadata for a given media file."""
         self._validate_input_path(file_path)
-        raise NotImplementedError("Metadata extraction will be implemented in a future batch.")
+        
+        command = [
+            self.settings.ffprobe_executable_path,
+            "-v", "quiet",
+            "-print_format", "json",
+            "-show_format",
+            "-show_streams",
+            file_path
+        ]
+        
+        result = self.executor.execute_command(command)
+        
+        try:
+            data = json.loads(result.stdout)
+            
+            # Find first video stream
+            video_stream = next((s for s in data.get("streams", []) if s.get("codec_type") == "video"), None)
+            # Check for audio stream
+            audio_stream = next((s for s in data.get("streams", []) if s.get("codec_type") == "audio"), None)
+            
+            format_info = data.get("format", {})
+            
+            duration_seconds = float(format_info.get("duration", 0.0))
+            
+            width = 0
+            height = 0
+            fps = 0.0
+            
+            if video_stream:
+                width = int(video_stream.get("width", 0))
+                height = int(video_stream.get("height", 0))
+                # fps can be a fraction string like "30000/1001" or "30/1"
+                r_frame_rate = video_stream.get("r_frame_rate", "0/1")
+                try:
+                    num, den = map(int, r_frame_rate.split('/'))
+                    if den != 0:
+                        fps = num / den
+                except (ValueError, ZeroDivisionError):
+                    fps = 0.0
+            
+            has_audio = audio_stream is not None
+            format_name = format_info.get("format_name", "")
+            
+            bitrate_str = format_info.get("bitrate")
+            bitrate = int(bitrate_str) if bitrate_str is not None else None
+            
+            return MediaMetadata(
+                duration_seconds=duration_seconds,
+                width=width,
+                height=height,
+                fps=fps,
+                has_audio=has_audio,
+                format_name=format_name,
+                bitrate=bitrate,
+                extra_info=data
+            )
+        except Exception as e:
+            raise MediaProcessingError(f"Failed to parse metadata from ffprobe output: {str(e)}") from e
 
     def extract_clip(self, request: ClipExtractionRequest) -> MediaProcessingResponse:
         """Extracts a video clip based on the requested parameters."""
@@ -133,7 +191,40 @@ class FFmpegMediaProcessor(IMediaProcessor):
         """Generates a thumbnail image from the media at the specified timestamp."""
         self._validate_input_path(request.source_path)
         self._prepare_output_path(request.output_path)
-        raise NotImplementedError("Thumbnail generation will be implemented in a future batch.")
+        
+        if request.timestamp < 0:
+            raise MediaProcessingError(f"Invalid timestamp: {request.timestamp}. Must be non-negative.")
+            
+        command = [
+            self.settings.ffmpeg_executable_path,
+            "-y",  # Overwrite output files
+            "-ss", str(request.timestamp),  # Seek to timestamp
+            "-i", request.source_path,
+            "-vframes", "1",  # Output exactly one frame
+        ]
+        
+        # Add scaling if dimensions are provided
+        if request.target_width is not None and request.target_height is not None:
+            command.extend(["-vf", f"scale={request.target_width}:{request.target_height}"])
+        elif request.target_width is not None:
+            command.extend(["-vf", f"scale={request.target_width}:-1"])
+        elif request.target_height is not None:
+            command.extend(["-vf", f"scale=-1:{request.target_height}"])
+            
+        command.append(request.output_path)
+        
+        start_time_exec = time.time()
+        
+        # SubprocessExecutor handles timeouts, exception translation, and shell=False enforcement.
+        self.executor.execute_command(command)
+        
+        execution_time = time.time() - start_time_exec
+        
+        return MediaProcessingResponse(
+            success=True,
+            output_path=request.output_path,
+            execution_time_seconds=execution_time
+        )
 
     def process_generic(self, request: GenericMediaProcessingRequest) -> MediaProcessingResponse:
         """Executes a generic or custom media processing operation."""
