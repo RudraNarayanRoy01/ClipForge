@@ -208,7 +208,11 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             template_variables={"text": text},
             response_schema=ExtractionRulesSchema
         )
-        response = await self._ai_service.execute(command)
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to extract CampaignRules: {str(e)}") from e
         
         result = response.structured_output
         if not result or not isinstance(result, ExtractionRulesSchema):
@@ -229,12 +233,24 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         )
 
     async def generate_summary(self, text: str) -> CampaignSummary:
-        prompt = (
-            "Generate a concise campaign summary from the following text. "
-            "Focus on the main objectives, rules, and risks. "
-            f"\n\nTEXT:\n{self._sanitize_text(text)}"
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
+            
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/generate_summary",
+            template_variables={"text": self._sanitize_text(text)},
+            response_schema=ExtractionSummarySchema
         )
-        result = await self._generate_with_retry(prompt, ExtractionSummarySchema)
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to generate CampaignSummary: {str(e)}") from e
+            
+        result = response.structured_output
+        if not result or not isinstance(result, ExtractionSummarySchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for extraction summary.")
+            
         return CampaignSummary(
             about=result.about,
             requirements=result.requirements,
@@ -245,14 +261,28 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         )
 
     async def calculate_worth_it_score(self, text: str, rules: CampaignRules) -> WorthItScore:
-        rules_str = json.dumps(dataclasses.asdict(rules))
-        prompt = (
-            "Analyze the campaign and calculate a 'Worth-It' score out of 100 for each category. "
-            "Consider the requirements, restrictions, and payout. Higher ROI is better. "
-            f"\n\nRULES EXTRACTED:\n{rules_str}"
-            f"\n\nRAW TEXT:\n{self._sanitize_text(text)}"
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
+            
+        rules_str = self._sanitize_text(json.dumps(dataclasses.asdict(rules)))
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/calculate_worth_it_score",
+            template_variables={
+                "rules_str": rules_str,
+                "text": self._sanitize_text(text)
+            },
+            response_schema=ExtractionScoreSchema
         )
-        result = await self._generate_with_retry(prompt, ExtractionScoreSchema)
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to calculate WorthItScore: {str(e)}") from e
+            
+        result = response.structured_output
+        if not result or not isinstance(result, ExtractionScoreSchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for extraction score.")
+            
         return WorthItScore(
             estimated_roi=result.estimated_roi,
             estimated_effort=result.estimated_effort,
