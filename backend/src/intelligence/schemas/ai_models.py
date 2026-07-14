@@ -44,3 +44,12 @@ class AIResponse(BaseModel):
     
     # The raw unparsed response from the underlying SDK, for debugging
     raw_response: Optional[Any] = None
+
+class AIExecutionCommand(BaseModel):
+    """High-level business command for executing an AI prompt."""
+    prompt_identifier: str
+    template_variables: Dict[str, Any] = Field(default_factory=dict)
+    response_schema: Optional[Type[BaseModel]] = None
+    
+    class Config:
+        frozen = True

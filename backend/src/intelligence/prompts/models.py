@@ -20,3 +20,12 @@ class PromptTemplate(BaseModel):
     """
     metadata: PromptMetadata
     body: str
+
+class RenderedPrompt(BaseModel):
+    """
+    Encapsulates the final rendered prompt string alongside its source metadata.
+    Produced by the PromptManager and consumed by the AI Orchestrator.
+    """
+    prompt_identifier: str
+    text: str
+    metadata: PromptMetadata
