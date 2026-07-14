@@ -2,8 +2,7 @@ import json
 import logging
 import re
 from pydantic import BaseModel, Field
-from typing import List, Optional, Type, TypeVar
-import typing
+from typing import List, Optional
 import dataclasses
 from src.domain.ports import ICampaignIntelligence
 from src.domain.campaign_entities import (
@@ -100,8 +99,6 @@ class SuitabilityAssessmentSchema(BaseModel):
     confidence: float
     recommendation: str
 
-T = TypeVar("T", bound=BaseModel)
-
 class CampaignIntelligenceService(ICampaignIntelligence):
     def __init__(self, structured_llm: IStructuredOutput, ai_service: IAIService = None):
         self.llm = structured_llm
@@ -125,61 +122,7 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             
         return sanitized
 
-    async def _generate_with_retry(self, prompt: str, schema: Type[T], max_retries: int = 3) -> T:
-        import time
-        attempt = 0
-        last_exception = None
-        while attempt < max_retries:
-            attempt += 1
-            start_time = time.time()
-            try:
-                result_base = await self.llm.generate_object(prompt, schema)
-                duration = time.time() - start_time
-                logger.info(
-                    "LLM Generation successful",
-                    extra={
-                        "planner_model": self.llm.__class__.__name__,
-                        "planning_version": PLANNING_VERSION,
-                        "generation_duration_sec": round(duration, 2),
-                        "attempt": attempt,
-                        "schema": schema.__name__
-                    }
-                )
-                return typing.cast(T, result_base)
-            except Exception as e:
-                duration = time.time() - start_time
-                last_exception = e
-                logger.warning(
-                    f"LLM Generation failed on attempt {attempt}: {e}",
-                    extra={
-                        "planner_model": self.llm.__class__.__name__,
-                        "planning_version": PLANNING_VERSION,
-                        "generation_duration_sec": round(duration, 2),
-                        "attempt": attempt,
-                        "schema": schema.__name__
-                    }
-                )
-                # Retry transient LLM failures.
-        
-        logger.error(f"Exhausted {max_retries} retries for {schema.__name__}")
-        raise PlanningGenerationError(f"Failed to generate {schema.__name__} after {max_retries} attempts. Last error: {last_exception}")
 
-    # --- Builders ---
-    def _build_execution_plan_prompt(self, campaign: Campaign) -> str:
-        # Migrated to PromptManager: campaign_intelligence/generate_execution_plan.md
-        pass
-
-    def _build_clip_strategy_prompt(self, plan: CampaignExecutionPlan) -> str:
-        # Migrated to PromptManager: campaign_intelligence/generate_clip_strategy.md
-        pass
-
-    def _build_prompt_template_prompt(self, plan: CampaignExecutionPlan, strategy: CampaignClipStrategy) -> str:
-        # Migrated to PromptManager: campaign_intelligence/generate_prompt_template.md
-        pass
-
-    def _build_suitability_prompt(self, campaign: Campaign) -> str:
-        # Migrated to PromptManager: campaign_intelligence/assess_suitability.md
-        pass
 
     # --- Legacy methods from previous batches ---
     async def extract_rules(self, text: str) -> CampaignRules:
