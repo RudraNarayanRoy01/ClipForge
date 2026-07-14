@@ -92,7 +92,42 @@ class FFmpegMediaProcessor(IMediaProcessor):
         """Extracts an audio track from the given media."""
         self._validate_input_path(request.source_path)
         self._prepare_output_path(request.output_path)
-        raise NotImplementedError("Audio extraction will be implemented in a future batch.")
+        
+        if not request.output_path:
+            raise MediaProcessingError("Output path cannot be empty.")
+            
+        if request.target_sample_rate <= 0:
+            raise MediaProcessingError(f"Invalid target sample rate: {request.target_sample_rate}. Must be positive.")
+            
+        if request.target_channels <= 0:
+            raise MediaProcessingError(f"Invalid target channels: {request.target_channels}. Must be positive.")
+            
+        command = [
+            self.settings.ffmpeg_executable_path,
+            "-y",  # Overwrite output files
+            "-i", request.source_path,
+            "-vn",  # Disable video processing
+        ]
+        
+        # Applying specific format conversion as requested by the DTO.
+        command.extend([
+            "-ar", str(request.target_sample_rate),
+            "-ac", str(request.target_channels),
+            request.output_path
+        ])
+        
+        start_time_exec = time.time()
+        
+        # SubprocessExecutor handles timeouts, exception translation, and shell=False enforcement.
+        self.executor.execute_command(command)
+        
+        execution_time = time.time() - start_time_exec
+        
+        return MediaProcessingResponse(
+            success=True,
+            output_path=request.output_path,
+            execution_time_seconds=execution_time
+        )
 
     def generate_thumbnail(self, request: ThumbnailGenerationRequest) -> MediaProcessingResponse:
         """Generates a thumbnail image from the media at the specified timestamp."""
