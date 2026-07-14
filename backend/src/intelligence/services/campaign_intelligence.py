@@ -12,6 +12,8 @@ from src.domain.campaign_entities import (
     PlanningValidationError, PlanningConfidenceError, PlanningGenerationError, PromptSanitizationError
 )
 from src.intelligence.providers.capabilities import IStructuredOutput
+from src.intelligence.interfaces.ai_service import IAIService
+from src.intelligence.schemas.ai_models import AIExecutionCommand
 
 logger = logging.getLogger(__name__)
 
@@ -101,8 +103,9 @@ class SuitabilityAssessmentSchema(BaseModel):
 T = TypeVar("T", bound=BaseModel)
 
 class CampaignIntelligenceService(ICampaignIntelligence):
-    def __init__(self, structured_llm: IStructuredOutput):
+    def __init__(self, structured_llm: IStructuredOutput, ai_service: IAIService = None):
         self.llm = structured_llm
+        self._ai_service = ai_service
 
     def _sanitize_text(self, text: str) -> str:
         """Sanitizes prompt text to prevent obvious injection and control char issues."""
@@ -197,12 +200,20 @@ class CampaignIntelligenceService(ICampaignIntelligence):
 
     # --- Legacy methods from previous batches ---
     async def extract_rules(self, text: str) -> CampaignRules:
-        prompt = (
-            "Extract the campaign rules from the following text. "
-            "If a value is not explicitly stated, do not guess; leave it null/empty. "
-            f"\n\nTEXT:\n{self._sanitize_text(text)}"
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService. The extract_rules migration requires this dependency.")
+            
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/extract_rules",
+            template_variables={"text": text},
+            response_schema=ExtractionRulesSchema
         )
-        result = await self._generate_with_retry(prompt, ExtractionRulesSchema)
+        response = await self._ai_service.execute(command)
+        
+        result = response.structured_output
+        if not result or not isinstance(result, ExtractionRulesSchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for extraction rules.")
+            
         return CampaignRules(
             allowed_regions=result.allowed_regions,
             video_duration_min=result.video_duration_min,
