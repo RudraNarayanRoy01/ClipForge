@@ -100,7 +100,7 @@ class SuitabilityAssessmentSchema(BaseModel):
     recommendation: str
 
 class CampaignIntelligenceService(ICampaignIntelligence):
-    def __init__(self, structured_llm: IStructuredOutput, ai_service: IAIService = None):
+    def __init__(self, structured_llm: IStructuredOutput, ai_service: IAIService | None = None):
         self.llm = structured_llm
         self._ai_service = ai_service
 

@@ -55,7 +55,7 @@ class BaseProvider(ABC):
             duration_ms = int((time.time() - start_time) * 1000)
             self._log_execution(duration_ms, success, error_msg)
 
-    def _log_execution(self, duration_ms: int, success: bool, error: str = None) -> None:
+    def _log_execution(self, duration_ms: int, success: bool, error: str | None = None) -> None:
         """Standardized logging for all providers."""
         extra = {
             "ai_provider": self.provider_id,

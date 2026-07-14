@@ -17,7 +17,7 @@ class ProviderRegistry:
         cls._providers[name] = builder
 
     @classmethod
-    def get_provider_builder(cls, name: str) -> ProviderBuilder:
+    def get_provider_builder(cls, name: str) -> ProviderBuilder | None:
         """Retrieve a provider builder by name."""
         return cls._providers.get(name)
 
