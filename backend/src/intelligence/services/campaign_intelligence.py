@@ -166,14 +166,8 @@ class CampaignIntelligenceService(ICampaignIntelligence):
 
     # --- Builders ---
     def _build_execution_plan_prompt(self, campaign: Campaign) -> str:
-        rules_text = json.dumps(dataclasses.asdict(campaign.rules)) if campaign.rules else "{}"
-        summary_text = json.dumps(dataclasses.asdict(campaign.summary)) if campaign.summary else "{}"
-        return (
-            "You are a Principal Social Media Editor. Generate an Execution Plan for this campaign.\n"
-            "Make deterministic decisions based on the requirements.\n"
-            f"\n\nCAMPAIGN RULES:\n{self._sanitize_text(rules_text)}"
-            f"\n\nCAMPAIGN SUMMARY:\n{self._sanitize_text(summary_text)}"
-        )
+        # Migrated to PromptManager: campaign_intelligence/generate_execution_plan.md
+        pass
 
     def _build_clip_strategy_prompt(self, plan: CampaignExecutionPlan) -> str:
         plan_text = json.dumps(dataclasses.asdict(plan))
@@ -308,8 +302,30 @@ class CampaignIntelligenceService(ICampaignIntelligence):
             )
 
     async def generate_execution_plan(self, campaign: Campaign) -> CampaignExecutionPlan:
-        prompt = self._build_execution_plan_prompt(campaign)
-        result = await self._generate_with_retry(prompt, ExecutionPlanSchema)
+        if not self._ai_service:
+            raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
+            
+        rules_text = json.dumps(dataclasses.asdict(campaign.rules)) if campaign.rules else "{}"
+        summary_text = json.dumps(dataclasses.asdict(campaign.summary)) if campaign.summary else "{}"
+        
+        command = AIExecutionCommand(
+            prompt_identifier="campaign_intelligence/generate_execution_plan",
+            template_variables={
+                "rules_text": self._sanitize_text(rules_text),
+                "summary_text": self._sanitize_text(summary_text)
+            },
+            response_schema=ExecutionPlanSchema
+        )
+        
+        try:
+            response = await self._ai_service.execute(command)
+        except Exception as e:
+            raise PlanningGenerationError(f"Failed to generate execution plan: {str(e)}") from e
+            
+        result = response.structured_output
+        if not result or not isinstance(result, ExecutionPlanSchema):
+            raise PlanningGenerationError("AIService returned an invalid or missing structured output for execution plan.")
+            
         self._validate_execution_plan(result)
         
         return CampaignExecutionPlan(
