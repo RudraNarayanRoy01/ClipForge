@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, TypeVar, Type
-from backend.src.intelligence.timeline.models import SemanticEvent
+from src.intelligence.timeline.models import SemanticEvent
 
 T = TypeVar('T', bound=SemanticEvent)
 

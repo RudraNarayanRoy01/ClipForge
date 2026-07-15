@@ -1,7 +1,7 @@
 import uuid
 from typing import List
-from backend.src.intelligence.timeline.models import TranscriptEvent
-from backend.src.infrastructure.timeline.store import temporal_store
+from src.intelligence.timeline.models import TranscriptEvent
+from src.infrastructure.timeline.store import temporal_store
 
 class IngestionPipeline:
     def process_video(self, video_id: str, video_path: str) -> None:
