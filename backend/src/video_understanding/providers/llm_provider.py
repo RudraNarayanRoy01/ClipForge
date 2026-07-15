@@ -55,13 +55,34 @@ class LLMVideoUnderstandingService(IVideoUnderstandingService):
         try:
             response = await self._ai_service.execute(command)
             
-            # The AIResponse structured_output should already be parsed as the response_schema
             if not isinstance(response.structured_output, VideoUnderstandingResult):
                 if isinstance(response.structured_output, dict):
-                    return VideoUnderstandingResult.parse_obj(response.structured_output)
-                raise VideoUnderstandingValidationError("AI Service did not return the expected structured output type.")
+                    result = VideoUnderstandingResult.parse_obj(response.structured_output)
+                else:
+                    raise VideoUnderstandingValidationError("AI Service did not return the expected structured output type.")
+            else:
+                result = response.structured_output
                 
-            return response.structured_output
+            # Post-process: ensure deduplication of topics (case-insensitive)
+            seen_topic_names = set()
+            unique_topics = []
+            for t in result.topics:
+                t_name_lower = t.name.strip().lower()
+                if t_name_lower not in seen_topic_names:
+                    seen_topic_names.add(t_name_lower)
+                    unique_topics.append(t)
+
+            if len(unique_topics) != len(result.topics):
+                result = VideoUnderstandingResult(
+                    topics=unique_topics,
+                    entities=result.entities,
+                    hooks=result.hooks,
+                    highlights=result.highlights,
+                    overall_sentiment=result.overall_sentiment,
+                    summary=result.summary
+                )
+
+            return result
 
         except AIConnectionError as e:
             logger.error(f"Connection error analyzing video {request.video_id}: {e}")

@@ -7,12 +7,12 @@ class Topic(BaseModel):
     Represents a distinct subject or theme discussed in the video.
     Immutable to ensure data integrity across the pipeline.
     """
-    name: str
-    description: str
-    confidence: float
-    start_time: float
-    end_time: float
-    reasoning: Optional[str] = None
+    name: str = Field(description="A concise concept representing the primary topic discussed. Avoid full sentences.")
+    description: str = Field(description="A brief description of the topic.")
+    confidence: float = Field(description="Confidence score of this topic extraction between 0.0 and 1.0.")
+    start_time: float = Field(description="Start time of the topic in seconds.")
+    end_time: float = Field(description="End time of the topic in seconds.")
+    reasoning: Optional[str] = Field(default=None, description="Reasoning for extracting this topic.")
 
     class Config:
         frozen = True
@@ -22,10 +22,10 @@ class Entity(BaseModel):
     """
     Represents a specific person, organization, location, or concept in the video.
     """
-    name: str
-    entity_type: str
-    confidence: float
-    reasoning: Optional[str] = None
+    name: str = Field(description="The exact name of the extracted entity.")
+    entity_type: str = Field(description="Type of the entity (e.g., People, Companies, Brands, Products, Technologies, Organizations, Locations, Events).")
+    confidence: float = Field(description="Confidence score of this entity extraction between 0.0 and 1.0.")
+    reasoning: Optional[str] = Field(default=None, description="Evidence from the transcript supporting this entity.")
 
     class Config:
         frozen = True
