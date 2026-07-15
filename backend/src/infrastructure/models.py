@@ -199,3 +199,16 @@ class TranscriptWordModel(Base):
     speaker: Mapped[str | None] = mapped_column(String, nullable=True)
     
     segment: Mapped["TranscriptSegmentModel"] = relationship("TranscriptSegmentModel", back_populates="words")
+
+
+class VideoKnowledgeModel(Base):
+    __tablename__ = "video_knowledge_snapshots"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    video_asset_id: Mapped[str] = mapped_column(String, ForeignKey("video_assets.id"), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # Store the entire immutable knowledge snapshot as JSON
+    knowledge_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    
+    video: Mapped["VideoAssetModel"] = relationship("VideoAssetModel")
