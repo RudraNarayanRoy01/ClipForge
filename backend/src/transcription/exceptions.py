@@ -21,3 +21,7 @@ class TranscriptionProcessingError(TranscriptionError):
 class LanguageNotSupportedError(TranscriptionError):
     """Raised when the requested language is not supported by the provider."""
     pass
+
+class TranscriptValidationError(TranscriptionError):
+    """Raised when a transcript fails structural or business validation rules."""
+    pass

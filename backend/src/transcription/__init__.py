@@ -12,7 +12,9 @@ from .exceptions import (
     TranscriptionConfigurationError,
     TranscriptionProcessingError,
     LanguageNotSupportedError,
+    TranscriptValidationError,
 )
+from .validation import TranscriptValidationService, TranscriptValidationResult
 
 __all__ = [
     "ITranscriptionService",
@@ -27,4 +29,7 @@ __all__ = [
     "TranscriptionConfigurationError",
     "TranscriptionProcessingError",
     "LanguageNotSupportedError",
+    "TranscriptValidationError",
+    "TranscriptValidationService",
+    "TranscriptValidationResult",
 ]
