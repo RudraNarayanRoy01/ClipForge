@@ -26,4 +26,4 @@ Consider these target audiences when evaluating topics and entities:
 ## Transcript
 {{transcript_text}}
 
-Analyze the transcript based on the instructions above and return a structured JSON response matching the required schema. Ensure you only populate topics and entities.
+Analyze the transcript based on the instructions above and return a structured JSON response matching the required schema. Ensure you populate topics, entities, hooks, and highlights.

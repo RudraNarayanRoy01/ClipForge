@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
@@ -71,6 +72,19 @@ class Sentiment(BaseModel):
         frozen = True
 
 
+class UnderstandingMetadata(BaseModel):
+    """
+    Provider-independent metadata about the understanding analysis.
+    """
+    analysis_version: str = Field(description="Version of the analysis pipeline")
+    schema_version: str = Field(description="Version of the output schema")
+    processing_timestamp: datetime = Field(description="When this analysis was performed")
+    provider_identifier: str = Field(description="Generic identifier for the provider used")
+
+    class Config:
+        frozen = True
+
+
 class VideoUnderstandingResult(BaseModel):
     """
     The complete result of a video understanding analysis request.
@@ -82,11 +96,10 @@ class VideoUnderstandingResult(BaseModel):
     highlights: List[Highlight] = Field(default_factory=list)
     overall_sentiment: Optional[Sentiment] = None
     summary: Optional[str] = None
+    metadata: Optional[UnderstandingMetadata] = None
 
     class Config:
         frozen = True
-
-
 class VideoAnalysisRequest(BaseModel):
     """
     Request payload for starting a video understanding job.
