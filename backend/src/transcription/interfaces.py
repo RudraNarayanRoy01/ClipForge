@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import uuid
-from .dtos import TranscriptionRequest, Transcript
-
+from typing import List, Optional
+from .dtos import TranscriptionRequest, Transcript, TranscriptSearchResult
 
 class ITranscriptRepository(ABC):
     """
@@ -22,6 +22,16 @@ class ITranscriptRepository(ABC):
         """
         Retrieves a transcript for a given video asset.
         Raises a ValueError if the transcript is not found.
+        """
+        pass
+
+    @abstractmethod
+    async def search_transcripts(self, query: str, video_asset_id: Optional[uuid.UUID] = None, limit: int = 50) -> List[TranscriptSearchResult]:
+        """
+        Searches transcripts for segments matching the keyword query.
+        Results are ordered logically and executed efficiently at the database level.
+        
+        Raises a ValueError for invalid or excessively long queries.
         """
         pass
 

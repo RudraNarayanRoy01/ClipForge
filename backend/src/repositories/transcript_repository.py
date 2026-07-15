@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from src.transcription.interfaces import ITranscriptRepository
-from src.transcription.dtos import Transcript, TranscriptionSegment, TranscriptionWord
+from src.transcription.dtos import Transcript, TranscriptionSegment, TranscriptionWord, TranscriptSearchResult
 from src.infrastructure.models import TranscriptModel, TranscriptSegmentModel, TranscriptWordModel
 
 class TranscriptRepository(ITranscriptRepository):
@@ -99,3 +99,57 @@ class TranscriptRepository(ITranscriptRepository):
             language=language_val,
             metadata=metadata_val
         )
+
+    async def search_transcripts(self, query: str, video_asset_id: Optional[uuid.UUID] = None, limit: int = 50) -> List[TranscriptSearchResult]:
+        if not query or not query.strip():
+            raise ValueError("Search query cannot be empty")
+        
+        # Limit the query length to prevent absurdly large queries
+        if len(query) > 200:
+            raise ValueError("Search query is too long")
+
+        # Start building the SQLAlchemy query for segments
+        stmt = select(TranscriptSegmentModel)
+
+        # Apply keyword search using case-insensitive LIKE
+        # By default, SQLAlchemy `ilike` maps to `ILIKE` on PostgreSQL and `LIKE` on SQLite.
+        stmt = stmt.where(TranscriptSegmentModel.text.ilike(f"%{query}%"))
+
+        if video_asset_id:
+            stmt = stmt.where(TranscriptSegmentModel.video_asset_id == str(video_asset_id))
+
+        # Order by video and then by start_time so sequential results appear in order
+        stmt = stmt.order_by(TranscriptSegmentModel.video_asset_id, TranscriptSegmentModel.start_time)
+        stmt = stmt.limit(limit)
+
+        result = await self.db.execute(stmt)
+        db_segments = result.scalars().all()
+
+        search_results = []
+        for db_segment in db_segments:
+            words = []
+            for db_word in db_segment.words:
+                words.append(TranscriptionWord(
+                    text=db_word.text,
+                    start_time=db_word.start_time,
+                    end_time=db_word.end_time,
+                    confidence=db_word.confidence,
+                    speaker=db_word.speaker
+                ))
+
+            segment_dto = TranscriptionSegment(
+                text=db_segment.text,
+                start_time=db_segment.start_time,
+                end_time=db_segment.end_time,
+                words=words,
+                language=db_segment.language,
+                speaker=db_segment.speaker,
+                confidence=db_segment.confidence
+            )
+
+            search_results.append(TranscriptSearchResult(
+                video_asset_id=uuid.UUID(db_segment.video_asset_id),
+                segment=segment_dto
+            ))
+
+        return search_results

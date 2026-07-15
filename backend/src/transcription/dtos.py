@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
+import uuid
 
 
 class TranscriptionWord(BaseModel):
@@ -55,6 +56,17 @@ class TranscriptionRequest(BaseModel):
     language_hint: Optional[str] = None
     prompt: Optional[str] = Field(default=None, description="Optional prompt to guide transcription context")
     detect_speakers: bool = False
+    
+    class Config:
+        frozen = True
+
+
+class TranscriptSearchResult(BaseModel):
+    """
+    Represents a search result containing a matched segment and its associated video asset ID.
+    """
+    video_asset_id: uuid.UUID
+    segment: TranscriptionSegment
     
     class Config:
         frozen = True

@@ -168,7 +168,7 @@ class TranscriptSegmentModel(Base):
     __tablename__ = "transcript_segments"
     
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    video_asset_id: Mapped[str] = mapped_column(String, ForeignKey("transcripts.video_asset_id"), nullable=False)
+    video_asset_id: Mapped[str] = mapped_column(String, ForeignKey("transcripts.video_asset_id"), nullable=False, index=True)
     segment_index: Mapped[int] = mapped_column(Integer, nullable=False)
     text: Mapped[str] = mapped_column(String, nullable=False)
     start_time: Mapped[float] = mapped_column(Float, nullable=False)
