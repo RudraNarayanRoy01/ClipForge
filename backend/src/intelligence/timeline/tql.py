@@ -31,5 +31,5 @@ class TemporalQueryBuilder:
         # Fetch all for the stream, then apply filters (inefficient but works for MVP)
         results = [e for e in self.store._events if e.stream_id == self.stream_id]
         for f in self._filters:
-            results = list(filter(f, results))
+            results = [e for e in results if f(e)]
         return results
