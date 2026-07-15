@@ -35,11 +35,11 @@ class Hook(BaseModel):
     """
     Represents an engaging segment at the beginning or within the video designed to capture attention.
     """
-    text: str
-    start_time: float
-    end_time: float
-    score: float
-    reasoning: Optional[str] = None
+    text: str = Field(description="The exact text of the hook from the transcript.")
+    start_time: Optional[float] = Field(default=None, description="Start time of the hook in seconds, if available.")
+    end_time: Optional[float] = Field(default=None, description="End time of the hook in seconds, if available.")
+    confidence: float = Field(description="Confidence score of this hook extraction between 0.0 and 1.0.")
+    reasoning: Optional[str] = Field(default=None, description="Reasoning for extracting this hook.")
 
     class Config:
         frozen = True
@@ -49,12 +49,11 @@ class Highlight(BaseModel):
     """
     Represents a highly engaging, important, or entertaining segment of the video.
     """
-    title: str
-    description: str
-    start_time: float
-    end_time: float
-    viral_score: float
-    reasoning: Optional[str] = None
+    text: str = Field(description="The exact text or description of the highlight from the transcript.")
+    start_time: float = Field(description="Start time of the highlight in seconds.")
+    end_time: float = Field(description="End time of the highlight in seconds.")
+    confidence: float = Field(description="Confidence score of this highlight extraction between 0.0 and 1.0.")
+    reasoning: Optional[str] = Field(default=None, description="Reasoning for extracting this highlight.")
 
     class Config:
         frozen = True
