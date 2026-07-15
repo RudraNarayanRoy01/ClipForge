@@ -145,3 +145,57 @@ class PlanningPipelineResultModel(Base):
     clip_strategy_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     prompt_template_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     suitability_assessment_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+class TranscriptModel(Base):
+    __tablename__ = "transcripts"
+    
+    video_asset_id: Mapped[str] = mapped_column(String, ForeignKey("video_assets.id"), primary_key=True)
+    full_text: Mapped[str] = mapped_column(String, nullable=False)
+    language: Mapped[str | None] = mapped_column(String, nullable=True)
+    metadata_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    video: Mapped["VideoAssetModel"] = relationship("VideoAssetModel")
+    segments: Mapped[list["TranscriptSegmentModel"]] = relationship(
+        "TranscriptSegmentModel", 
+        back_populates="transcript", 
+        cascade="all, delete-orphan", 
+        order_by="TranscriptSegmentModel.segment_index",
+        lazy="selectin"
+    )
+
+class TranscriptSegmentModel(Base):
+    __tablename__ = "transcript_segments"
+    
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    video_asset_id: Mapped[str] = mapped_column(String, ForeignKey("transcripts.video_asset_id"), nullable=False)
+    segment_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    text: Mapped[str] = mapped_column(String, nullable=False)
+    start_time: Mapped[float] = mapped_column(Float, nullable=False)
+    end_time: Mapped[float] = mapped_column(Float, nullable=False)
+    language: Mapped[str | None] = mapped_column(String, nullable=True)
+    speaker: Mapped[str | None] = mapped_column(String, nullable=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    
+    transcript: Mapped["TranscriptModel"] = relationship("TranscriptModel", back_populates="segments")
+    words: Mapped[list["TranscriptWordModel"]] = relationship(
+        "TranscriptWordModel", 
+        back_populates="segment", 
+        cascade="all, delete-orphan", 
+        order_by="TranscriptWordModel.word_index",
+        lazy="selectin"
+    )
+
+class TranscriptWordModel(Base):
+    __tablename__ = "transcript_words"
+    
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    segment_id: Mapped[str] = mapped_column(String, ForeignKey("transcript_segments.id"), nullable=False)
+    word_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    text: Mapped[str] = mapped_column(String, nullable=False)
+    start_time: Mapped[float | None] = mapped_column(Float, nullable=True)
+    end_time: Mapped[float | None] = mapped_column(Float, nullable=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    speaker: Mapped[str | None] = mapped_column(String, nullable=True)
+    
+    segment: Mapped["TranscriptSegmentModel"] = relationship("TranscriptSegmentModel", back_populates="words")

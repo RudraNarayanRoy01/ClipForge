@@ -1,4 +1,4 @@
-from .interfaces import ITranscriptionService
+from .interfaces import ITranscriptionService, ITranscriptRepository
 from .dtos import (
     TranscriptionRequest,
     Transcript,
@@ -16,6 +16,7 @@ from .exceptions import (
 
 __all__ = [
     "ITranscriptionService",
+    "ITranscriptRepository",
     "TranscriptionRequest",
     "Transcript",
     "TranscriptionSegment",
