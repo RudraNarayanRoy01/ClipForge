@@ -9,7 +9,6 @@ from .interfaces import (
     IRecommendationEngine,
     ICampaignEvaluationRepository
 )
-from .services.campaign_reasoning_service import DefaultCampaignReasoningService
 from .domain.models import (
     EvaluationContext,
     CampaignEvaluation,
@@ -21,7 +20,11 @@ from .domain.models import (
     RecommendationResult,
     EvaluationId,
     EvaluationStatus,
-    EvaluationMetadata
+    EvaluationMetadata,
+    RecommendationConfidence,
+    RecommendationPriority,
+    RecommendationExplanation,
+    EvaluationSummary
 )
 
 __all__ = [
@@ -30,7 +33,6 @@ __all__ = [
     
     # Application Services
     "ICampaignReasoningService",
-    "DefaultCampaignReasoningService",
     
     # Engines
     "IEligibilityEngine",
@@ -54,5 +56,9 @@ __all__ = [
     "RecommendationResult",
     "EvaluationId",
     "EvaluationStatus",
-    "EvaluationMetadata"
+    "EvaluationMetadata",
+    "RecommendationConfidence",
+    "RecommendationPriority",
+    "RecommendationExplanation",
+    "EvaluationSummary"
 ]
