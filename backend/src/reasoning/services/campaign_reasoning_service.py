@@ -1,15 +1,10 @@
 from datetime import datetime, timezone
 from dataclasses import replace
 
-from src.reasoning.interfaces import (
-    ICampaignReasoningService,
-    IEligibilityEngine,
-    ICompatibilityEngine,
-    ISuitabilityEngine,
-    IRiskEngine,
-    IWorthItEngine,
-    IRecommendationEngine
-)
+from src.reasoning.interfaces import ICampaignReasoningService
+from src.reasoning.eligibility.interfaces import IEligibilityAssessmentEngine
+from src.reasoning.worth_it.interfaces import IWorthItAssessmentEngine
+from src.reasoning.recommendation.interfaces import IRecommendationSynthesisEngine
 from src.reasoning.domain.models import (
     EvaluationContext,
     CampaignEvaluation,
@@ -27,47 +22,29 @@ class DefaultCampaignReasoningService(ICampaignReasoningService):
 
     def __init__(
         self,
-        eligibility_engine: IEligibilityEngine,
-        compatibility_engine: ICompatibilityEngine,
-        suitability_engine: ISuitabilityEngine,
-        risk_engine: IRiskEngine,
-        worth_it_engine: IWorthItEngine,
-        recommendation_engine: IRecommendationEngine
+        eligibility_engine: IEligibilityAssessmentEngine,
+        worth_it_engine: IWorthItAssessmentEngine,
+        recommendation_engine: IRecommendationSynthesisEngine
     ):
         self._eligibility_engine = eligibility_engine
-        self._compatibility_engine = compatibility_engine
-        self._suitability_engine = suitability_engine
-        self._risk_engine = risk_engine
         self._worth_it_engine = worth_it_engine
         self._recommendation_engine = recommendation_engine
 
-    async def evaluate_campaign(self, context: EvaluationContext) -> CampaignEvaluation:
+    def evaluate_campaign(self, context: EvaluationContext) -> CampaignEvaluation:
         # Record the start of evaluation
         metadata_start = EvaluationMetadata(reasoning_version="2.0")
 
         try:
             # 1. Eligibility
-            eligibility = await self._eligibility_engine.evaluate(context)
+            eligibility = self._eligibility_engine.assess(context.document)
 
-            # 2. Compatibility
-            compatibility = await self._compatibility_engine.evaluate(context)
+            # 2. Worth-It
+            worth_it = self._worth_it_engine.assess(context.document, eligibility)
 
-            # 3. Suitability
-            suitability = await self._suitability_engine.evaluate(context)
-
-            # 4. Risk
-            risk = await self._risk_engine.assess(context)
-
-            # 5. Worth-It
-            worth_it = await self._worth_it_engine.evaluate(context)
-
-            # 6. Recommendation
-            recommendation = await self._recommendation_engine.generate_recommendation(
-                context=context,
+            # 3. Recommendation
+            recommendation = self._recommendation_engine.synthesize(
+                document=context.document,
                 eligibility=eligibility,
-                compatibility=compatibility,
-                suitability=suitability,
-                risk=risk,
                 worth_it=worth_it
             )
 
@@ -83,9 +60,6 @@ class DefaultCampaignReasoningService(ICampaignReasoningService):
                 context=context,
                 metadata=metadata_completed,
                 eligibility=eligibility,
-                compatibility=compatibility,
-                suitability=suitability,
-                risk=risk,
                 worth_it=worth_it,
                 recommendation=recommendation
             )

@@ -17,6 +17,20 @@ from .rules import (
 )
 from .engine import DefaultWorthItAssessmentEngine
 
+def create_worth_it_engine() -> IWorthItAssessmentEngine:
+    """
+    Factory function to create the standard Worth-It Assessment Engine 
+    with the default set of deterministic rules.
+    """
+    rules = [
+        RewardRule(),
+        DeliverableRule(),
+        DeadlineRule(),
+        ComplexityRule(),
+        CompletenessRule(),
+    ]
+    return DefaultWorthItAssessmentEngine(rules=rules)
+
 __all__ = [
     "WorthItRating",
     "AssessmentConfidence",
@@ -24,10 +38,5 @@ __all__ = [
     "WorthItAssessment",
     "IWorthItRule",
     "IWorthItAssessmentEngine",
-    "RewardRule",
-    "DeliverableRule",
-    "DeadlineRule",
-    "ComplexityRule",
-    "CompletenessRule",
-    "DefaultWorthItAssessmentEngine",
+    "create_worth_it_engine",
 ]

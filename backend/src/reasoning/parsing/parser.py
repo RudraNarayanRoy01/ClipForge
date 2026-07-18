@@ -153,4 +153,12 @@ class DefaultCampaignStructureParser(ICampaignStructureParser):
         # Push the final section
         push_section()
         
+        # Ensure at least one section for an empty document
+        if not sections:
+            sections.append(DocumentSection(
+                position=0,
+                title=None,
+                elements=[]
+            ))
+        
         return StructuredCampaignDocument(sections=sections)

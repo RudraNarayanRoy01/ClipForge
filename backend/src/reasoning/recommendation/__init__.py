@@ -6,8 +6,14 @@ from src.reasoning.recommendation.models import (
     Recommendation
 )
 from src.reasoning.recommendation.interfaces import IRecommendationSynthesisEngine
-from src.reasoning.recommendation.policy import RecommendationPolicy
 from src.reasoning.recommendation.engine import DefaultRecommendationSynthesisEngine
+
+def create_recommendation_engine() -> IRecommendationSynthesisEngine:
+    """
+    Factory function to create the standard Recommendation Synthesis Engine 
+    with the default policy.
+    """
+    return DefaultRecommendationSynthesisEngine()
 
 __all__ = [
     "RecommendationDecision",
@@ -16,6 +22,5 @@ __all__ = [
     "RecommendationRationale",
     "Recommendation",
     "IRecommendationSynthesisEngine",
-    "RecommendationPolicy",
-    "DefaultRecommendationSynthesisEngine",
+    "create_recommendation_engine",
 ]
