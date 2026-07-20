@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List
 
-from src.editing.domain.pipeline.editing import EditingRequest, EditingSequence
+from src.editing.domain.models.items import Clip
+from src.editing.domain.models.project import EditingProject
 
 
 class IEditingService(ABC):
@@ -9,8 +11,12 @@ class IEditingService(ABC):
     """
 
     @abstractmethod
-    def generate_edit_sequence(self, request: EditingRequest) -> EditingSequence:
+    async def generate_edit_sequence(
+        self, 
+        project: EditingProject, 
+        clips: List[Clip]
+    ) -> Dict[str, Any]:
         """
-        Generates the editing sequence.
+        Generates metadata for the editing sequence based on clips.
         """
         pass

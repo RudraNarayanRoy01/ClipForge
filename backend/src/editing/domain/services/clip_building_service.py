@@ -12,13 +12,12 @@ class IClipBuildingService(ABC):
     """
 
     @abstractmethod
-    async def build_clip(
+    async def build_clips(
         self, 
-        asset_id: UUID, 
-        source_time_range: TimeRange, 
-        target_time_range: TimeRange
-    ) -> Clip:
+        project: EditingProject,
+        timeline: Timeline
+    ) -> List[Clip]:
         """
-        Constructs a Clip timeline item for the given asset and timing boundaries.
+        Constructs Clip timeline items for the given project and timeline.
         """
         pass

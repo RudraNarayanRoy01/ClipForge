@@ -10,7 +10,7 @@ class IEditingOrchestrator(ABC):
     """
 
     @abstractmethod
-    def execute(
+    async def execute(
         self,
         command: EditingExecutionCommand,
     ) -> EditingExecutionResult:
