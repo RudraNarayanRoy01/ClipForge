@@ -8,6 +8,7 @@ from .transformation import ITimelineTransformationService
 from .editing_pipeline_service import IEditingPipelineService
 from .editing_validation_service import IEditingValidationService
 from .executor import ITimelineOperationExecutor
+from .timeline_execution_pipeline import ITimelineExecutionPipeline
 
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     "IEditingPipelineService",
     "IEditingValidationService",
     "ITimelineOperationExecutor",
+    "ITimelineExecutionPipeline",
 ]

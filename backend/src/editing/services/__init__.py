@@ -3,6 +3,7 @@ from .default_timeline_transformation_service import DefaultTimelineTransformati
 from .default_editing_pipeline_service import DefaultEditingPipelineService
 from .default_editing_validation_service import DefaultEditingValidationService
 from .default_timeline_operation_executor import DefaultTimelineOperationExecutor
+from .default_timeline_execution_pipeline import DefaultTimelineExecutionPipeline
 
 __all__ = [
     "DefaultEditingStrategyService",
@@ -10,4 +11,5 @@ __all__ = [
     "DefaultEditingPipelineService",
     "DefaultEditingValidationService",
     "DefaultTimelineOperationExecutor",
+    "DefaultTimelineExecutionPipeline",
 ]
