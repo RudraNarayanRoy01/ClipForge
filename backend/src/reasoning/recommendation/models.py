@@ -44,6 +44,22 @@ class RecommendationRequest:
 
 
 @dataclass(frozen=True)
+class RecommendationInput:
+    """
+    Groups the raw domain inputs required for recommendation evaluation.
+    Provides a stable application-layer payload for the Recommendation Service.
+    """
+    facts: Optional[List[str]] = None
+    days_to_deadline: Optional[float] = None
+    estimated_reward: Optional[float] = None
+    confidence_score: Optional[float] = None
+    estimated_effort: Optional[float] = None
+    risk_score: Optional[float] = None
+    target_platform: Optional[str] = None
+    content_category: Optional[str] = None
+
+
+@dataclass(frozen=True)
 class RecommendationMetrics:
     """
     Strongly typed quantitative metrics for deterministic rule evaluation.
