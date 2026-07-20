@@ -6,3 +6,10 @@ class TrackType(str, Enum):
     SUBTITLE = "SUBTITLE"
     OVERLAY = "OVERLAY"
     EFFECT = "EFFECT"
+
+class TimelineTrackType(str, Enum):
+    """Categories of tracks within the editable timeline state."""
+    VIDEO = "VIDEO"
+    AUDIO = "AUDIO"
+    OVERLAY = "OVERLAY"
+    SUBTITLE = "SUBTITLE"
