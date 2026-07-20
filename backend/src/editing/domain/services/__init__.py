@@ -5,6 +5,8 @@ from .export_planning_service import IExportPlanningService
 from .editing_service import IEditingService
 from .editing_strategy_service import IEditingStrategyService
 from .transformation import ITimelineTransformationService
+from .editing_pipeline_service import IEditingPipelineService
+from .editing_validation_service import IEditingValidationService
 
 
 __all__ = [
@@ -15,4 +17,6 @@ __all__ = [
     "IExportPlanningService",
     "IEditingStrategyService",
     "ITimelineTransformationService",
+    "IEditingPipelineService",
+    "IEditingValidationService",
 ]
