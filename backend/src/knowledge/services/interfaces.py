@@ -9,7 +9,7 @@ class IVideoKnowledgeAccessService(ABC):
     """
     
     @abstractmethod
-    async def get_latest(self, video_id: uuid.UUID) -> VideoKnowledge:
+    async def get_latest(self, video_asset_id: uuid.UUID) -> VideoKnowledge:
         """
         Retrieve the most recent VideoKnowledge snapshot for a video.
         Raises KnowledgeNotFound if no snapshots exist.
@@ -17,7 +17,7 @@ class IVideoKnowledgeAccessService(ABC):
         pass
         
     @abstractmethod
-    async def get_version(self, video_id: uuid.UUID, version: str) -> VideoKnowledge:
+    async def get_version(self, video_asset_id: uuid.UUID, version: str) -> VideoKnowledge:
         """
         Retrieve a specific version of the VideoKnowledge snapshot for a video.
         
@@ -31,7 +31,7 @@ class IVideoKnowledgeAccessService(ABC):
         pass
         
     @abstractmethod
-    async def exists(self, video_id: uuid.UUID) -> bool:
+    async def exists(self, video_asset_id: uuid.UUID) -> bool:
         """
         Check if any VideoKnowledge snapshots exist for a video.
         """

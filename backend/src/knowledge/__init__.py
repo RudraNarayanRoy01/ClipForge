@@ -1,6 +1,6 @@
 from .dtos import VideoKnowledge, KnowledgeMetadata, KnowledgeStatus
 from .exceptions import KnowledgeError, KnowledgeNotFound, KnowledgeUnavailable, KnowledgeVersionNotFound
-from .services import IVideoKnowledgeAccessService, VideoKnowledgeAccessService
+from .services import IVideoKnowledgeAccessService
 
 __all__ = [
     "VideoKnowledge",
@@ -10,6 +10,5 @@ __all__ = [
     "KnowledgeNotFound",
     "KnowledgeUnavailable",
     "KnowledgeVersionNotFound",
-    "IVideoKnowledgeAccessService",
-    "VideoKnowledgeAccessService"
+    "IVideoKnowledgeAccessService"
 ]
