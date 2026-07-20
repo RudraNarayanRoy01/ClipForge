@@ -17,12 +17,15 @@ from .models import (
     MatchConfidence,
     PolicyDecision,
     PolicyRationale,
+    MatchingOutcome,
 )
 
 from .exceptions import (
     MatchingException,
     InvalidMatchRequest,
     InvalidMatchingScope,
+    EngineExecutionError,
+    MatchingServiceError,
 )
 
 __all__ = [
@@ -38,4 +41,6 @@ __all__ = [
     "MatchingException",
     "InvalidMatchRequest",
     "InvalidMatchingScope",
+    "EngineExecutionError",
+    "MatchingServiceError",
 ]

@@ -101,3 +101,15 @@ class PolicyDecision:
     overall_confidence: MatchConfidence
     rationale: PolicyRationale
 
+
+@dataclass(frozen=True)
+class MatchingOutcome:
+    """
+    The immutable service-level contract representing the complete evaluation of a match.
+    Encapsulates the original request, the engine's deterministic result,
+    and the policy's business interpretation.
+    """
+    request: MatchRequest
+    result: MatchResult
+    decision: PolicyDecision
+

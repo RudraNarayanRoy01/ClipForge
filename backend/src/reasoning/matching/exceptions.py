@@ -16,3 +16,8 @@ class InvalidMatchingScope(MatchingException):
 class EngineExecutionError(MatchingException):
     """Raised when the matching engine encounters an error during rule execution."""
     pass
+
+
+class MatchingServiceError(MatchingException):
+    """Raised when the matching service encounters an error orchestrating the workflow."""
+    pass
