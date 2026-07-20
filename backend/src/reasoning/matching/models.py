@@ -79,3 +79,25 @@ class MatchResult:
     matched_requirements: List[MatchedRequirement] = field(default_factory=list)
     knowledge_matches: List[KnowledgeMatch] = field(default_factory=list)
     reasoning: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class PolicyRationale:
+    """
+    Immutable value object containing the supporting explanation for a PolicyDecision.
+    Separates the reasoning process from the final business outcome.
+    """
+    reasons: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class PolicyDecision:
+    """
+    Represents the business interpretation of a MatchResult.
+    This is an immutable domain object representing business conclusions.
+    """
+    accepted: bool
+    overall_confidence: MatchConfidence
+    rationale: PolicyRationale
+

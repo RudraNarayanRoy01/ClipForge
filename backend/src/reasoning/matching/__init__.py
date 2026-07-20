@@ -15,6 +15,8 @@ from .models import (
     MatchingScope,
     MatchingConstraints,
     MatchConfidence,
+    PolicyDecision,
+    PolicyRationale,
 )
 
 from .exceptions import (
@@ -31,6 +33,8 @@ __all__ = [
     "MatchingScope",
     "MatchingConstraints",
     "MatchConfidence",
+    "PolicyDecision",
+    "PolicyRationale",
     "MatchingException",
     "InvalidMatchRequest",
     "InvalidMatchingScope",
