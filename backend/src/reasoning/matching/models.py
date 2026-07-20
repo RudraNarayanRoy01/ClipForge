@@ -52,6 +52,7 @@ class MatchedRequirement:
     requirement_id: uuid.UUID
     description: str
     is_met: bool
+    confidence: Optional[MatchConfidence] = None
 
 
 @dataclass(frozen=True)
@@ -74,7 +75,7 @@ class MatchResult:
     """
     request_id: uuid.UUID
     is_successful: bool
-    confidence: MatchConfidence
+    confidence: Optional[MatchConfidence] = None
     matched_requirements: List[MatchedRequirement] = field(default_factory=list)
     knowledge_matches: List[KnowledgeMatch] = field(default_factory=list)
     reasoning: Optional[str] = None
