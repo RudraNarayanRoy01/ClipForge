@@ -44,6 +44,27 @@ class RecommendationRequest:
 
 
 @dataclass(frozen=True)
+class RecommendationMetrics:
+    """
+    Strongly typed quantitative metrics for deterministic rule evaluation.
+    """
+    days_to_deadline: Optional[float] = None
+    estimated_reward: Optional[float] = None
+    confidence_score: Optional[float] = None
+    estimated_effort: Optional[float] = None
+    risk_score: Optional[float] = None
+
+
+@dataclass(frozen=True)
+class RecommendationAttributes:
+    """
+    Strongly typed qualitative attributes for deterministic rule evaluation.
+    """
+    target_platform: Optional[str] = None
+    content_category: Optional[str] = None
+
+
+@dataclass(frozen=True)
 class RecommendationContext:
     """
     Represents the prepared, immutable context required to evaluate recommendations.
@@ -51,6 +72,8 @@ class RecommendationContext:
     """
     context_id: uuid.UUID = field(default_factory=uuid.uuid4)
     facts: List[str] = field(default_factory=list)
+    metrics: RecommendationMetrics = field(default_factory=RecommendationMetrics)
+    attributes: RecommendationAttributes = field(default_factory=RecommendationAttributes)
 
 
 @dataclass(frozen=True)
