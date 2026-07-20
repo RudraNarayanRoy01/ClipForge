@@ -1,7 +1,7 @@
 from typing import List
 
-from reasoning.matching.models import MatchResult, PolicyDecision, MatchConfidence, PolicyRationale
-from reasoning.matching.policy.interfaces import IMatchPolicy
+from src.reasoning.matching.models import MatchResult, PolicyDecision, MatchConfidence, PolicyRationale
+from src.reasoning.matching.policy.interfaces import IMatchPolicy
 
 
 class DefaultMatchPolicy(IMatchPolicy):

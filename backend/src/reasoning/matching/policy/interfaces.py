@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from reasoning.matching.models import MatchResult, PolicyDecision
+from src.reasoning.matching.models import MatchResult, PolicyDecision
 
 class IMatchPolicy(ABC):
     """
