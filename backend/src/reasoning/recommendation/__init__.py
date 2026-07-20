@@ -1,26 +1,36 @@
-from src.reasoning.recommendation.models import (
-    RecommendationDecision,
+from .models import (
     RecommendationConfidence,
-    RecommendationReason,
-    RecommendationRationale,
+    RecommendationPriority,
+    SuggestedAction,
+    RecommendationRequest,
+    RecommendationContext,
+    RecommendationRuleMatch,
+    RecommendationResult,
+    RecommendationReasoning,
+    RecommendationDecision,
     Recommendation
 )
-from src.reasoning.recommendation.interfaces import IRecommendationSynthesisEngine
-from src.reasoning.recommendation.engine import DefaultRecommendationSynthesisEngine
 
-def create_recommendation_engine() -> IRecommendationSynthesisEngine:
-    """
-    Factory function to create the standard Recommendation Synthesis Engine 
-    with the default policy.
-    """
-    return DefaultRecommendationSynthesisEngine()
+from .exceptions import (
+    RecommendationDomainError,
+    InvalidRecommendationRequestError,
+    RecommendationContextError,
+    ConflictingRecommendationError
+)
 
 __all__ = [
-    "RecommendationDecision",
     "RecommendationConfidence",
-    "RecommendationReason",
-    "RecommendationRationale",
+    "RecommendationPriority",
+    "SuggestedAction",
+    "RecommendationRequest",
+    "RecommendationContext",
+    "RecommendationRuleMatch",
+    "RecommendationResult",
+    "RecommendationReasoning",
+    "RecommendationDecision",
     "Recommendation",
-    "IRecommendationSynthesisEngine",
-    "create_recommendation_engine",
+    "RecommendationDomainError",
+    "InvalidRecommendationRequestError",
+    "RecommendationContextError",
+    "ConflictingRecommendationError"
 ]
