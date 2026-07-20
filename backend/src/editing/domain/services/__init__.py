@@ -9,6 +9,7 @@ from .editing_pipeline_service import IEditingPipelineService
 from .editing_validation_service import IEditingValidationService
 from .executor import ITimelineOperationExecutor
 from .timeline_execution_pipeline import ITimelineExecutionPipeline
+from .timeline_validation_service import ITimelineValidationService
 
 
 __all__ = [
@@ -23,4 +24,5 @@ __all__ = [
     "IEditingValidationService",
     "ITimelineOperationExecutor",
     "ITimelineExecutionPipeline",
+    "ITimelineValidationService",
 ]
