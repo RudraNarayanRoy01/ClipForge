@@ -59,14 +59,15 @@ class DefaultRecommendationPolicy(IRecommendationPolicy):
                 )
             )
 
-        # Basic translation of result properties (like confidence) into business decisions
+        # Derive business priority and suggested action from the deterministic result
         priority = RecommendationPriority.NORMAL
         action = SuggestedAction.REVIEW
         
-        if result.confidence == RecommendationConfidence.HIGH:
+        # Interpret confidence based on the number of matching rules
+        if len(matched_rules) >= 4:
             priority = RecommendationPriority.HIGH
             action = SuggestedAction.PUBLISH
-        elif result.confidence == RecommendationConfidence.LOW:
+        elif len(matched_rules) <= 1:
             priority = RecommendationPriority.LOW
 
         rationale = [f"Matched rule: {r.description}" for r in matched_rules]

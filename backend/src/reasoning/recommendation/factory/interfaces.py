@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Optional, Protocol
 
-from src.reasoning.recommendation.models import RecommendationContext
+from ..models import RecommendationContext
 
 
 class IRecommendationContextFactory(Protocol):

@@ -49,6 +49,5 @@ class DefaultRecommendationEngine(IRecommendationEngine):
         return RecommendationResult(
             request_id=request_id,
             is_successful=True,
-            rule_matches=rule_matches,
-            confidence=None  # Confidence logic resides outside this engine or is passed differently.
+            rule_matches=rule_matches
         )

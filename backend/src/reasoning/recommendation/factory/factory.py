@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Optional
 
-from src.reasoning.recommendation.models import (
+from ..models import (
     RecommendationContext,
     RecommendationMetrics,
     RecommendationAttributes

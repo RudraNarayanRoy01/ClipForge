@@ -111,7 +111,6 @@ class RecommendationResult:
     request_id: uuid.UUID
     is_successful: bool
     rule_matches: List[RecommendationRuleMatch] = field(default_factory=list)
-    confidence: Optional[RecommendationConfidence] = None
     id: uuid.UUID = field(default_factory=uuid.uuid4)
 
 
