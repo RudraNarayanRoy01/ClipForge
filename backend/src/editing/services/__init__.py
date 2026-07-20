@@ -5,6 +5,7 @@ from .default_editing_validation_service import DefaultEditingValidationService
 from .default_timeline_operation_executor import DefaultTimelineOperationExecutor
 from .default_timeline_execution_pipeline import DefaultTimelineExecutionPipeline
 from .default_timeline_validation_service import DefaultTimelineValidationService
+from .default_editing_backend import DefaultEditingBackend
 
 __all__ = [
     "DefaultEditingStrategyService",
@@ -14,4 +15,5 @@ __all__ = [
     "DefaultTimelineOperationExecutor",
     "DefaultTimelineExecutionPipeline",
     "DefaultTimelineValidationService",
+    "DefaultEditingBackend",
 ]

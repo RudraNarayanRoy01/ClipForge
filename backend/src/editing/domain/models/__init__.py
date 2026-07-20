@@ -12,6 +12,7 @@ from src.editing.domain.models.state import (
     TimelineTrack,
     TimelineState,
 )
+from src.editing.domain.models.execution import EditingExecutionResult
 
 __all__ = [
     "TimelineOperation",
@@ -22,4 +23,5 @@ __all__ = [
     "TimelineMetadata",
     "TimelineTrack",
     "TimelineState",
+    "EditingExecutionResult",
 ]

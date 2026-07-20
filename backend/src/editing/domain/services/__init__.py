@@ -10,6 +10,7 @@ from .editing_validation_service import IEditingValidationService
 from .executor import ITimelineOperationExecutor
 from .timeline_execution_pipeline import ITimelineExecutionPipeline
 from .timeline_validation_service import ITimelineValidationService
+from .editing_backend import IEditingBackend
 
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     "ITimelineOperationExecutor",
     "ITimelineExecutionPipeline",
     "ITimelineValidationService",
+    "IEditingBackend",
 ]
