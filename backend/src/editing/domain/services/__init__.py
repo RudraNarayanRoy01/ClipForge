@@ -4,6 +4,8 @@ from .subtitle_generation_service import ISubtitleGenerationService
 from .export_planning_service import IExportPlanningService
 from .editing_service import IEditingService
 from .editing_strategy_service import IEditingStrategyService
+from .transformation import ITimelineTransformationService
+
 
 __all__ = [
     "ITimelinePlanningService",
@@ -12,4 +14,5 @@ __all__ = [
     "ISubtitleGenerationService",
     "IExportPlanningService",
     "IEditingStrategyService",
+    "ITimelineTransformationService",
 ]
