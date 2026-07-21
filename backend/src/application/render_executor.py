@@ -1,5 +1,6 @@
 from src.domain.models.render_plan import RenderPlan
-from src.domain.models.render_result import RenderResult, RenderStatus
+from src.domain.models.render_result import RenderResult
+from src.domain.ports import IRenderBackend
 
 
 class RenderExecutor:
@@ -11,6 +12,9 @@ class RenderExecutor:
     and remains completely backend-independent.
     """
 
+    def __init__(self, backend: IRenderBackend):
+        self._backend = backend
+
     def execute(self, plan: RenderPlan) -> RenderResult:
         """
         Executes a rendering plan and returns the canonical result.
@@ -21,8 +25,4 @@ class RenderExecutor:
         Returns:
             RenderResult: The canonical domain-level outcome of execution.
         """
-        # Placeholder behavior representing the execution contract.
-        return RenderResult(
-            status=RenderStatus.PENDING,
-            message="Execution contract placeholder"
-        )
+        return self._backend.execute(plan)

@@ -33,6 +33,16 @@ class ILLMReasoningEngine(Protocol):
     def rank_clips(self, clips: List[ClipSegment], context: TimelineContext) -> List[ClipSegment]: ...
 
 # --- INFRASTRUCTURE PORTS ---
+from src.domain.models.render_plan import RenderPlan
+from src.domain.models.render_result import RenderResult
+
+class IRenderBackend(Protocol):
+    """
+    Rendering backend abstraction.
+    It owns exactly one responsibility: Execute a RenderPlan.
+    """
+    def execute(self, plan: RenderPlan) -> RenderResult: ...
+
 class IVideoProcessor(Protocol):
     def extract_audio(self, video_path: str, output_path: str) -> None: ...
     def extract_frames(self, video_path: str, output_dir: str, fps: int = 1) -> None: ...
