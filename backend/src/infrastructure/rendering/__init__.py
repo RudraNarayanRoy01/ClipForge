@@ -1,3 +1,3 @@
-from .moviepy_provider import MoviePyRenderingProvider
+from .moviepy_backend import MoviePyRenderingBackend
 
-__all__ = ["MoviePyRenderingProvider"]
+__all__ = ["MoviePyRenderingBackend"]

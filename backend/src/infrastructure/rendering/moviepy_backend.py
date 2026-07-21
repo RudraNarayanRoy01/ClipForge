@@ -1,9 +1,11 @@
 import os
+import uuid
 from typing import Callable, Optional
 from uuid import UUID
 
-from src.domain.services import IRenderingProvider
-from src.domain.models.rendering import RenderSettings, RenderResult, RenderStatus
+from src.domain.ports import IRenderBackend
+from src.domain.models.render_plan import RenderPlan
+from src.domain.models.render_result import RenderResult, RenderStatus
 from src.editing.domain.models.state import TimelineState
 from src.editing.domain.models.items import Clip, Overlay, Subtitle
 from src.editing.domain.enums.items import TimelineItemType
@@ -24,34 +26,54 @@ except ImportError:
     pass
 
 
-class MoviePyRenderingProvider(IRenderingProvider):
+class MoviePyRenderingBackend(IRenderBackend):
     """
-    First concrete implementation of IRenderingProvider using MoviePy.
+    Concrete implementation of IRenderBackend using MoviePy.
     
-    Responsible for translating a complete TimelineState and RenderSettings 
-    into MoviePy rendering operations. Ensures complete isolation of MoviePy 
-    constructs from the domain models.
+    Responsible for executing a RenderPlan using MoviePy constructs.
+    Maintains complete isolation of MoviePy types from the application layer.
     """
 
-    def __init__(self, asset_path_resolver: Callable[[UUID], str]):
+    def __init__(self, asset_path_resolver: Callable[[UUID], str], output_dir: Optional[str] = None):
         """
-        Initializes the MoviePyRenderingProvider.
+        Initializes the MoviePyRenderingBackend.
         
         Args:
-            asset_path_resolver: A synchronous callable that resolves an asset UUID 
-                                 to a local file system path for rendering.
+            asset_path_resolver: Resolves an asset UUID to a local file system path.
+            output_dir: The directory where rendered outputs will be saved. Defaults to system temp.
         """
         self._asset_path_resolver = asset_path_resolver
+        if output_dir is None:
+            import tempfile
+            self._output_dir = tempfile.gettempdir()
+        else:
+            self._output_dir = output_dir
 
-    def render(self, timeline_state: TimelineState, render_settings: RenderSettings) -> RenderResult:
+    def execute(self, plan: RenderPlan) -> RenderResult:
         """
-        Renders a TimelineState according to RenderSettings using MoviePy.
+        Executes a rendering plan using MoviePy.
         
-        Translates domain tracks and items into MoviePy clips, composites them, 
-        and triggers the final rendering process.
+        Args:
+            plan: The canonical RenderPlan containing timeline state and render profile.
+            
+        Returns:
+            RenderResult containing status and output location on success, or error details on failure.
         """
+        try:
+            return self._execute_safe(plan)
+        except Exception as e:
+            return RenderResult(
+                status=RenderStatus.FAILED,
+                message=str(e),
+                rendering_metadata={"provider": "MoviePyRenderingBackend", "error_type": type(e).__name__}
+            )
+
+    def _execute_safe(self, plan: RenderPlan) -> RenderResult:
         visual_clips = []
         audio_clips = []
+        
+        timeline_state = plan.timeline_state
+        render_profile = plan.render_profile
 
         # Process Video Tracks
         for track in timeline_state.video_tracks:
@@ -111,8 +133,8 @@ class MoviePyRenderingProvider(IRenderingProvider):
                     audio_clips.append(audio_clip)
 
         # Composite Visuals
-        output_width = render_settings.output_resolution.width
-        output_height = render_settings.output_resolution.height
+        output_width = render_profile.resolution.width
+        output_height = render_profile.resolution.height
         total_duration = timeline_state.total_duration.value
 
         base_clip = ColorClip(size=(output_width, output_height), color=(0, 0, 0), duration=total_duration)
@@ -123,16 +145,23 @@ class MoviePyRenderingProvider(IRenderingProvider):
             final_audio = CompositeAudioClip(audio_clips)
             final_video = final_video.set_audio(final_audio)
 
-        # Render Output
-        output_path = render_settings.render_output_location
-        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+        # Generate unique output path
+        os.makedirs(self._output_dir, exist_ok=True)
+        filename = f"render_{uuid.uuid4().hex}.{render_profile.output_container.lstrip('.')}"
+        output_path = os.path.join(self._output_dir, filename)
         
+        # Determine bitrates (MoviePy expects strings like '5000k')
+        video_bitrate = render_profile.video_bitrate if render_profile.video_bitrate else None
+        audio_bitrate = render_profile.audio_bitrate if render_profile.audio_bitrate else None
+        
+        # Render Output
         final_video.write_videofile(
             output_path,
-            fps=render_settings.frame_rate,
-            codec=render_settings.video_codec,
-            audio_codec=render_settings.audio_codec,
-            bitrate=render_settings.bitrate
+            fps=render_profile.frame_rate,
+            codec=render_profile.video_codec,
+            audio_codec=render_profile.audio_codec,
+            bitrate=video_bitrate,
+            audio_bitrate=audio_bitrate
         )
 
         final_video.close()
@@ -141,7 +170,7 @@ class MoviePyRenderingProvider(IRenderingProvider):
             status=RenderStatus.COMPLETED,
             rendered_output_location=output_path,
             rendered_duration=total_duration,
-            rendering_metadata={"provider": "MoviePyRenderingProvider"}
+            rendering_metadata={"provider": "MoviePyRenderingBackend"}
         )
 
     def _apply_time_range(self, moviepy_clip, source_time_range: Optional[TimeRange], timeline_time_range: TimeRange):
