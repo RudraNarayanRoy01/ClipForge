@@ -4,6 +4,8 @@ from .export_pipeline import ExportPipeline
 from .export_backend import ExportBackend
 from .render_planner import RenderPlanner
 from .render_validator import RenderValidator
+from .render_composer import RenderComposer
+from .render_planning_pipeline import RenderPlanningPipeline
 
 __all__ = [
     "RenderingPipeline",
@@ -12,4 +14,6 @@ __all__ = [
     "ExportBackend",
     "RenderPlanner",
     "RenderValidator",
+    "RenderComposer",
+    "RenderPlanningPipeline",
 ]
