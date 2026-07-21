@@ -91,8 +91,8 @@ class PlanningPipelineService:
             if not normalized_result.normalized_text.strip():
                 raise ValidationError("Campaign content is empty after normalization. Cannot proceed with planning.")
             
-            # The campaign content is now validated as non-empty and canonical.
-            # In a full implementation we would persist the normalized_text on the campaign object.
+            # Enforce Cross-Subsystem Invariant: Campaign Planning requires normalized campaign
+            campaign.raw_content = normalized_result.normalized_text
             
             logger.info("Stage Finished", extra={"campaign_id": str(campaign_id), "stage": "normalization_and_validation"})
 

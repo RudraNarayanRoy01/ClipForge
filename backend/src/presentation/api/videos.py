@@ -33,6 +33,18 @@ def get_job_repository() -> IJobRepository:
 def get_workflow_dispatcher(repo: IJobRepository = Depends(get_job_repository)) -> IWorkflowDispatcher:
     return AsyncWorkflowDispatcher(repo)
 
+def get_generate_clips_use_case(db: AsyncSession = Depends(get_db)) -> GenerateClipsUseCase:
+    project_repo = ProjectRepository(db)
+    video_processor = FfmpegVideoProcessor()
+    return GenerateClipsUseCase(
+        audio_analyzer=MockAudioAnalyzer(),
+        vision_analyzer=MockVisionAnalyzer(),
+        llm_engine=MockLLMReasoningEngine(),
+        timeline_repo=None, # type: ignore
+        project_repo=project_repo,
+        video_processor=video_processor
+    )
+
 @router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete Video")
 async def delete_video(video_id: str, service: VideoService = Depends(get_video_service)):
     """Delete a video and its physical file."""
@@ -52,7 +64,8 @@ async def analyze_video(
     request: AnalyzeVideoRequest,
     db: AsyncSession = Depends(get_db),
     job_repo: IJobRepository = Depends(get_job_repository),
-    dispatcher: IWorkflowDispatcher = Depends(get_workflow_dispatcher)
+    dispatcher: IWorkflowDispatcher = Depends(get_workflow_dispatcher),
+    use_case: GenerateClipsUseCase = Depends(get_generate_clips_use_case)
 ):
     """
     Triggers the massive multimodal AI pipeline for a video.
@@ -67,22 +80,6 @@ async def analyze_video(
     job = Job(name=f"analyze_video_{video_id}")
     job.accept()
     await job_repo.save(job)
-
-    # Initialize Mock Services
-    audio_analyzer = MockAudioAnalyzer()
-    vision_analyzer = MockVisionAnalyzer()
-    llm_engine = MockLLMReasoningEngine()
-    project_repo = ProjectRepository(db)
-    video_processor = FfmpegVideoProcessor()
-
-    use_case = GenerateClipsUseCase(
-        audio_analyzer=audio_analyzer,
-        vision_analyzer=vision_analyzer,
-        llm_engine=llm_engine,
-        timeline_repo=None, # type: ignore
-        project_repo=project_repo,
-        video_processor=video_processor
-    )
 
     # Dispatch to background execution
     await dispatcher.dispatch(

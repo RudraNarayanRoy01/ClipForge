@@ -79,13 +79,6 @@ class GenerateClipsUseCase:
             full_text = " ".join([w.word for w in words])
             topics = await asyncio.to_thread(self.llm.detect_topics, full_text)
             
-            context = TimelineContext(
-                video_asset_id=video_asset_id,
-                words=words, speakers=speakers, energy=energy, silences=silences,
-                scenes=scenes, faces=faces, emotions=emotions, gestures=gestures,
-                objects=objects, ocr_texts=ocr, topics=topics
-            )
-            
             # Knowledge Extraction (Transformation)
             knowledge_builder = VideoKnowledgeBuilder()
             
@@ -114,6 +107,17 @@ class GenerateClipsUseCase:
                 .with_transcript(transcript_dto)
                 .with_understanding(understanding_dto)
                 .build()
+            )
+            
+            from src.knowledge.dtos import KnowledgeStatus
+            if video_knowledge.status not in [KnowledgeStatus.COMPLETE, KnowledgeStatus.PARTIAL]:
+                raise ValueError("Lifecycle Invariant Violation: Timeline Context generation requires valid Video Knowledge.")
+            
+            context = TimelineContext(
+                video_asset_id=video_asset_id,
+                words=words, speakers=speakers, energy=energy, silences=silences,
+                scenes=scenes, faces=faces, emotions=emotions, gestures=gestures,
+                objects=objects, ocr_texts=ocr, topics=topics
             )
             
             # Persist Timeline Context (Timeline Generation)
