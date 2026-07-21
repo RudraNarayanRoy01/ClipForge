@@ -23,7 +23,10 @@ def get_video_service(db: AsyncSession = Depends(get_db)) -> VideoService:
 @router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete Video")
 async def delete_video(video_id: str, service: VideoService = Depends(get_video_service)):
     """Delete a video and its physical file."""
-    await service.delete_video(video_id)
+    try:
+        await service.delete_video(video_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 @router.get("/{video_id}/clips", response_model=ClipListResponse, tags=["Clips"], summary="Get Video Clips")
 async def get_clips_for_video(video_id: uuid.UUID, skip: int = 0, limit: int = 50):

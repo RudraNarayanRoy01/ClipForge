@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, UploadFile, File
+from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException
 from typing import List
 
 from src.presentation.schemas import ProjectCreate, ProjectResponse, ProjectListResponse, VideoAssetResponse
@@ -28,8 +28,13 @@ def get_video_service(db: AsyncSession = Depends(get_db)) -> VideoService:
 @router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED, summary="Create Workspace")
 async def create_project(project: ProjectCreate, service: ProjectService = Depends(get_project_service)):
     """Create a new video clipping project workspace."""
-    new_project = await service.create_project(project)
-    return new_project
+    try:
+        new_project = await service.create_project(name=project.name, description=project.description)
+        return new_project
+    except ValueError as e:
+        if "already exists" in str(e):
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 @router.get("/", response_model=ProjectListResponse, summary="List Workspaces")
 async def list_projects(skip: int = 0, limit: int = 50, service: ProjectService = Depends(get_project_service)):
@@ -39,19 +44,33 @@ async def list_projects(skip: int = 0, limit: int = 50, service: ProjectService 
 @router.get("/{project_id}", response_model=ProjectResponse, summary="Get Workspace Details")
 async def get_project(project_id: str, service: ProjectService = Depends(get_project_service)):
     """Get complete workspace details by its ID."""
-    return await service.get_project(project_id)
+    try:
+        return await service.get_project(project_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete Workspace")
 async def delete_project(project_id: str, service: ProjectService = Depends(get_project_service)):
     """Delete a workspace and all its data."""
-    await service.delete_project(project_id)
+    try:
+        await service.delete_project(project_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 @router.post("/{project_id}/videos", response_model=VideoAssetResponse, summary="Upload Video")
 async def upload_video(project_id: str, file: UploadFile = File(...), service: VideoService = Depends(get_video_service)):
     """Upload a new video to the project workspace."""
-    return await service.upload_video(project_id, file)
+    try:
+        return await service.upload_video(project_id, file)
+    except ValueError as e:
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 @router.get("/{project_id}/videos", response_model=List[VideoAssetResponse], summary="List Videos")
 async def list_videos(project_id: str, service: VideoService = Depends(get_video_service)):
     """List all videos imported into the project."""
-    return await service.list_videos(project_id)
+    try:
+        return await service.list_videos(project_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

@@ -1,11 +1,9 @@
 import os
 import uuid
 from typing import List
-from fastapi import UploadFile, HTTPException
 
 from src.domain.entities import VideoAsset
-from src.domain.ports import IVideoRepository, IVideoProcessor
-from src.repositories.project_repository import ProjectRepository
+from src.domain.ports import IVideoRepository, IVideoProcessor, IProjectRepository, IUploadFile
 
 ALLOWED_EXTENSIONS = {'.mp4', '.mov', '.mkv', '.avi', '.webm'}
 
@@ -13,20 +11,20 @@ class VideoService:
     def __init__(
         self, 
         video_repo: IVideoRepository,
-        project_repo: ProjectRepository,
+        project_repo: IProjectRepository,
         video_processor: IVideoProcessor
     ):
         self.video_repo = video_repo
         self.project_repo = project_repo
         self.video_processor = video_processor
 
-    async def upload_video(self, project_id: str, file: UploadFile) -> VideoAsset:
+    async def upload_video(self, project_id: str, file: IUploadFile) -> VideoAsset:
         if not file.filename:
-            raise HTTPException(status_code=400, detail="Empty filename")
+            raise ValueError("Empty filename")
             
         file_ext = os.path.splitext(file.filename)[1].lower()
         if file_ext not in ALLOWED_EXTENSIONS:
-            raise HTTPException(status_code=400, detail=f"Unsupported file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}")
+            raise ValueError(f"Unsupported file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}")
             
         try:
             # Verify project exists
@@ -34,8 +32,11 @@ class VideoService:
             project = await self.project_repo.get_by_id(str(project_uuid))
             if not project:
                 raise ValueError("Project not found")
-        except ValueError:
-             raise HTTPException(status_code=404, detail="Project not found")
+        except ValueError as e:
+            # E.g. invalid UUID format or project doesn't exist
+            if str(e) == "Project not found":
+                raise e
+            raise ValueError("Project not found")
             
         # Create storage path
         storage_dir = os.path.join("backend", "storage", "projects", project_id, "videos")
@@ -54,11 +55,12 @@ class VideoService:
                     buffer.write(content)
                     file_size += len(content)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+            raise ValueError(f"Failed to save file: {str(e)}")
             
         if file_size == 0:
-            os.remove(storage_path)
-            raise HTTPException(status_code=400, detail="Uploaded file is empty")
+            if os.path.exists(storage_path):
+                os.remove(storage_path)
+            raise ValueError("Uploaded file is empty")
             
         # Extract metadata
         metadata = {}
@@ -98,8 +100,10 @@ class VideoService:
             if not project:
                 raise ValueError("Project not found")
             return await self.video_repo.get_videos_for_project(project_uuid)
-        except ValueError:
-            raise HTTPException(status_code=404, detail="Project not found")
+        except ValueError as e:
+            if str(e) == "Project not found":
+                raise e
+            raise ValueError("Project not found")
 
     async def delete_video(self, video_id: str) -> None:
         try:
@@ -113,4 +117,4 @@ class VideoService:
             # Delete database record
             await self.video_repo.delete_video(video_uuid)
         except ValueError as e:
-            raise HTTPException(status_code=404, detail=str(e))
+            raise ValueError(str(e))

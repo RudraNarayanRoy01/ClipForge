@@ -104,9 +104,12 @@ class Project:
     """Aggregate Root"""
     id: uuid.UUID = field(default_factory=uuid.uuid4)
     name: str = "Untitled Project"
+    description: Optional[str] = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     status: str = "created"
     storage_path: str = ""
+    video_count: int = 0
+    thumbnail_path: Optional[str] = None
 
 @dataclass
 class VideoAsset:

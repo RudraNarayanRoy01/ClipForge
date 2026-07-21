@@ -1,31 +1,30 @@
 import uuid
-from fastapi import HTTPException
+from typing import Optional
 
-from src.infrastructure.models import ProjectModel
-from src.repositories.project_repository import ProjectRepository
-from src.presentation.schemas import ProjectCreate
+from src.domain.entities import Project
+from src.domain.ports import IProjectRepository
 
 class ProjectService:
-    def __init__(self, repository: ProjectRepository):
+    def __init__(self, repository: IProjectRepository):
         self.repository = repository
 
-    async def create_project(self, project_data: ProjectCreate) -> ProjectModel:
-        name = project_data.name.strip()
+    async def create_project(self, name: str, description: Optional[str] = None) -> Project:
+        name = name.strip()
         if not name:
-            raise HTTPException(status_code=400, detail="Project name cannot be empty")
+            raise ValueError("Project name cannot be empty")
 
         existing_project = await self.repository.get_by_name(name)
         if existing_project:
-            raise HTTPException(status_code=409, detail="A project with this name already exists")
+            raise ValueError("A project with this name already exists")
 
-        project_id = str(uuid.uuid4())
+        project_id = uuid.uuid4()
         # Generate storage path but do not create folder as per sprint rules
         storage_path = f"/data/projects/{project_id}"
 
-        new_project = ProjectModel(
+        new_project = Project(
             id=project_id,
             name=name,
-            description=getattr(project_data, 'description', None),
+            description=description,
             storage_path=storage_path,
             status="EMPTY",
             video_count=0
@@ -45,14 +44,14 @@ class ProjectService:
             }
         }
 
-    async def get_project(self, project_id: str) -> ProjectModel:
+    async def get_project(self, project_id: str) -> Project:
         project = await self.repository.get_by_id(project_id)
         if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+            raise ValueError("Project not found")
         return project
 
     async def delete_project(self, project_id: str) -> None:
         project = await self.repository.get_by_id(project_id)
         if not project:
-            raise HTTPException(status_code=404, detail="Project not found")
+            raise ValueError("Project not found")
         await self.repository.delete(project)
