@@ -27,7 +27,8 @@ class RenderSettings:
     audio_codec: str
     bitrate: str
     output_format: str
-    output_destination: str
+    # Where rendering writes the produced artifact. Not the final user-facing export destination.
+    render_output_location: str
 
 
 @dataclass(frozen=True)

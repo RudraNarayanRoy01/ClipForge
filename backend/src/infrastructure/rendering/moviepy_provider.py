@@ -124,7 +124,7 @@ class MoviePyRenderingProvider(IRenderingProvider):
             final_video = final_video.set_audio(final_audio)
 
         # Render Output
-        output_path = render_settings.output_destination
+        output_path = render_settings.render_output_location
         os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
         
         final_video.write_videofile(
