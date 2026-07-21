@@ -10,5 +10,8 @@
       ]
     }
   },
-  "terminal.integrated.defaultProfile.windows": "PowerShell (Backend venv)"
+  "terminal.integrated.defaultProfile.windows": "PowerShell (Backend venv)",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend"
+  ]
 }

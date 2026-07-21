@@ -4,6 +4,10 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Virtual environments
 .venv/
@@ -33,6 +37,9 @@ yarn-error.log*
 # IDE
 # =========================
 .idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # OS
 Thumbs.db
