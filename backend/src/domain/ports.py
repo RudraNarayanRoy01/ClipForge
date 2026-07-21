@@ -13,6 +13,7 @@ from src.domain.entities import (
     ObjectDetection, OCREvent, TopicSegment, TimelineContext, ClipSegment,
     Project, VideoAsset
 )
+from src.domain.job import Job
 
 # --- PHASE 1 & 2: AUDIO MODALITIES ---
 class IAudioAnalyzer(Protocol):
@@ -115,3 +116,15 @@ class ICampaignRepository(Protocol):
     async def get_planning_result(self, campaign_id: uuid.UUID) -> PlanningPipelineResult: ...
     async def get_planning_history(self, campaign_id: uuid.UUID) -> List[PlanningPipelineResult]: ...
     async def delete_planning_result(self, campaign_id: uuid.UUID) -> None: ...
+
+class IJobRepository(Protocol):
+    """Persistence for Workflow Jobs"""
+    async def save(self, job: Job) -> None: ...
+    async def get(self, job_id: uuid.UUID) -> Job | None: ...
+
+class IWorkflowDispatcher(Protocol):
+    """
+    Technology-agnostic dispatcher for asynchronous workflows.
+    Should orchestrate execution by invoking domain transition methods (e.g. queue, start, complete, fail).
+    """
+    async def dispatch(self, job: Job, task_callable, *args, **kwargs) -> None: ...
