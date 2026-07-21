@@ -6,6 +6,7 @@ from .render_planner import RenderPlanner
 from .render_validator import RenderValidator
 from .render_composer import RenderComposer
 from .render_planning_pipeline import RenderPlanningPipeline
+from .render_executor import RenderExecutor
 
 __all__ = [
     "RenderingPipeline",
@@ -16,4 +17,5 @@ __all__ = [
     "RenderValidator",
     "RenderComposer",
     "RenderPlanningPipeline",
+    "RenderExecutor",
 ]
