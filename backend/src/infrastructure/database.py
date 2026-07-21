@@ -2,8 +2,10 @@ import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
+from src.config.system_settings import SystemSettings
+
 # Local SQLite Database for the AI Clipping Platform
-DB_PATH = os.environ.get("DB_PATH", "clipping_platform.db")
+DB_PATH = SystemSettings().db_path
 # Note the use of aiosqlite for async database drivers
 DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
 

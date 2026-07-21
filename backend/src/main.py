@@ -16,7 +16,10 @@ APP_TITLE = "AI Clipping Platform API"
 APP_DESCRIPTION = "Local-first REST API for multimodal video analysis and clip generation."
 APP_VERSION = "1.0.0"
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+from src.config.system_settings import SystemSettings
+
+system_settings = SystemSettings()
+ENVIRONMENT = system_settings.environment
 
 CORS_ORIGIN_REGEX: Optional[str]
 
@@ -26,7 +29,7 @@ if ENVIRONMENT == "development":
     CORS_ORIGIN_REGEX = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
 else:
     # Production: Require explicit origins, deny all by default
-    raw_origins = os.getenv("CORS_ORIGINS", "")
+    raw_origins = system_settings.cors_origins
     CORS_ORIGINS = [origin.strip() for origin in raw_origins.split(",")] if raw_origins else []
     CORS_ORIGIN_REGEX = None
 

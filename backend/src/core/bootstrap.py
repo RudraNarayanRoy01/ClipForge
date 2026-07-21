@@ -13,8 +13,20 @@ async def validate_startup(app: FastAPI):
     logger.info("Initializing Backend Startup Validation...")
     
     # 1. Configuration
-    # In a real app, we would validate Pydantic settings here
-    logger.info("[SUCCESS] Configuration verified.")
+    try:
+        from src.config.system_settings import SystemSettings
+        from src.config.ai_settings import AISettings
+        from src.config.media_settings import MediaSettings
+        from src.config.transcription_settings import TranscriptionSettings
+        
+        SystemSettings()
+        AISettings()
+        MediaSettings()
+        TranscriptionSettings()
+        logger.info("[SUCCESS] Configuration verified.")
+    except Exception as e:
+        logger.error(f"[FAILED] Configuration validation failed: {str(e)}")
+        raise RuntimeError(f"Configuration validation failed: {e}")
 
     # 2. Database & Repositories
     try:
