@@ -7,6 +7,10 @@ from src.domain.ports import (
 )
 from src.domain.entities import TimelineContext, ClipSegment
 from src.domain.ports import IProjectRepository
+from src.knowledge.builders.video_knowledge_builder import VideoKnowledgeBuilder
+from src.media.dtos import MediaMetadata
+from src.transcription.dtos import Transcript, TranscriptionSegment, TranscriptionWord
+from src.video_understanding.dtos import VideoUnderstandingResult, Topic
 
 class GenerateClipsUseCase:
     """
@@ -57,8 +61,38 @@ class GenerateClipsUseCase:
             objects=objects, ocr_texts=ocr, topics=topics
         )
         
-        # Ensure repo calls are async if supported (TimelineContextRepo is currently synchronous mock in design)
-        # self.timeline_repo.save_context(context)
+        # Knowledge Extraction (Transformation)
+        knowledge_builder = VideoKnowledgeBuilder()
+        
+        # Mappings from internal entities to DTOs for Knowledge Builder
+        transcript_dto = Transcript(
+            full_text=full_text,
+            segments=[
+                TranscriptionSegment(
+                    text=" ".join(w.word for w in words),
+                    start_time=words[0].timestamp if words else 0.0,
+                    end_time=words[-1].timestamp if words else 0.0,
+                    words=[TranscriptionWord(text=w.word, start_time=w.timestamp, end_time=w.timestamp, confidence=1.0) for w in words]
+                )
+            ]
+        )
+        media_meta_dto = MediaMetadata(video_id=str(video_asset_id), duration_seconds=120.0, width=1920, height=1080, fps=30.0)
+        understanding_dto = VideoUnderstandingResult(
+            video_id=str(video_asset_id),
+            topics=[Topic(name=t.topic, start_time=t.start_time, end_time=t.end_time) for t in topics],
+            highlights=[]
+        )
+        
+        video_knowledge = (
+            knowledge_builder
+            .with_media_metadata(media_meta_dto)
+            .with_transcript(transcript_dto)
+            .with_understanding(understanding_dto)
+            .build()
+        )
+        
+        # Persist Timeline Context (Timeline Generation)
+        self.timeline_repo.save_context(context)
         
         candidates = await asyncio.to_thread(self.llm.generate_clips, context)
         ranked_clips = await asyncio.to_thread(self.llm.rank_clips, candidates, context)

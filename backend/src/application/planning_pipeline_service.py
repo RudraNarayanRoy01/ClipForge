@@ -4,7 +4,7 @@ import logging
 
 from src.domain.campaign_entities import PlanningPipelineResult, PipelineStatus, ValidationStatus
 from src.domain.ports import ICampaignRepository
-from src.domain.errors import PlanningError, InfrastructureError, DomainError
+from src.domain.errors import PlanningError, InfrastructureError, DomainError, ValidationError
 from src.application.planning_use_cases import (
     GenerateExecutionPlanUseCase,
     GenerateClipStrategyUseCase,
@@ -12,6 +12,8 @@ from src.application.planning_use_cases import (
     AssessCampaignSuitabilityUseCase,
     PersistPlanningResultsUseCase
 )
+from src.reasoning.normalization.pipeline import DefaultCampaignNormalizationPipeline
+from src.reasoning.normalization.models import CampaignSource
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +79,19 @@ class PlanningPipelineService:
             await self.persist_results_uc.execute(result)
 
         try:
+            # Stage 0: Normalization and Initial Validation
+            logger.info("Stage Started", extra={"campaign_id": str(campaign_id), "stage": "normalization_and_validation"})
+            normalizer = DefaultCampaignNormalizationPipeline()
+            normalized_result = normalizer.normalize(campaign.raw_content, source=CampaignSource.UNKNOWN)
+            
+            if not normalized_result.normalized_text.strip():
+                raise ValidationError("Campaign content is empty after normalization. Cannot proceed with planning.")
+            
+            # The campaign content is now validated as non-empty and canonical.
+            # In a full implementation we would persist the normalized_text on the campaign object.
+            
+            logger.info("Stage Finished", extra={"campaign_id": str(campaign_id), "stage": "normalization_and_validation"})
+
             # Stage 1: Execution Plan
             if not result.execution_plan:
                 stage_start = time.time()
