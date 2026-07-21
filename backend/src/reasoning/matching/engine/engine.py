@@ -4,7 +4,6 @@ from typing import List
 from src.reasoning.matching.engine.interfaces import IMatchingEngine
 from src.reasoning.matching.exceptions import EngineExecutionError
 from src.reasoning.matching.models import (
-    MatchConfidence,
     MatchedRequirement,
     MatchResult,
 )

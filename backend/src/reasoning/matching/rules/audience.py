@@ -3,7 +3,6 @@ from src.reasoning.matching.rules.interfaces import (
     MatchingContext,
     RuleEvaluationResult,
 )
-from src.reasoning.knowledge.models import KnowledgeCategory
 from src.reasoning.matching.models import MatchConfidence
 
 

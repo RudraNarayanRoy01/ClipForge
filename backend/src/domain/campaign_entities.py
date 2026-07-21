@@ -1,6 +1,7 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import List, Optional, Any
+from enum import Enum
+from typing import List, Optional
 from datetime import datetime, timezone
 
 @dataclass(frozen=True)
@@ -92,7 +93,6 @@ class CampaignSuitabilityAssessment:
     confidence: float
     recommendation: str
 
-from enum import Enum
 
 class PipelineStatus(str, Enum):
     NOT_STARTED = "not_started"

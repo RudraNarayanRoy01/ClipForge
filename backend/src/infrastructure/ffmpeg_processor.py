@@ -1,7 +1,7 @@
 import os
 import subprocess
 import json
-from typing import List, Dict, Optional, Union
+from typing import Dict, Optional, Union
 from src.domain.ports import IVideoProcessor
 from src.domain.entities import ClipSegment
 

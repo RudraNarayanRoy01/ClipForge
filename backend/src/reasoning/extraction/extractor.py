@@ -1,4 +1,3 @@
-from typing import List
 
 from src.reasoning.parsing.models import StructuredCampaignDocument
 from .models import (

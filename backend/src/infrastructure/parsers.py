@@ -1,5 +1,8 @@
+import os
+import pymupdf
+import email
+from email import policy
 import httpx
-import json
 from urllib.parse import urlparse
 from src.domain.ports import ICampaignParser
 
@@ -40,11 +43,6 @@ class UrlCampaignParser(ICampaignParser):
                 return content
             except httpx.RequestError as e:
                 raise ValueError(f"Failed to fetch campaign URL: {str(e)}")
-
-import os
-import pymupdf
-import email
-from email import policy
 
 class PdfCampaignParser(ICampaignParser):
     def __init__(self, max_bytes: int = 5 * 1024 * 1024):

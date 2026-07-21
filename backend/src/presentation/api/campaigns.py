@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 import uuid
-from typing import List
 import os
 import tempfile
 
@@ -167,7 +166,7 @@ async def upload_campaign(
         if temp_path and os.path.exists(temp_path):
             try:
                 os.remove(temp_path)
-            except:
+            except Exception:
                 pass
 
 @router.get("/history", response_model=CampaignImportHistoryListResponse, summary="Get Import History")

@@ -17,7 +17,6 @@ from .models import (
     MatchConfidence,
     PolicyDecision,
     PolicyRationale,
-    MatchingOutcome,
 )
 
 from .exceptions import (

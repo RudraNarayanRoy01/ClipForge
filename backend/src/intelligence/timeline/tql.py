@@ -1,4 +1,4 @@
-from typing import List, Optional, TypeVar, Type, Callable
+from typing import List, TypeVar, Type, Callable
 from src.intelligence.timeline.models import SemanticEvent
 from src.infrastructure.timeline.store import TemporalStore
 

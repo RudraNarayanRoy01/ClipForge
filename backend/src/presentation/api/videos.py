@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from typing import List
 import uuid
 
 from src.presentation.schemas import AnalyzeVideoRequest, JobAcceptedResponse, ClipListResponse

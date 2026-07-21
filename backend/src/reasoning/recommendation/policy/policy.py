@@ -3,8 +3,7 @@ from src.reasoning.recommendation.models import (
     RecommendationDecision,
     RecommendationReasoning,
     RecommendationPriority,
-    SuggestedAction,
-    RecommendationConfidence
+    SuggestedAction
 )
 from src.reasoning.recommendation.policy.interfaces import IRecommendationPolicy
 from src.reasoning.recommendation.policy.exceptions import RecommendationInterpretationError

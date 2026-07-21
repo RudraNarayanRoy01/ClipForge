@@ -1,6 +1,5 @@
 import os
 import uuid
-import shutil
 from typing import List
 from fastapi import UploadFile, HTTPException
 
@@ -35,7 +34,7 @@ class VideoService:
             project = await self.project_repo.get_by_id(str(project_uuid))
             if not project:
                 raise ValueError("Project not found")
-        except ValueError as e:
+        except ValueError:
              raise HTTPException(status_code=404, detail="Project not found")
             
         # Create storage path
@@ -65,7 +64,7 @@ class VideoService:
         metadata = {}
         try:
             metadata = self.video_processor.get_video_metadata(storage_path)
-        except Exception as e:
+        except Exception:
             # Log error but don't fail upload completely?
             # For this MVP we can allow it to proceed with missing metadata
             pass

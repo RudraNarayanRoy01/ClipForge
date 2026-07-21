@@ -27,7 +27,8 @@ def test_health_endpoint_schema_and_status():
 def test_projects_create_schema_and_error():
     """Verify that project creation enforces the input schema and currently returns 501."""
     # Valid schema payload, expecting 201
-    response = client.post("/api/v1/projects/", json={"name": "New Project"})
+    import uuid
+    response = client.post("/api/v1/projects/", json={"name": f"New Project {uuid.uuid4()}"})
     assert response.status_code == 201
     
     # Invalid schema payload, expecting 422 Unprocessable Entity

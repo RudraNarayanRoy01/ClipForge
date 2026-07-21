@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 
 from src.editing.domain.models.items import Clip
-from src.editing.domain.value_objects.time import TimeRange
-
+from src.editing.domain.models.project import EditingProject
+from src.editing.domain.models.timeline import Timeline
+from typing import List
 
 class IClipBuildingService(ABC):
     """

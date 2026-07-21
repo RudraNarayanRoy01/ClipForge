@@ -1,5 +1,4 @@
-import re
-from typing import List, Type, Any
+from typing import List, Type
 
 from src.reasoning.parsing.models import (
     DocumentSection,

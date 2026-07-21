@@ -1,8 +1,6 @@
 import uuid
 import time
 import logging
-from typing import Optional
-from datetime import datetime, timezone
 
 from src.domain.campaign_entities import PlanningPipelineResult, PipelineStatus, ValidationStatus
 from src.domain.ports import ICampaignRepository

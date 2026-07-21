@@ -1,4 +1,4 @@
-from typing import Protocol, List, Any, AsyncGenerator, Type, runtime_checkable
+from typing import Protocol, List, Any, Type, runtime_checkable
 from pydantic import BaseModel
 
 from src.intelligence.schemas.ai_models import AIRequest, AIResponse

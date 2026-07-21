@@ -1,5 +1,4 @@
 from typing import Sequence, List, Dict, Tuple
-from dataclasses import replace
 import uuid
 
 from src.reasoning.knowledge.models import KnowledgeEntry, KnowledgeSource, KnowledgeCategory

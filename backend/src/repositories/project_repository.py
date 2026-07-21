@@ -1,4 +1,3 @@
-import uuid
 from typing import Sequence, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select

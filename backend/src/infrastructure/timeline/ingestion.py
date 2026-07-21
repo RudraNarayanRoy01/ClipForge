@@ -1,5 +1,4 @@
 import uuid
-from typing import List
 from src.intelligence.timeline.models import TranscriptEvent
 from src.infrastructure.timeline.store import temporal_store
 

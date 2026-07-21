@@ -1,10 +1,10 @@
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import Optional, Dict, Any
+from dataclasses import dataclass
 
 from src.domain.entities import Resolution
-
 from src.domain.models.render_result import RenderStatus, RenderResult
+from typing import Optional, Dict, Any
+
+__all__ = ["RenderSettings", "RenderStatus", "RenderResult"]
 
 @dataclass(frozen=True)
 class RenderSettings:

@@ -98,7 +98,7 @@ class ImportCampaignUseCase:
             
         except DuplicateCampaignError:
             raise
-        except Exception as e:
+        except Exception:
             campaign.status = CampaignStatus.FAILED
             history.processing_status = "failed"
         

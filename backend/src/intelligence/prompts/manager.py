@@ -2,7 +2,7 @@ import os
 import re
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from pydantic import ValidationError
 from src.intelligence.prompts.models import PromptMetadata, PromptTemplate, RenderedPrompt

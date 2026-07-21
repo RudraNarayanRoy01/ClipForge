@@ -1,9 +1,9 @@
 from src.editing.domain.models.project import EditingProject
-from src.editing.domain.pipeline.clips import ClipBuildingRequest, ClipSequence
-from src.editing.domain.pipeline.editing import EditingRequest, EditingSequence
-from src.editing.domain.pipeline.export import ExportPlanningRequest, RenderPlan
-from src.editing.domain.pipeline.subtitles import SubtitleGenerationRequest, SubtitleTrack
-from src.editing.domain.pipeline.timeline import TimelinePlanningRequest, TimelinePlanningResult
+from src.editing.domain.pipeline.clips import ClipSequence
+from src.editing.domain.pipeline.editing import EditingSequence
+from src.editing.domain.pipeline.export import RenderPlan
+from src.editing.domain.pipeline.subtitles import SubtitleTrack
+from src.editing.domain.pipeline.timeline import TimelinePlanningResult
 from src.editing.domain.services.clip_building_service import IClipBuildingService
 from src.editing.domain.services.editing_service import IEditingService
 from src.editing.domain.services.export_planning_service import IExportPlanningService

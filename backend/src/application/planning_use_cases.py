@@ -3,7 +3,7 @@ from src.domain.campaign_entities import (
     Campaign, CampaignExecutionPlan, CampaignClipStrategy, 
     CampaignPromptTemplate, CampaignSuitabilityAssessment, PlanningPipelineResult
 )
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 from src.domain.ports import ICampaignIntelligence, ICampaignRepository
 
 if TYPE_CHECKING:
@@ -87,7 +87,6 @@ class RegeneratePlanningUseCase:
     async def execute(self, campaign_id: uuid.UUID) -> PlanningPipelineResult:
         return await self.pipeline_service.run_pipeline(campaign_id, force_regenerate=True)
 
-from typing import List
 
 class GetPlanningResultUseCase:
     """

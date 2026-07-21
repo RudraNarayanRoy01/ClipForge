@@ -1,5 +1,4 @@
 import logging
-from typing import Any, Dict
 from datetime import datetime, timezone
 
 from src.intelligence.interfaces.ai_service import IAIService

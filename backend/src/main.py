@@ -4,10 +4,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-import os
 
 from src.presentation.api.v1 import api_router
-
+from src.config.system_settings import SystemSettings
+from src.core.bootstrap import validate_startup
+import httpx
+from src.intelligence.providers.registry import ProviderRegistry
+from src.intelligence.providers.ollama.provider import OllamaProvider
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from src.presentation.schemas import ErrorResponse, ErrorDetail
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -16,7 +22,7 @@ APP_TITLE = "AI Clipping Platform API"
 APP_DESCRIPTION = "Local-first REST API for multimodal video analysis and clip generation."
 APP_VERSION = "1.0.0"
 
-from src.config.system_settings import SystemSettings
+
 
 system_settings = SystemSettings()
 ENVIRONMENT = system_settings.environment
@@ -34,14 +40,7 @@ else:
     CORS_ORIGIN_REGEX = None
 
 # --- Lifecycle ---
-from src.core.bootstrap import validate_startup
-from src.infrastructure.database import engine, Base
 
-
-
-import httpx
-from src.intelligence.providers.registry import ProviderRegistry
-from src.intelligence.providers.ollama.provider import OllamaProvider
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -84,9 +83,6 @@ def configure_middleware(app: FastAPI) -> None:
         
     app.add_middleware(CORSMiddleware, **cors_kwargs)
 
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from src.presentation.schemas import ErrorResponse, ErrorDetail
 
 def configure_exception_handlers(app: FastAPI) -> None:
     """Configures global exception handlers to enforce strict API contracts."""

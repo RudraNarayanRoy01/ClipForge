@@ -1,6 +1,4 @@
 import uuid
-from typing import Sequence, Optional
-from datetime import datetime, timezone
 from fastapi import HTTPException
 
 from src.infrastructure.models import ProjectModel

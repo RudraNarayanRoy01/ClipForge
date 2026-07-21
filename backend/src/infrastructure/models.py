@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, ForeignKey, JSON, Enum as SQLEnum
+from sqlalchemy import String, Float, Integer, Boolean, DateTime, ForeignKey, JSON, Enum as SQLEnum
 from typing import Any
 from datetime import datetime, timezone
 

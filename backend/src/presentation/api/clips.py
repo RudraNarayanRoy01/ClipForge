@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
 import uuid
 
 from src.presentation.schemas import (
-    ClipResponse, ClipListResponse, ClipUpdate, JobAcceptedResponse
+    ClipResponse, ClipUpdate, JobAcceptedResponse
 )
 
 router = APIRouter(

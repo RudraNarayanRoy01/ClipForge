@@ -2,7 +2,7 @@ import uuid
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from src.domain.entities import Project, ClipSegment, VideoAsset, TimeRange, Resolution, GeneratedCaption
+from src.domain.entities import Project, ClipSegment, TimeRange, GeneratedCaption
 # We technically need an async port interface, but we will adapt the existing one conceptually
 from src.infrastructure.models import ProjectModel, ClipSegmentModel
 

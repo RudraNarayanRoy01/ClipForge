@@ -144,7 +144,7 @@ class DefaultCampaignStructureParser(ICampaignStructureParser):
                 i += 1
                 
             current_elements.append(ParagraphBlock(
-                text=" ".join([l.strip() for l in orig_lines]),
+                text=" ".join([line.strip() for line in orig_lines]),
                 original_lines=orig_lines,
                 start_line=start_i,
                 end_line=i - 1

@@ -1,5 +1,12 @@
 from typing import Protocol, List
 import uuid
+from src.domain.models.render_plan import RenderPlan
+from src.domain.models.render_result import RenderResult
+from src.domain.campaign_entities import (
+    Campaign, CampaignRules, CampaignSummary, WorthItScore, CampaignImportHistory,
+    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment,
+    PlanningPipelineResult
+)
 from src.domain.entities import (
     WordLevelTimestamp, SpeakerSegment, EnergySegment, SilenceSegment,
     SceneBoundary, FaceBoundingBox, EmotionSegment, GestureEvent,
@@ -32,10 +39,6 @@ class ILLMReasoningEngine(Protocol):
     def generate_clips(self, context: TimelineContext) -> List[ClipSegment]: ...
     def rank_clips(self, clips: List[ClipSegment], context: TimelineContext) -> List[ClipSegment]: ...
 
-# --- INFRASTRUCTURE PORTS ---
-from src.domain.models.render_plan import RenderPlan
-from src.domain.models.render_result import RenderResult
-
 class IRenderBackend(Protocol):
     """
     Rendering backend abstraction.
@@ -64,13 +67,6 @@ class IVideoRepository(Protocol):
 class ITimelineContextRepository(Protocol):
     def save_context(self, context: TimelineContext) -> None: ...
     def get_context(self, video_asset_id: uuid.UUID) -> TimelineContext: ...
-
-# --- CAMPAIGN INTELLIGENCE PORTS ---
-from src.domain.campaign_entities import (
-    Campaign, CampaignRules, CampaignSummary, WorthItScore, CampaignImportHistory,
-    CampaignExecutionPlan, CampaignClipStrategy, CampaignPromptTemplate, CampaignSuitabilityAssessment,
-    PlanningPipelineResult
-)
 
 class ICampaignNormalizationService(Protocol):
     """Normalizes raw campaign text before intelligence extraction"""

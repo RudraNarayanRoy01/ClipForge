@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import uuid
-from typing import List
 
-from src.infrastructure.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.presentation.schemas import PlanningRequest, PlanningResponse, PlanningHistoryResponse, PaginationMeta
+from src.presentation.schemas import PlanningRequest, PlanningResponse, PlanningHistoryResponse
 from src.infrastructure.campaign_repository import CampaignRepository
 from src.application.planning_pipeline_service import PlanningPipelineService
 from src.application.planning_use_cases import (

@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-import uuid
+from fastapi import APIRouter, Depends, status, UploadFile, File
 from typing import List
 
 from src.presentation.schemas import ProjectCreate, ProjectResponse, ProjectListResponse, VideoAssetResponse
