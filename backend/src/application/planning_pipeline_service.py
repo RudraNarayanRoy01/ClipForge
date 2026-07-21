@@ -2,7 +2,7 @@ import uuid
 import time
 import logging
 
-from src.domain.campaign_entities import PlanningPipelineResult, PipelineStatus, ValidationStatus
+from src.domain.campaign_entities import PlanningPipelineResult, PipelineStatus, ValidationStatus, ExecutionStatus
 from src.domain.ports import ICampaignRepository
 from src.domain.errors import PlanningError, InfrastructureError, DomainError, ValidationError
 from src.application.planning_use_cases import (
@@ -59,11 +59,14 @@ class PlanningPipelineService:
                 planning_version="unknown",
                 version=result.version + 1
             )
+            result.transition_execution_state(ExecutionStatus.CREATED)
             logger.info("Forcing Pipeline Regeneration", extra={"campaign_id": str(campaign_id), "new_version": result.version})
         else:
             if result.pipeline_status in (PipelineStatus.COMPLETED, PipelineStatus.RUNNING):
                 logger.info("Pipeline Skipped", extra={"campaign_id": str(campaign_id), "status": result.pipeline_status.value})
                 return result
+
+        result.transition_execution_state(ExecutionStatus.INITIALIZED)
 
         logger.info(
             "Pipeline Started",
@@ -76,6 +79,7 @@ class PlanningPipelineService:
 
         if result.pipeline_status in (PipelineStatus.NOT_STARTED, PipelineStatus.FAILED):
             result.pipeline_status = PipelineStatus.RUNNING
+            result.transition_execution_state(ExecutionStatus.RUNNING)
             await self.persist_results_uc.execute(result)
 
         try:
@@ -146,6 +150,7 @@ class PlanningPipelineService:
 
             # Mark Completed
             result.pipeline_status = PipelineStatus.COMPLETED
+            result.transition_execution_state(ExecutionStatus.COMPLETED)
             result.execution_duration_ms += int((time.time() - pipeline_start_time) * 1000)
             
             result.compute_overall_confidence()
@@ -182,6 +187,7 @@ class PlanningPipelineService:
                 }
             )
             result.pipeline_status = PipelineStatus.FAILED
+            result.transition_execution_state(ExecutionStatus.FAILED)
             result.execution_duration_ms += int((time.time() - pipeline_start_time) * 1000)
             await self.persist_results_uc.execute(result)
             raise
@@ -197,6 +203,7 @@ class PlanningPipelineService:
                 exc_info=True
             )
             result.pipeline_status = PipelineStatus.FAILED
+            result.transition_execution_state(ExecutionStatus.FAILED)
             result.execution_duration_ms += int((time.time() - pipeline_start_time) * 1000)
             await self.persist_results_uc.execute(result)
             raise InfrastructureError(f"Unexpected pipeline error: {str(e)}") from e

@@ -94,6 +94,14 @@ class CampaignSuitabilityAssessment:
     recommendation: str
 
 
+class ExecutionStatus(str, Enum):
+    CREATED = "created"
+    INITIALIZED = "initialized"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
 class PipelineStatus(str, Enum):
     NOT_STARTED = "not_started"
     RUNNING = "running"
@@ -116,16 +124,34 @@ class PlanningPipelineResult:
     planner_model: str = "unknown"
     planning_version: str = "1.0.0"
     version: int = 1
+    
+    # Domain-specific progress
     pipeline_status: PipelineStatus = PipelineStatus.NOT_STARTED
     validation_status: ValidationStatus = ValidationStatus.PENDING
     overall_confidence: float = 0.0
     execution_duration_ms: int = 0
     generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
+    # Generic Execution Lifecycle
+    execution_status: ExecutionStatus = ExecutionStatus.CREATED
+    previous_execution_status: Optional[ExecutionStatus] = None
+    execution_status_updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    
     execution_plan: Optional[CampaignExecutionPlan] = None
     clip_strategy: Optional[CampaignClipStrategy] = None
     prompt_template: Optional[CampaignPromptTemplate] = None
     suitability_assessment: Optional[CampaignSuitabilityAssessment] = None
+
+    def transition_execution_state(self, new_status: ExecutionStatus) -> None:
+        """Deterministic state transition for generic pipeline execution lifecycle."""
+        # Enforce basic invariant: cannot transition if already in a terminal state unless resetting
+        terminal_states = {ExecutionStatus.COMPLETED, ExecutionStatus.FAILED, ExecutionStatus.CANCELLED}
+        if self.execution_status in terminal_states and new_status not in {ExecutionStatus.CREATED, ExecutionStatus.INITIALIZED}:
+             raise ValueError(f"Cannot transition pipeline execution from terminal state {self.execution_status} to {new_status}")
+             
+        self.previous_execution_status = self.execution_status
+        self.execution_status = new_status
+        self.execution_status_updated_at = datetime.now(timezone.utc)
 
     def validate_consistency(self) -> None:
         """
