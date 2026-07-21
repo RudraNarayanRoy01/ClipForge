@@ -45,13 +45,13 @@ class DefaultAIService(IAIService):
             try:
                 # If provider natively returned a pre-parsed data structure (e.g., via Tool Calling/JSON Mode)
                 if isinstance(response.structured_output, (dict, list)):
-                    response.structured_output = command.response_schema.model_validate(response.structured_output)
+                    response.structured_output = command.response_schema.parse_obj(response.structured_output)
                 elif response.text:
                     text = response.text.strip()
                     # Defensively strip markdown formatting (case-insensitive for language identifier)
                     text = re.sub(r'^```(?:json)?\s*', '', text, flags=re.IGNORECASE)
                     text = re.sub(r'\s*```$', '', text)
-                    response.structured_output = command.response_schema.model_validate_json(text.strip())
+                    response.structured_output = command.response_schema.parse_raw(text.strip())
                 else:
                     raise AIResponseValidationError("Provider returned empty response when structured output was expected.")
             except ValidationError as e:

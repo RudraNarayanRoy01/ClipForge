@@ -53,7 +53,7 @@ class LLMVideoUnderstandingService(IVideoUnderstandingService):
 
     def _normalize_result(self, result: VideoUnderstandingResult, provider_id: str) -> VideoUnderstandingResult:
         # 1. Normalize and deduplicate Topics
-        topic_map = {}
+        topic_map: dict[str, Topic] = {}
         for t in result.topics or []:
             name_key = t.name.strip().lower()
             conf = self._normalize_confidence(t.confidence)
@@ -70,7 +70,7 @@ class LLMVideoUnderstandingService(IVideoUnderstandingService):
         unique_topics = sorted(topic_map.values(), key=lambda x: x.confidence, reverse=True)
 
         # 2. Normalize and deduplicate Entities
-        entity_map = {}
+        entity_map: dict[tuple[str, str], Entity] = {}
         for e in result.entities or []:
             key = (e.name.strip().lower(), e.entity_type.strip().lower())
             conf = self._normalize_confidence(e.confidence)
@@ -84,24 +84,24 @@ class LLMVideoUnderstandingService(IVideoUnderstandingService):
         unique_entities = sorted(entity_map.values(), key=lambda x: x.confidence, reverse=True)
 
         # 3. Normalize Hooks
-        hook_map = {}
+        hook_map: dict[str, Hook] = {}
         for h in result.hooks or []:
             text_key = h.text.strip().lower()
             conf = self._normalize_confidence(h.confidence)
-            st = h.start_time
-            et = h.end_time
-            if st is not None and et is not None:
-                st, et = self._normalize_timestamps(st, et)
-            elif st is not None:
-                st = max(0.0, st)
-            elif et is not None:
-                et = max(0.0, et)
+            hook_st = h.start_time
+            hook_et = h.end_time
+            if hook_st is not None and hook_et is not None:
+                hook_st, hook_et = self._normalize_timestamps(hook_st, hook_et)
+            elif hook_st is not None:
+                hook_st = max(0.0, hook_st)
+            elif hook_et is not None:
+                hook_et = max(0.0, hook_et)
             
             if text_key not in hook_map or hook_map[text_key].confidence < conf:
                 hook_map[text_key] = Hook(
                     text=h.text,
-                    start_time=st,
-                    end_time=et,
+                    start_time=hook_st,
+                    end_time=hook_et,
                     confidence=conf,
                     reasoning=h.reasoning
                 )
@@ -109,7 +109,7 @@ class LLMVideoUnderstandingService(IVideoUnderstandingService):
         hooks.sort(key=lambda x: x.start_time if x.start_time is not None else 0.0)
 
         # 4. Normalize Highlights
-        highlight_map = {}
+        highlight_map: dict[str, Highlight] = {}
         for hl in result.highlights or []:
             text_key = hl.text.strip().lower()
             conf = self._normalize_confidence(hl.confidence)

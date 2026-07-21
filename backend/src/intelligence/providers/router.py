@@ -1,6 +1,7 @@
 from typing import List, Type, Any, Optional
 from src.intelligence.providers.local.gemma4 import Gemma4LocalProvider
 from src.intelligence.providers.factory import ProviderFactory
+from src.intelligence.providers.capabilities import IAIProvider
 
 class CapabilityRouter:
     def __init__(self, factory: Optional[ProviderFactory] = None):
@@ -8,7 +9,7 @@ class CapabilityRouter:
         Legacy capability router. 
         Adapted to optionally accept modern ProviderFactory via DI.
         """
-        self._providers = []
+        self._providers: List[IAIProvider] = []
         
         # If modern factory is injected, resolve the modern provider
         if factory:

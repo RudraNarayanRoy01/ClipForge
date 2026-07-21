@@ -1,5 +1,6 @@
 import time
 import httpx
+from typing import Any
 from pydantic import ValidationError
 
 from src.config.ai_settings import AISettings
@@ -33,7 +34,7 @@ class OllamaProvider(BaseProvider):
         url = f"{self._base_url}/api/generate"
         
         # Build payload mapping AIRequest to Ollama API
-        payload = {
+        payload: dict[str, Any] = {
             "model": self._settings.ollama_model,
             "prompt": request.prompt,
             "stream": False,
@@ -52,7 +53,7 @@ class OllamaProvider(BaseProvider):
 
         # Support structured output via JSON Schema format
         if request.response_schema is not None:
-            payload["format"] = request.response_schema.model_json_schema()
+            payload["format"] = request.response_schema.schema()
 
         timeout = self._settings.ai_timeout_seconds
         
@@ -70,7 +71,7 @@ class OllamaProvider(BaseProvider):
         if request.response_schema is not None:
             # Parse the string into the Pydantic model
             # This can raise ValidationError, which we catch in _translate_exception
-            structured_output = request.response_schema.model_validate_json(text)
+            structured_output = request.response_schema.parse_raw(text)
 
         return AIResponse(
             text=text,

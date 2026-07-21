@@ -107,10 +107,6 @@ class TranscriptValidationService:
         if "word_count" not in new_metadata:
             new_metadata["word_count"] = word_count
 
-        # Support both Pydantic v1 and v2 for copying immutable models
-        try:
-            enriched_transcript = transcript.model_copy(update={"metadata": new_metadata})
-        except AttributeError:
-            enriched_transcript = transcript.copy(update={"metadata": new_metadata})
+        enriched_transcript = transcript.copy(update={"metadata": new_metadata})
 
         return TranscriptValidationResult(is_valid=True, errors=[], transcript=enriched_transcript)

@@ -140,12 +140,12 @@ class RecommendationKnowledgeRule(IKnowledgeExtractionRule):
     ) -> List[KnowledgeEntry]:
         entries: List[KnowledgeEntry] = []
 
-        for reason in recommendation.rationale.reasons:
+        for reason in recommendation.decision.reasoning.supporting_rationale:
             entries.append(
                 KnowledgeEntry(
                     category=KnowledgeCategory.CAMPAIGN,
                     subject="Decision Pattern Insight",
-                    value=f"Observation: Decision '{recommendation.decision.name}' was influenced by '{reason.code}'. This may indicate a recurring workflow pattern.",
+                    value=f"Observation: Decision '{recommendation.decision.primary_action.name}' was influenced by '{reason}'. This may indicate a recurring workflow pattern.",
                     confidence=KnowledgeConfidence.LOW
                 )
             )

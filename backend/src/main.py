@@ -99,7 +99,7 @@ def configure_exception_handlers(app: FastAPI) -> None:
         error_response = ErrorResponse(error=error_detail)
         return JSONResponse(
             status_code=422,
-            content=error_response.model_dump(),
+            content=error_response.dict(),
         )
 
 def configure_routers(app: FastAPI) -> None:
