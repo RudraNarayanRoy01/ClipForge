@@ -121,7 +121,7 @@ class GenerateClipsUseCase:
             )
             
             # Persist Timeline Context (Timeline Generation)
-            self.timeline_repo.save_context(context)
+            await self.timeline_repo.save_context(context)
             
             candidates = await asyncio.to_thread(self.llm.generate_clips, context)
             ranked_clips = await asyncio.to_thread(self.llm.rank_clips, candidates, context)
