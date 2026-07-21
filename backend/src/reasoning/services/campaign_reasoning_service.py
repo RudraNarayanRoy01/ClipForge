@@ -5,7 +5,7 @@ from src.reasoning.interfaces import ICampaignReasoningService
 from src.reasoning.eligibility.interfaces import IEligibilityAssessmentEngine
 from src.reasoning.worth_it.interfaces import IWorthItAssessmentEngine
 from src.reasoning.recommendation.interfaces import IRecommendationSynthesisEngine
-from src.reasoning.domain.models import (
+from src.reasoning.domain import (
     EvaluationContext,
     CampaignEvaluation,
     EvaluationId,

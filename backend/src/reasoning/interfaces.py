@@ -2,7 +2,7 @@ import uuid
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from src.reasoning.domain.models import (
+from src.reasoning.domain import (
     EvaluationContext,
     CampaignEvaluation,
     EvaluationId

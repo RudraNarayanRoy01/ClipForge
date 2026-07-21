@@ -1,13 +1,13 @@
-from backend.src.reasoning.recommendation.models import (
+from src.reasoning.recommendation.models import (
     RecommendationRequest,
     RecommendationInput,
     Recommendation
 )
-from backend.src.reasoning.recommendation.factory import IRecommendationContextFactory
-from backend.src.reasoning.recommendation.engine import IRecommendationEngine
-from backend.src.reasoning.recommendation.policy import IRecommendationPolicy
-from backend.src.reasoning.recommendation.service.interfaces import IRecommendationService
-from backend.src.reasoning.recommendation.service.exceptions import RecommendationServiceError
+from src.reasoning.recommendation.factory import IRecommendationContextFactory
+from src.reasoning.recommendation.engine import IRecommendationEngine
+from src.reasoning.recommendation.policy import IRecommendationPolicy
+from src.reasoning.recommendation.service.interfaces import IRecommendationService
+from src.reasoning.recommendation.service.exceptions import RecommendationServiceError
 
 
 class DefaultRecommendationService(IRecommendationService):

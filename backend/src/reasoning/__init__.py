@@ -3,7 +3,7 @@ from .interfaces import (
     ICampaignReasoningService,
     ICampaignEvaluationRepository
 )
-from .domain.models import (
+from .domain import (
     EvaluationContext,
     CampaignEvaluation,
     EvaluationId,

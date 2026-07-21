@@ -1,4 +1,4 @@
-from backend.src.reasoning.recommendation.models import (
+from src.reasoning.recommendation.models import (
     RecommendationResult,
     RecommendationDecision,
     RecommendationReasoning,
@@ -6,8 +6,8 @@ from backend.src.reasoning.recommendation.models import (
     SuggestedAction,
     RecommendationConfidence
 )
-from backend.src.reasoning.recommendation.policy.interfaces import IRecommendationPolicy
-from backend.src.reasoning.recommendation.policy.exceptions import RecommendationInterpretationError
+from src.reasoning.recommendation.policy.interfaces import IRecommendationPolicy
+from src.reasoning.recommendation.policy.exceptions import RecommendationInterpretationError
 
 
 class DefaultRecommendationPolicy(IRecommendationPolicy):

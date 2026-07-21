@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from backend.src.reasoning.recommendation.models import (
+from src.reasoning.recommendation.models import (
     RecommendationRequest,
     RecommendationInput,
     Recommendation

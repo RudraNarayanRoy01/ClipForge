@@ -1,6 +1,6 @@
-from backend.src.reasoning.recommendation.policy.interfaces import IRecommendationPolicy
-from backend.src.reasoning.recommendation.policy.policy import DefaultRecommendationPolicy
-from backend.src.reasoning.recommendation.policy.exceptions import (
+from src.reasoning.recommendation.policy.interfaces import IRecommendationPolicy
+from src.reasoning.recommendation.policy.policy import DefaultRecommendationPolicy
+from src.reasoning.recommendation.policy.exceptions import (
     RecommendationPolicyError,
     RecommendationInterpretationError
 )

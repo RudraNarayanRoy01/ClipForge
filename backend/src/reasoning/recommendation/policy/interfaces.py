@@ -1,6 +1,6 @@
 import abc
 
-from backend.src.reasoning.recommendation.models import (
+from src.reasoning.recommendation.models import (
     RecommendationResult,
     RecommendationDecision
 )

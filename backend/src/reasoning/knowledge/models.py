@@ -92,10 +92,10 @@ class KnowledgeEntry:
     - Deadline = Tomorrow
     - Platform = TikTok
     """
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
     category: KnowledgeCategory
     subject: str
     value: str
     confidence: KnowledgeConfidence
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
     evidence: List[KnowledgeEvidence] = field(default_factory=list)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
