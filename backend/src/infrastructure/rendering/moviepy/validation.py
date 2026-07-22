@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Set
 
+from src.infrastructure.rendering.moviepy.timeline import MoviePyTimeline
+
 class MoviePyAssetValidator:
     """
     Validates infrastructure assets prior to loading.
@@ -56,3 +58,40 @@ class MoviePyAssetValidator:
             raise ValueError(f"Unsupported subtitle format '{ext}' for asset: {source_reference}")
         elif expected_category not in {"video", "audio", "image", "subtitle"}:
             raise ValueError(f"Unknown asset category '{expected_category}' for asset: {source_reference}")
+
+
+class MoviePyOutputValidator:
+    """
+    Validates render specification semantics and timeline consistency prior to output composition.
+    Does not validate execution environment or filesystem concerns.
+    """
+    
+    @classmethod
+    def validate_timeline(cls, timeline: MoviePyTimeline) -> None:
+        """
+        Validates the semantic consistency of a composed timeline graph.
+        
+        Args:
+            timeline: The immutable timeline to validate.
+            
+        Raises:
+            ValueError: If the timeline is semantically invalid for rendering.
+        """
+        if not timeline:
+            raise ValueError("Timeline cannot be None")
+            
+        if timeline.context is None:
+            raise ValueError("Timeline context cannot be missing, graph integrity compromised")
+            
+        if not timeline.has_video and not timeline.has_audio:
+            raise ValueError("Timeline is empty: must contain at least one visual or audio track")
+            
+        if timeline.context.duration_seconds <= 0:
+            raise ValueError(f"Timeline duration must be positive, got {timeline.context.duration_seconds}")
+            
+        if timeline.context.resolution_width <= 0 or timeline.context.resolution_height <= 0:
+            raise ValueError(
+                f"Timeline resolution must be positive, got "
+                f"{timeline.context.resolution_width}x{timeline.context.resolution_height}"
+            )
+
