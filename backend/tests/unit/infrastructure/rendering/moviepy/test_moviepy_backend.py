@@ -54,13 +54,24 @@ def dummy_request():
 
 import asyncio
 
-def test_moviepy_backend_success_execution(dummy_request):
+@patch("src.infrastructure.rendering.moviepy.backend.MoviePyRenderExecutor")
+@patch("src.infrastructure.rendering.moviepy.backend.MoviePyOutputComposer")
+def test_moviepy_backend_success_execution(mock_output_composer, mock_executor, dummy_request):
     """
     Test that the backend successfully returns a completed RenderExecutionResult
     without performing actual rendering, maintaining stateless execution.
     """
     translator = MoviePyRequestTranslator()
     backend = MoviePyRenderingBackend(translator=translator)
+    
+    mock_output_composer.compose_output.return_value = None
+    
+    # Mock executor to return a successful result
+    from src.infrastructure.rendering.moviepy.execution import MoviePyExecutionResult
+    mock_executor.execute.return_value = MoviePyExecutionResult.create_success(
+        elapsed_time_seconds=1.5,
+        metadata={"codec": "libx264"}
+    )
     
     result = asyncio.run(backend.execute(dummy_request))
     

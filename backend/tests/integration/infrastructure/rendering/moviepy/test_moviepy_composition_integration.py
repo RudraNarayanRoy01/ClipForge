@@ -89,12 +89,21 @@ def test_timeline_composition_integration_lifecycle(integration_render_plan):
     
     assert pool.get_video_clip(segment_id) is None
     
+from unittest.mock import patch
+
 @pytest.mark.asyncio
-async def test_backend_execution_incorporates_composition(integration_render_plan):
+@patch("src.infrastructure.rendering.moviepy.backend.MoviePyRenderExecutor")
+async def test_backend_execution_incorporates_composition(mock_executor, integration_render_plan):
     """
     Test that the backend execute method successfully orchestrates loading and composition
     and returns a success result without performing a file export.
     """
+    from src.infrastructure.rendering.moviepy.execution import MoviePyExecutionResult
+    mock_executor.execute.return_value = MoviePyExecutionResult.create_success(
+        elapsed_time_seconds=2.0,
+        metadata={"codec": "libx264"}
+    )
+    
     validated = ValidatedRenderPlan(plan=integration_render_plan, validated_at=datetime.utcnow())
     request = RenderExecutionRequest(validated_plan=validated, output_destination="/tmp/never_written.mp4")
     
