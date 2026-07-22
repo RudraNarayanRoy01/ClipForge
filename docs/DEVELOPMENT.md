@@ -52,7 +52,7 @@ The frontend uses Vite, TypeScript, and React. Ensure you are running commands f
 ### Setup
 ```bash
 cd frontend
-npm install
+npm ci
 ```
 
 ### Static Analysis
