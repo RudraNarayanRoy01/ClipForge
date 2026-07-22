@@ -6,12 +6,12 @@ from unittest.mock import patch
 
 from src.application.render_planner import RenderPlanner
 from src.application.render_validator import RenderValidator
-from src.application.render_composer import RenderComposer
+from src.application.render_composition_service import RenderCompositionService
 from src.application.render_planning_pipeline import RenderPlanningPipeline
 from src.application.render_execution_pipeline import RenderExecutionPipeline
 from src.application.render_executor import RenderExecutor
 from src.infrastructure.rendering.moviepy_backend import MoviePyRenderingBackend
-from src.domain.models.render_plan import RenderPlan
+from src.domain.render_plan import RenderPlan
 from src.domain.models.render_result import RenderResult, RenderStatus
 from src.domain.models.render_profile import RenderProfile
 from src.domain.entities import Resolution
@@ -107,7 +107,7 @@ def test_end_to_end_render_pipeline():
     # 2. Build the Pipelines
     planner = RenderPlanner()
     validator = RenderValidator()
-    composer = RenderComposer()
+    composer = RenderCompositionService()
     
     planning_pipeline = RenderPlanningPipeline(
         planner=planner,
@@ -129,8 +129,8 @@ def test_end_to_end_render_pipeline():
     render_plan = planning_pipeline.execute(timeline_state, render_profile)
     
     assert isinstance(render_plan, RenderPlan)
-    assert render_plan.timeline_state == timeline_state
-    assert render_plan.render_profile == render_profile
+    assert len(render_plan.layers) == 4
+    assert render_plan.metadata.duration_seconds == total_duration.value
     
     # 4. Execute Rendering Phase (with mock moviepy)
     # RenderPlan -> RenderExecutionPipeline -> RenderResult

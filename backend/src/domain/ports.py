@@ -1,6 +1,6 @@
 from typing import Protocol, List, Sequence
 import uuid
-from src.domain.models.render_plan import RenderPlan
+from src.domain.render_plan import RenderPlan
 from src.domain.models.render_result import RenderResult
 from src.domain.campaign_entities import (
     Campaign, CampaignRules, CampaignSummary, WorthItScore, CampaignImportHistory,

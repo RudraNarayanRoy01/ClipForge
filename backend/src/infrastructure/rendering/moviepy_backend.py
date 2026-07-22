@@ -4,7 +4,7 @@ from typing import Callable, Optional
 from uuid import UUID
 
 from src.domain.ports import IRenderBackend
-from src.domain.models.render_plan import RenderPlan
+from src.domain.render_plan import RenderPlan
 from src.domain.models.render_result import RenderResult, RenderStatus
 from src.editing.domain.models.items import Clip, Overlay, Subtitle
 from src.editing.domain.enums.items import TimelineItemType

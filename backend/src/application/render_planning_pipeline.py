@@ -1,7 +1,7 @@
 from src.application.render_planner import RenderPlanner
 from src.application.render_validator import RenderValidator
-from src.application.render_composer import RenderComposer
-from src.domain.models.render_plan import RenderPlan
+from src.application.render_composition_service import RenderCompositionService
+from src.domain.render_plan import RenderPlan
 from src.domain.models.render_profile import RenderProfile
 from src.editing.domain.models.state import TimelineState
 
@@ -18,7 +18,7 @@ class RenderPlanningPipeline:
         self,
         planner: RenderPlanner,
         validator: RenderValidator,
-        composer: RenderComposer
+        composer: RenderCompositionService
     ):
         self.planner = planner
         self.validator = validator
