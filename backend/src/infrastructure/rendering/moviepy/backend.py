@@ -10,15 +10,19 @@ from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTrans
 from src.infrastructure.rendering.moviepy.exceptions import MoviePyExceptionTranslator
 from src.infrastructure.rendering.moviepy.loader import MoviePyAssetLoader
 from src.infrastructure.rendering.moviepy.timeline import MoviePyTimelineComposer
+from src.infrastructure.rendering.moviepy.output import MoviePyOutputComposer
+from src.infrastructure.rendering.moviepy.execution import (
+    MoviePyExecutionContext,
+    MoviePyRenderExecutor
+)
 
 
 class MoviePyRenderingBackend(IRenderBackend):
     """
     Concrete implementation of IRenderBackend using MoviePy.
     
-    Responsible for executing a RenderExecutionRequest using MoviePy constructs.
-    It remains stateless and translates all backend failures to ensure
-    MoviePy exceptions never escape the Infrastructure layer.
+    Responsible for orchestrating the preparation of the execution context
+    and delegating the actual rendering execution to the MoviePyRenderExecutor.
     """
 
     def __init__(self, translator: Optional[MoviePyRequestTranslator] = None):
@@ -32,14 +36,7 @@ class MoviePyRenderingBackend(IRenderBackend):
 
     async def execute(self, request: RenderExecutionRequest) -> RenderExecutionResult:
         """
-        Executes a rendering request asynchronously.
-        
-        Args:
-            request (RenderExecutionRequest): The execution request containing a validated RenderPlan.
-            
-        Returns:
-            RenderExecutionResult: The outcome of the rendering process, including neutral 
-                                   status and diagnostics, abstracting away backend-specific errors.
+        Orchestrates rendering asynchronously by delegating to the executor.
         """
         start_time = time.monotonic()
         moviepy_task = None
@@ -51,32 +48,50 @@ class MoviePyRenderingBackend(IRenderBackend):
                 request.output_destination
             )
             
-            # 2. Resource loading and validation
-            # The loader securely resolves references into backend-owned resources.
-            # Ownership remains isolated inside the task's ResourcePool.
+            # 2. Resource loading
             MoviePyAssetLoader.load_assets(
                 request.validated_plan.plan, 
                 moviepy_task.resources
             )
             
             # 3. Timeline Composition
-            # Compose the timeline, yielding a detached immutable composition graph
-            # Note: No export or encoding is performed in this batch.
             timeline = MoviePyTimelineComposer.compose(
                 plan=request.validated_plan.plan, 
                 resources=moviepy_task.resources
             )
             
-            # (Export deferred to Batch 5.5.5.4: Output Composition)
-            duration = time.monotonic() - start_time
-            return RenderExecutionResult.success(
-                duration_seconds=duration,
-                output_artifact_path=request.output_destination
+            # 4. Output Composition (Specification)
+            render_output = MoviePyOutputComposer.compose_output(
+                timeline=timeline,
+                custom_metadata=request.execution_options.get("metadata")
             )
             
+            # 5. Prepare Execution Context
+            context = MoviePyExecutionContext(
+                execution_destination=request.output_destination,
+                resource_pool=moviepy_task.resources,
+                runtime_options=request.execution_options
+            )
+            
+            # 6. Execute Render (Executor handles its own exceptions and cleanup)
+            execution_result = MoviePyRenderExecutor.execute(render_output, context)
+            
+            # 7. Translate Execution Result
+            if execution_result.success:
+                return RenderExecutionResult.success(
+                    duration_seconds=execution_result.elapsed_time_seconds,
+                    output_artifact_path=request.output_destination
+                )
+            else:
+                return RenderExecutionResult.failure(
+                    duration_seconds=execution_result.elapsed_time_seconds,
+                    category=execution_result.failure_category,
+                    message=execution_result.failure_message,
+                    details=execution_result.diagnostics
+                )
+            
         except Exception as e:
-            # 4. Explicit Exception Translation
-            # Ensure exceptions never escape the Infrastructure layer.
+            # Catch exceptions that occur BEFORE execution (e.g., during translation, loading, composition)
             category, message, details = MoviePyExceptionTranslator.translate(e)
             
             duration = time.monotonic() - start_time
@@ -88,7 +103,6 @@ class MoviePyRenderingBackend(IRenderBackend):
             )
             
         finally:
-            # 5. Deterministic Cleanup
-            # Driven purely by ownership logic, independent of execution success/failure.
+            # Deterministic Fallback Cleanup (e.g., if exception occurred before executor)
             if moviepy_task is not None:
                 moviepy_task.resources.cleanup()
