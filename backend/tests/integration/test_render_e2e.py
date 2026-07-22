@@ -12,8 +12,29 @@ from src.application.execution_models import ValidatedRenderPlan, RenderExecutio
 
 # Replace RenderExecutionPipeline and RenderExecutor with the new execution service
 from src.application.render_execution_service import RenderExecutionService
+from src.application.execution_models import RenderExecutionRequest, RenderFailureCategory
+from src.domain.contracts.render_backend import IRenderBackend
 
-from src.infrastructure.rendering.moviepy.backend import MoviePyRenderingBackend
+class DummyRenderingBackend(IRenderBackend):
+    """
+    Behavioral test double for IRenderBackend capable of exercising representative orchestration scenarios.
+    Ensures backend neutrality by avoiding actual FFmpeg/MoviePy dependencies.
+    """
+    def __init__(self, simulate_failure: bool = False):
+        self.simulate_failure = simulate_failure
+
+    async def execute(self, request: RenderExecutionRequest) -> RenderExecutionResult:
+        if self.simulate_failure:
+            return RenderExecutionResult.failure(
+                duration_seconds=0.5,
+                category=RenderFailureCategory.BACKEND_FAILURE,
+                message="Simulated architectural backend failure.",
+                details={"error_code": "SIM_FAIL"}
+            )
+        return RenderExecutionResult.success(
+            duration_seconds=1.0,
+            output_artifact_path=request.output_destination
+        )
 from src.domain.render_plan import RenderPlan
 from src.domain.models.render_profile import RenderProfile
 from src.domain.entities import Resolution
@@ -117,7 +138,7 @@ def test_end_to_end_render_pipeline():
         composer=composer
     )
     
-    backend = MoviePyRenderingBackend()
+    backend = DummyRenderingBackend(simulate_failure=False)
     execution_service = RenderExecutionService(backend=backend)
     
     # 3. Execute Planning Phase
@@ -133,12 +154,10 @@ def test_end_to_end_render_pipeline():
     import datetime
     validated_plan = ValidatedRenderPlan(plan=render_plan, validated_at=datetime.datetime.utcnow())
     
-    # 4. Execute Rendering Phase (with the MoviePy backend skeleton)
+    # 4. Execute Rendering Phase (with the Dummy backend)
     temp_dir = tempfile.gettempdir()
     dummy_result_path = os.path.join(temp_dir, "test_render.mp4")
     
-    # The new skeleton always returns a success result immediately, without throwing exceptions,
-    # thereby verifying the architectural integrity of the pipeline end-to-end.
     import asyncio
     result = asyncio.run(execution_service.execute_plan(validated_plan, dummy_result_path))
     
@@ -146,4 +165,75 @@ def test_end_to_end_render_pipeline():
     assert isinstance(result, RenderExecutionResult)
     assert result.status == RenderExecutionStatus.COMPLETED
     assert result.output_artifact_path == dummy_result_path
+
+def test_end_to_end_render_pipeline_failure():
+    """
+    Verifies that the orchestrator properly handles a backend failure, maintaining
+    statelessness and abstraction boundaries without leaking backend exceptions.
+    """
+    metadata = TimelineMetadata(fps=30.0, resolution=(1920, 1080), sample_rate=44100)
+    total_duration = Time(value=10.0)
+    
+    clip = Clip(
+        id=uuid.uuid4(),
+        item_type=TimelineItemType.CLIP,
+        timeline_time_range=TimeRange(start=Time(value=0.0), end=Time(value=10.0)),
+        asset_id=uuid.uuid4(),
+    )
+    
+    video_track = TimelineTrack(
+        id=uuid.uuid4(),
+        track_type=TimelineTrackType.VIDEO,
+        items=(clip,)
+    )
+    
+    timeline_state = TimelineState(
+        video_tracks=(video_track,),
+        audio_tracks=(),
+        overlay_tracks=(),
+        subtitle_tracks=(),
+        metadata=metadata,
+        total_duration=total_duration
+    )
+    
+    render_profile = RenderProfile(
+        name="1080p HD",
+        profile_type="youtube",
+        resolution=Resolution(width=1920, height=1080),
+        aspect_ratio=AspectRatio.RATIO_16_9,
+        frame_rate=30.0,
+        video_codec="libx264",
+        audio_codec="aac",
+        video_bitrate="5000k",
+        audio_bitrate="192k",
+        sample_rate=44100,
+        output_container=".mp4"
+    )
+    
+    planning_pipeline = RenderPlanningPipeline(
+        planner=RenderPlanner(),
+        validator=RenderValidator(),
+        composer=RenderCompositionService()
+    )
+    
+    backend = DummyRenderingBackend(simulate_failure=True)
+    execution_service = RenderExecutionService(backend=backend)
+    
+    render_plan = planning_pipeline.execute(timeline_state, render_profile)
+    
+    import datetime
+    validated_plan = ValidatedRenderPlan(plan=render_plan, validated_at=datetime.datetime.utcnow())
+    
+    temp_dir = tempfile.gettempdir()
+    dummy_result_path = os.path.join(temp_dir, "test_render_fail.mp4")
+    
+    import asyncio
+    result = asyncio.run(execution_service.execute_plan(validated_plan, dummy_result_path))
+    
+    assert isinstance(result, RenderExecutionResult)
+    assert result.status == RenderExecutionStatus.FAILED
+    assert result.diagnostics is not None
+    assert result.diagnostics.category == RenderFailureCategory.BACKEND_FAILURE
+    assert result.diagnostics.details["error_code"] == "SIM_FAIL"
+
 
