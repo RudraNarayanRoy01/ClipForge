@@ -5,6 +5,7 @@ from src.application.execution_models import (
     RenderExecutionResult,
 )
 from src.application.rendering.models import RenderProgress
+from src.application.rendering.telemetry import RenderExecutionEvent
 
 class IRenderExecutionService(Protocol):
     """
@@ -26,4 +27,14 @@ class IRenderProgressObserver(Protocol):
     Observers consume progress snapshots but never own or mutate the progress state.
     """
     def on_progress(self, progress: RenderProgress) -> None:
+        ...
+
+
+class IRenderTelemetryObserver(Protocol):
+    """
+    Contract for receiving execution telemetry events.
+    Observers are strictly passive: they may consume events but must never mutate 
+    telemetry state or influence orchestration decisions.
+    """
+    def on_event(self, event: RenderExecutionEvent) -> None:
         ...
