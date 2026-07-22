@@ -8,6 +8,7 @@ from src.application.execution_models import (
 )
 from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTranslator
 from src.infrastructure.rendering.moviepy.exceptions import MoviePyExceptionTranslator
+from src.infrastructure.rendering.moviepy.loader import MoviePyAssetLoader
 
 
 class MoviePyRenderingBackend(IRenderBackend):
@@ -40,6 +41,7 @@ class MoviePyRenderingBackend(IRenderBackend):
                                    status and diagnostics, abstracting away backend-specific errors.
         """
         start_time = time.monotonic()
+        moviepy_task = None
         
         try:
             # 1. Translate backend-agnostic request to MoviePy-specific task structure
@@ -48,10 +50,16 @@ class MoviePyRenderingBackend(IRenderBackend):
                 request.output_destination
             )
             
-            # 2. Resource loading and composition would happen here using moviepy_task.resources
-            # (Deferred to Batch 5.5.5.2)
+            # 2. Resource loading and validation
+            # The loader securely resolves references into backend-owned resources.
+            # Ownership remains isolated inside the task's ResourcePool.
+            MoviePyAssetLoader.load_assets(
+                request.validated_plan.plan, 
+                moviepy_task.resources
+            )
             
             # 3. Execution simulation
+            # (Deferred to Batch 5.5.5.3: Timeline Rendering Pipeline)
             # We return a success result conforming exactly to the RenderExecutionResult contract.
             duration = time.monotonic() - start_time
             return RenderExecutionResult.success(
@@ -71,3 +79,9 @@ class MoviePyRenderingBackend(IRenderBackend):
                 message=message,
                 details=details
             )
+            
+        finally:
+            # 5. Deterministic Cleanup
+            # Driven purely by ownership logic, independent of execution success/failure.
+            if moviepy_task is not None:
+                moviepy_task.resources.cleanup()

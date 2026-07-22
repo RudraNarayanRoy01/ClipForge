@@ -24,28 +24,27 @@ class MoviePyExceptionTranslator:
             - str: A generic message safe for the application layer.
             - Dict[str, Any]: Detailed diagnostic information.
         """
-        category = RenderFailureCategory.UNKNOWN
-        message = "An unexpected rendering backend error occurred."
         details: Dict[str, Any] = {
             "error_type": type(exception).__name__,
             "error_message": str(exception),
             "backend": "MoviePy"
         }
         
-        # In a real implementation, we would map specific MoviePy or FFmpeg 
-        # exceptions to specific categories.
-        # e.g., if isinstance(exception, FileNotFoundError):
-        #          category = RenderFailureCategory.RESOURCE_EXHAUSTED
-        #          message = "Required asset not found on disk."
-        
-        # For now, we use a generic mapping approach for the skeleton
-        if isinstance(exception, (OSError, IOError)):
+        if isinstance(exception, FileNotFoundError):
             category = RenderFailureCategory.RESOURCE_EXHAUSTED
-            message = "An IO or OS error occurred during rendering."
+            message = "Required asset not found on disk."
+        elif isinstance(exception, PermissionError):
+            category = RenderFailureCategory.RESOURCE_EXHAUSTED
+            message = "Permission denied when accessing required asset."
         elif isinstance(exception, ValueError):
             category = RenderFailureCategory.VALIDATION_REQUIRED
-            message = "Invalid parameters provided to the rendering backend."
+            message = "Invalid parameters or unsupported asset provided to the rendering backend."
+        elif isinstance(exception, (OSError, IOError)):
+            # MoviePy often raises OSError when it cannot read a file or probe it via ffmpeg
+            category = RenderFailureCategory.RESOURCE_EXHAUSTED
+            message = "An IO or OS error occurred while loading or processing media."
         else:
             category = RenderFailureCategory.BACKEND_FAILURE
+            message = "An unexpected rendering backend error occurred."
             
         return category, message, details
