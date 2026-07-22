@@ -9,6 +9,7 @@ from src.application.execution_models import (
 from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTranslator
 from src.infrastructure.rendering.moviepy.exceptions import MoviePyExceptionTranslator
 from src.infrastructure.rendering.moviepy.loader import MoviePyAssetLoader
+from src.infrastructure.rendering.moviepy.timeline import MoviePyTimelineComposer
 
 
 class MoviePyRenderingBackend(IRenderBackend):
@@ -58,9 +59,15 @@ class MoviePyRenderingBackend(IRenderBackend):
                 moviepy_task.resources
             )
             
-            # 3. Execution simulation
-            # (Deferred to Batch 5.5.5.3: Timeline Rendering Pipeline)
-            # We return a success result conforming exactly to the RenderExecutionResult contract.
+            # 3. Timeline Composition
+            # Compose the timeline, yielding a detached immutable composition graph
+            # Note: No export or encoding is performed in this batch.
+            timeline = MoviePyTimelineComposer.compose(
+                plan=request.validated_plan.plan, 
+                resources=moviepy_task.resources
+            )
+            
+            # (Export deferred to Batch 5.5.5.4: Output Composition)
             duration = time.monotonic() - start_time
             return RenderExecutionResult.success(
                 duration_seconds=duration,
