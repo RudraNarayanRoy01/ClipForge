@@ -11,6 +11,7 @@ from .exceptions import (
 )
 from .interfaces import IRenderExecutionService
 from .orchestrator import RenderJobOrchestrator
+from .session import RenderExecutionSession
 
 __all__ = [
     "RenderJob",
@@ -22,4 +23,5 @@ __all__ = [
     "RenderJobValidationError",
     "IRenderExecutionService",
     "RenderJobOrchestrator",
+    "RenderExecutionSession",
 ]
