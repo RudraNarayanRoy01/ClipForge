@@ -26,10 +26,10 @@ class RenderValidator:
         messages: List[str] = []
         
         # Validate TimelineState presence and content
-        if not draft.timeline_state:
-            errors.append("RenderDraft is missing a TimelineState.")
+        if not getattr(draft, 'finalized_edit', None) or not draft.finalized_edit.timeline:
+            errors.append("RenderDraft is missing a finalized edit or timeline.")
         else:
-            timeline = draft.timeline_state
+            timeline = draft.finalized_edit.timeline
             
             # Ensure there is at least one track with items to render
             has_video = any(track.items for track in timeline.video_tracks)

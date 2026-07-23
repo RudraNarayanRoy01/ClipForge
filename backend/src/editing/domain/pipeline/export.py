@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 
 from src.editing.domain.models.export import ExportProfile
 from src.editing.domain.models.project import EditingProject
+from src.editing.domain.models.state import TimelineState
 from src.editing.domain.pipeline.editing import EditingSequence
 from src.editing.domain.pipeline.subtitles import SubtitleTrack
 
@@ -15,6 +16,7 @@ class FinalizedEdit:
     Completely independent of rendering engines (FFmpeg, MoviePy, etc.).
     Describes only WHAT should be rendered.
     """
+    timeline: TimelineState
     editing_sequence: EditingSequence
     subtitle_track: SubtitleTrack
     export_profile: ExportProfile
@@ -28,6 +30,7 @@ class ExportPlanningRequest:
     Canonical input for export planning.
     """
     project: EditingProject
+    timeline: TimelineState
     editing_sequence: EditingSequence
     subtitle_track: SubtitleTrack
     export_profile: ExportProfile

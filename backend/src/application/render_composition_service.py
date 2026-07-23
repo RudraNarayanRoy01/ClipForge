@@ -36,13 +36,13 @@ class RenderCompositionService:
         # Since RenderDraft doesn't include a project ID, we assign one for the final plan execution context
         project_id = uuid.uuid4()
         
-        metadata = self._normalize_metadata(draft.timeline_state, draft.render_profile)
+        metadata = self._normalize_metadata(draft.finalized_edit.timeline, draft.render_profile)
         builder = RenderPlanBuilder(project_id=project_id, metadata=metadata)
         
-        self._compose_layer(builder, LayerCategory.VIDEO, "Video Layer", 0, draft.timeline_state.video_tracks)
-        self._compose_layer(builder, LayerCategory.AUDIO, "Audio Layer", 1, draft.timeline_state.audio_tracks)
-        self._compose_layer(builder, LayerCategory.OVERLAY, "Overlay Layer", 2, draft.timeline_state.overlay_tracks)
-        self._compose_layer(builder, LayerCategory.SUBTITLE, "Subtitle Layer", 3, draft.timeline_state.subtitle_tracks)
+        self._compose_layer(builder, LayerCategory.VIDEO, "Video Layer", 0, draft.finalized_edit.timeline.video_tracks)
+        self._compose_layer(builder, LayerCategory.AUDIO, "Audio Layer", 1, draft.finalized_edit.timeline.audio_tracks)
+        self._compose_layer(builder, LayerCategory.OVERLAY, "Overlay Layer", 2, draft.finalized_edit.timeline.overlay_tracks)
+        self._compose_layer(builder, LayerCategory.SUBTITLE, "Subtitle Layer", 3, draft.finalized_edit.timeline.subtitle_tracks)
         
         return builder.build()
         

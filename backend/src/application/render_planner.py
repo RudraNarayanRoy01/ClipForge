@@ -1,6 +1,6 @@
 from src.domain.models.render_draft import RenderDraft
 from src.domain.models.render_profile import RenderProfile
-from src.editing.domain.models.state import TimelineState
+from src.editing.domain.pipeline.export import FinalizedEdit
 
 
 class RenderPlanner:
@@ -11,18 +11,18 @@ class RenderPlanner:
     or exporting, and it remains decoupled from filesystem concepts.
     """
 
-    def plan(self, timeline_state: TimelineState, render_profile: RenderProfile) -> RenderDraft:
+    def plan(self, finalized_edit: FinalizedEdit, render_profile: RenderProfile) -> RenderDraft:
         """
         Assembles rendering inputs into a RenderDraft.
         
         Args:
-            timeline_state: The complete state of the timeline to be rendered.
+            finalized_edit: The complete immutable representation of the Editing Domain outcome.
             render_profile: The rendering profile containing platform rendering defaults.
             
         Returns:
             RenderDraft: An intermediate rendering specification.
         """
         return RenderDraft(
-            timeline_state=timeline_state,
+            finalized_edit=finalized_edit,
             render_profile=render_profile,
         )

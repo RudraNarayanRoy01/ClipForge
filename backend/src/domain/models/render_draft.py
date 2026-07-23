@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.editing.domain.models.state import TimelineState
+from src.editing.domain.pipeline.export import FinalizedEdit
 from src.domain.models.render_profile import RenderProfile
 
 
@@ -13,5 +13,5 @@ class RenderDraft:
     Contains assembled rendering information only, remaining backend independent
     and completely decoupled from filesystem locations or execution context.
     """
-    timeline_state: TimelineState
+    finalized_edit: FinalizedEdit
     render_profile: RenderProfile

@@ -1,4 +1,5 @@
 from src.editing.domain.models.project import EditingProject
+from src.editing.domain.models.state import TimelineState
 from src.editing.domain.pipeline.clips import ClipSequence
 from src.editing.domain.pipeline.editing import EditingSequence
 from src.editing.domain.pipeline.export import FinalizedEdit
@@ -46,7 +47,12 @@ class DefaultEditingOrchestrator(IEditingOrchestrator):
         clip_sequence = await self._build_clips(command.project, timeline_result)
         editing_sequence = await self._generate_edit_sequence(command.project, clip_sequence)
         subtitle_track = await self._generate_subtitles(command.project)
-        finalized_edit = await self._plan_export(command.project, editing_sequence, subtitle_track)
+        finalized_edit = await self._plan_export(
+            command.project, 
+            timeline_result.timeline, 
+            editing_sequence, 
+            subtitle_track
+        )
 
         return EditingOrchestrationResult(
             finalized_edit=finalized_edit,
@@ -86,11 +92,13 @@ class DefaultEditingOrchestrator(IEditingOrchestrator):
     async def _plan_export(
         self,
         project: EditingProject,
+        timeline: TimelineState,
         editing_sequence: EditingSequence,
         subtitle_track: SubtitleTrack,
     ) -> FinalizedEdit:
         export_profile = await self._export_planning_service.plan_export(project)
         return FinalizedEdit(
+            timeline=timeline,
             editing_sequence=editing_sequence,
             subtitle_track=subtitle_track,
             export_profile=export_profile

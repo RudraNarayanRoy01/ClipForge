@@ -3,7 +3,7 @@ from src.application.render_validator import RenderValidator
 from src.application.render_composition_service import RenderCompositionService
 from src.domain.render_plan import RenderPlan
 from src.domain.models.render_profile import RenderProfile
-from src.editing.domain.models.state import TimelineState
+from src.editing.domain.pipeline.export import FinalizedEdit
 
 
 class RenderPlanningPipeline:
@@ -24,12 +24,12 @@ class RenderPlanningPipeline:
         self.validator = validator
         self.composer = composer
         
-    def execute(self, timeline_state: TimelineState, render_profile: RenderProfile) -> RenderPlan:
+    def execute(self, finalized_edit: FinalizedEdit, render_profile: RenderProfile) -> RenderPlan:
         """
         Executes the render planning workflow.
         
         Args:
-            timeline_state: The complete state of the timeline to be rendered.
+            finalized_edit: The canonical outcome of the Editing Domain.
             render_profile: The rendering profile containing platform defaults.
             
         Returns:
@@ -39,7 +39,7 @@ class RenderPlanningPipeline:
             ValueError: If the render draft fails validation.
         """
         # 1. Plan
-        draft = self.planner.plan(timeline_state, render_profile)
+        draft = self.planner.plan(finalized_edit, render_profile)
         
         # 2. Validate
         validation_result = self.validator.validate(draft)
