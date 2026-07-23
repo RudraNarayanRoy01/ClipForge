@@ -40,8 +40,9 @@ class Container:
         else:
             self._transients[interface] = factory
 
-    def resolve(self, interface: Type[T]) -> T:
+    def resolve(self, interface: Type[T], _context: 'Container' = None) -> T:
         """Resolve a dependency by its interface/type."""
+        current_context = _context if _context is not None else self
         interface_name = interface if isinstance(interface, str) else getattr(interface, '__name__', str(interface))
         
         if interface in self._resolution_stack:
@@ -54,15 +55,15 @@ class Container:
         
         try:
             if interface in self._factories:
-                instance = self._factories[interface](self)
+                instance = self._factories[interface](current_context)
                 self._singletons[interface] = instance
                 return instance
                 
             if interface in self._transients:
-                return self._transients[interface](self)
+                return self._transients[interface](current_context)
                 
             if self._parent is not None:
-                return self._parent.resolve(interface)
+                return self._parent.resolve(interface, current_context)
                 
             raise KeyError(f"No registration found for {interface_name}")
         finally:
