@@ -32,6 +32,5 @@ Configuration architecture is a major strength of the platform. It enforces:
 - Strong separation of concerns and clear contribution guidelines.
 
 ## Remaining Risks
-- **Documentation Consistency**: Conflicting installation commands identified (e.g., `npm install` in `DEVELOPMENT.md` vs `npm ci` in `INSTALLATION.md`).
 - **Test Integrity**: The backend test suite currently fails to initialize due to missing modules and known assertion failures, preventing reliable automated verification of the platform.
 - **Static Analysis Compliance**: Numerous suppressed or unaddressed linting violations across both frontend and backend codebases representing creeping technical debt.

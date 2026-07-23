@@ -24,8 +24,3 @@
 - **Future Milestone Recommendation**: Implement the missing interface contracts for the recommendation engine.
 - **Priority**: High
 
-## Deferred Work
-- **Description**: Documentation Consistency: The `DEVELOPMENT.md` instructs developers to use `npm install` for frontend setup, whereas `INSTALLATION.md` explicitly forbids it in favor of `npm ci` for reproducible environments.
-- **Impact**: Divergent installation paths can lead to "works on my machine" issues where developers generate differing `package-lock.json` configurations.
-- **Future Milestone Recommendation**: Audit all documentation files and standardize on `npm ci` across all developer onboarding materials.
-- **Priority**: Low
