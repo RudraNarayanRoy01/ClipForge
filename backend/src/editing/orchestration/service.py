@@ -11,7 +11,7 @@ from src.editing.domain.services.subtitle_generation_service import ISubtitleGen
 from src.editing.domain.services.timeline_planning_service import ITimelinePlanningService
 from src.editing.orchestration.commands import EditingExecutionCommand
 from src.editing.orchestration.interfaces import IEditingOrchestrator
-from src.editing.orchestration.results import EditingExecutionResult
+from src.editing.orchestration.results import EditingOrchestrationResult
 
 
 class DefaultEditingOrchestrator(IEditingOrchestrator):
@@ -38,7 +38,7 @@ class DefaultEditingOrchestrator(IEditingOrchestrator):
     async def execute(
         self,
         command: EditingExecutionCommand,
-    ) -> EditingExecutionResult:
+    ) -> EditingOrchestrationResult:
         """
         Coordinates the complete editing workflow.
         """
@@ -48,7 +48,7 @@ class DefaultEditingOrchestrator(IEditingOrchestrator):
         subtitle_track = await self._generate_subtitles(command.project)
         render_plan = await self._plan_export(command.project, editing_sequence, subtitle_track)
 
-        return EditingExecutionResult(
+        return EditingOrchestrationResult(
             render_plan=render_plan,
         )
 

@@ -1,6 +1,6 @@
 from src.editing.orchestration.commands import EditingExecutionCommand
 from src.editing.orchestration.interfaces import IEditingOrchestrator
-from src.editing.orchestration.results import EditingExecutionResult
+from src.editing.orchestration.results import EditingOrchestrationResult
 from src.editing.orchestration.value_objects import (
     ExecutionDiagnostics,
     ExecutionMetadata,
@@ -11,7 +11,7 @@ from src.editing.orchestration.value_objects import (
 
 __all__ = [
     "EditingExecutionCommand",
-    "EditingExecutionResult",
+    "EditingOrchestrationResult",
     "IEditingOrchestrator",
     "ExecutionPreferences",
     "ExecutionOptions",

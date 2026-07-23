@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from src.editing.orchestration.commands import EditingExecutionCommand
-from src.editing.orchestration.results import EditingExecutionResult
+from src.editing.orchestration.results import EditingOrchestrationResult
 
 
 class IEditingOrchestrator(ABC):
@@ -13,7 +13,7 @@ class IEditingOrchestrator(ABC):
     async def execute(
         self,
         command: EditingExecutionCommand,
-    ) -> EditingExecutionResult:
+    ) -> EditingOrchestrationResult:
         """
         Coordinates the complete editing workflow.
 

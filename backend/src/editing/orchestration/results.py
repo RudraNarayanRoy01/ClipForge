@@ -8,7 +8,7 @@ from src.editing.orchestration.value_objects import (
 
 
 @dataclass(frozen=True)
-class EditingExecutionResult:
+class EditingOrchestrationResult:
     """
     Immutable orchestration result representing the completed execution 
     of the editing workflow.
