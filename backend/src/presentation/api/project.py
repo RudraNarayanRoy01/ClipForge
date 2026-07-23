@@ -4,25 +4,22 @@ from typing import List
 from src.presentation.schemas import ProjectCreate, ProjectResponse, ProjectListResponse, VideoAssetResponse
 from src.services.project_service import ProjectService
 from src.services.video_service import VideoService
-from src.repositories.project_repository import ProjectRepository
-from src.repositories.video_repository import VideoRepository
-from src.infrastructure.ffmpeg_processor import FfmpegVideoProcessor
-from src.infrastructure.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
+from src.domain.ports import IProjectRepository, IVideoRepository, IVideoProcessor
+from src.presentation.api.campaigns import get_request_container
 
 router = APIRouter(
     prefix="/projects",
     tags=["Projects"]
 )
 
-def get_project_service(db: AsyncSession = Depends(get_db)) -> ProjectService:
-    repo = ProjectRepository(db)
+def get_project_service(container = Depends(get_request_container)) -> ProjectService:
+    repo = container.resolve(IProjectRepository)
     return ProjectService(repo)
 
-def get_video_service(db: AsyncSession = Depends(get_db)) -> VideoService:
-    video_repo = VideoRepository(db)
-    project_repo = ProjectRepository(db)
-    video_processor = FfmpegVideoProcessor()
+def get_video_service(container = Depends(get_request_container)) -> VideoService:
+    video_repo = container.resolve(IVideoRepository)
+    project_repo = container.resolve(IProjectRepository)
+    video_processor = container.resolve(IVideoProcessor)
     return VideoService(video_repo, project_repo, video_processor)
 
 @router.post("/", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED, summary="Create Workspace")

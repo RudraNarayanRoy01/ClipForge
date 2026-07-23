@@ -3,7 +3,7 @@ import uuid
 
 
 from src.presentation.schemas import PlanningRequest, PlanningResponse, PlanningHistoryResponse
-from src.infrastructure.campaign_repository import CampaignRepository
+from src.domain.ports import ICampaignRepository
 from src.application.planning_pipeline_service import PlanningPipelineService
 from src.application.planning_use_cases import (
     RunPlanningPipelineUseCase,
@@ -39,7 +39,7 @@ async def generate_planning(
 @router.get("/campaigns/{campaign_id}/plan", response_model=PlanningResponse)
 async def get_planning(
     campaign_id: uuid.UUID,
-    repository: CampaignRepository = Depends(get_campaign_repository)
+    repository: ICampaignRepository = Depends(get_campaign_repository)
 ):
     """
     Retrieves the latest planning result for a campaign.
@@ -68,7 +68,7 @@ async def regenerate_planning(
 @router.delete("/campaigns/{campaign_id}/plan", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_planning(
     campaign_id: uuid.UUID,
-    repository: CampaignRepository = Depends(get_campaign_repository)
+    repository: ICampaignRepository = Depends(get_campaign_repository)
 ):
     """
     Deletes (archives) all planning results associated with a campaign.
@@ -79,7 +79,7 @@ async def delete_planning(
 @router.get("/planning/history", response_model=PlanningHistoryResponse)
 async def get_planning_history(
     campaign_id: uuid.UUID,
-    repository: CampaignRepository = Depends(get_campaign_repository)
+    repository: ICampaignRepository = Depends(get_campaign_repository)
 ):
     """
     Returns the history of planning results for a specific campaign.

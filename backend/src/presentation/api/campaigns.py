@@ -11,7 +11,8 @@ from src.presentation.schemas import (
 from src.application.campaign_use_cases import ImportCampaignUseCase, GetCampaignsUseCase, GetCampaignUseCase, GetImportHistoryUseCase
 from src.application.normalization_service import TextNormalizationService
 from src.infrastructure.campaign_repository import CampaignRepository
-from src.infrastructure.parsers import CampaignParserFactory
+from src.domain.ports import ICampaignParser, ICampaignNormalizationService
+from src.infrastructure.campaign_repository import CampaignRepository
 from src.intelligence.services.campaign_intelligence import CampaignIntelligenceService
 from src.application.planning_use_cases import (
     GenerateExecutionPlanUseCase, GenerateClipStrategyUseCase,
@@ -55,10 +56,11 @@ def get_campaign_intelligence(container = Depends(get_request_container)) -> Cam
 
 def get_import_campaign_use_case(
     repo: ICampaignRepository = Depends(get_campaign_repository),
-    intelligence: CampaignIntelligenceService = Depends(get_campaign_intelligence)
+    intelligence: CampaignIntelligenceService = Depends(get_campaign_intelligence),
+    container = Depends(get_request_container)
 ) -> ImportCampaignUseCase:
-    parser = CampaignParserFactory()
-    normalizer = TextNormalizationService()
+    parser = container.resolve(ICampaignParser)
+    normalizer = container.resolve(ICampaignNormalizationService)
     return ImportCampaignUseCase(parser, intelligence, repo, normalizer)
 def get_campaigns_use_case(repo: ICampaignRepository = Depends(get_campaign_repository)) -> GetCampaignsUseCase:
     return GetCampaignsUseCase(repo)

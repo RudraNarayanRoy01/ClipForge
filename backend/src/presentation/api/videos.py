@@ -3,43 +3,35 @@ import uuid
 
 from src.presentation.schemas import AnalyzeVideoRequest, JobAcceptedResponse, ClipListResponse
 from src.services.video_service import VideoService
-from src.repositories.project_repository import ProjectRepository
-from src.repositories.video_repository import VideoRepository
-from src.infrastructure.ffmpeg_processor import FfmpegVideoProcessor
-from src.infrastructure.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.domain.job import Job
-from src.domain.ports import IWorkflowDispatcher, IJobRepository
-from src.workers.state.job_repository import global_job_repository
-from src.workers.app import AsyncWorkflowDispatcher
+from src.domain.ports import IWorkflowDispatcher, IJobRepository, IProjectRepository, IVideoRepository, IVideoProcessor, IAudioAnalyzer, IVisionAnalyzer, ILLMReasoningEngine
+from src.presentation.api.campaigns import get_request_container
 from src.application.use_cases import GenerateClipsUseCase
-from src.infrastructure.mocks import MockAudioAnalyzer, MockVisionAnalyzer, MockLLMReasoningEngine
+from src.domain.job import Job
 
 router = APIRouter(
     prefix="/videos",
     tags=["Videos"]
 )
 
-def get_video_service(db: AsyncSession = Depends(get_db)) -> VideoService:
-    video_repo = VideoRepository(db)
-    project_repo = ProjectRepository(db)
-    video_processor = FfmpegVideoProcessor()
+def get_video_service(container = Depends(get_request_container)) -> VideoService:
+    video_repo = container.resolve(IVideoRepository)
+    project_repo = container.resolve(IProjectRepository)
+    video_processor = container.resolve(IVideoProcessor)
     return VideoService(video_repo, project_repo, video_processor)
 
-def get_job_repository() -> IJobRepository:
-    return global_job_repository
+def get_job_repository(container = Depends(get_request_container)) -> IJobRepository:
+    return container.resolve(IJobRepository)
 
-def get_workflow_dispatcher(repo: IJobRepository = Depends(get_job_repository)) -> IWorkflowDispatcher:
-    return AsyncWorkflowDispatcher(repo)
+def get_workflow_dispatcher(container = Depends(get_request_container)) -> IWorkflowDispatcher:
+    return container.resolve(IWorkflowDispatcher)
 
-def get_generate_clips_use_case(db: AsyncSession = Depends(get_db)) -> GenerateClipsUseCase:
-    project_repo = ProjectRepository(db)
-    video_processor = FfmpegVideoProcessor()
+def get_generate_clips_use_case(container = Depends(get_request_container)) -> GenerateClipsUseCase:
+    project_repo = container.resolve(IProjectRepository)
+    video_processor = container.resolve(IVideoProcessor)
     return GenerateClipsUseCase(
-        audio_analyzer=MockAudioAnalyzer(),
-        vision_analyzer=MockVisionAnalyzer(),
-        llm_engine=MockLLMReasoningEngine(),
+        audio_analyzer=container.resolve(IAudioAnalyzer),
+        vision_analyzer=container.resolve(IVisionAnalyzer),
+        llm_engine=container.resolve(ILLMReasoningEngine),
         timeline_repo=None, # type: ignore
         project_repo=project_repo,
         video_processor=video_processor
@@ -62,7 +54,7 @@ async def get_clips_for_video(video_id: uuid.UUID, skip: int = 0, limit: int = 5
 async def analyze_video(
     video_id: uuid.UUID, 
     request: AnalyzeVideoRequest,
-    db: AsyncSession = Depends(get_db),
+    container = Depends(get_request_container),
     job_repo: IJobRepository = Depends(get_job_repository),
     dispatcher: IWorkflowDispatcher = Depends(get_workflow_dispatcher),
     use_case: GenerateClipsUseCase = Depends(get_generate_clips_use_case)
@@ -71,7 +63,7 @@ async def analyze_video(
     Triggers the massive multimodal AI pipeline for a video.
     Returns a Job ID immediately as this process runs in the background.
     """
-    video_repo = VideoRepository(db)
+    video_repo = container.resolve(IVideoRepository)
     try:
         video = await video_repo.get_video(video_id)
     except ValueError:
