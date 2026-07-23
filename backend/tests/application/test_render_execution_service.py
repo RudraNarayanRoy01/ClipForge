@@ -19,7 +19,7 @@ from src.application.execution_models import (
     RenderExecutionStatus,
     RenderFailureCategory,
 )
-from src.domain.contracts.render_backend import IRenderBackend
+from src.domain.ports import IRenderBackend
 from src.application.render_execution_service import RenderExecutionService
 
 

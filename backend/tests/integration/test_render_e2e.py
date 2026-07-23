@@ -13,7 +13,7 @@ from src.application.execution_models import ValidatedRenderPlan, RenderExecutio
 # Replace RenderExecutionPipeline and RenderExecutor with the new execution service
 from src.application.render_execution_service import RenderExecutionService
 from src.application.execution_models import RenderExecutionRequest, RenderFailureCategory
-from src.domain.contracts.render_backend import IRenderBackend
+from src.domain.ports import IRenderBackend
 
 class DummyRenderingBackend(IRenderBackend):
     """

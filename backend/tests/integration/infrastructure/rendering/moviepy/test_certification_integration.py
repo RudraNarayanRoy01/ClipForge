@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.infrastructure.rendering.moviepy.backend import MoviePyRenderingBackend
 from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTranslator
-from src.domain.contracts.render_backend import IRenderBackend
+from src.domain.ports import IRenderBackend
 from src.application.execution_models import (
     RenderExecutionRequest,
     RenderExecutionResult,
