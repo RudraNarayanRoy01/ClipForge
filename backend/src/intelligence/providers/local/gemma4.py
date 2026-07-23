@@ -3,13 +3,12 @@ from pydantic import BaseModel
 from src.intelligence.providers.capabilities import IReasoning, IStructuredOutput, IToolCalling, IAIProvider
 from src.intelligence.schemas.ai_models import AIRequest, AIResponse
 
-class BaseProvider:
-    provider_id: str
+from src.intelligence.providers.base import BaseProvider
 
 class Gemma4LocalProvider(BaseProvider, IReasoning, IStructuredOutput, IToolCalling, IAIProvider):
     provider_id = "gemma-4-local"
 
-    async def generate(self, request: AIRequest) -> AIResponse:
+    async def _do_generate(self, request: AIRequest) -> AIResponse:
         text = await self.generate_text(request.prompt, [])
         structured_output = None
         if request.response_schema:
@@ -22,6 +21,9 @@ class Gemma4LocalProvider(BaseProvider, IReasoning, IStructuredOutput, IToolCall
             model="gemma-4-local",
             latency_ms=0
         )
+
+    def _translate_exception(self, e: Exception) -> Exception:
+        return e
 
     async def generate_text(self, prompt: str, context: list) -> str:
         # Placeholder for Gemma 4 local inference
