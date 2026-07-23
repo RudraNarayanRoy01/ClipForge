@@ -8,7 +8,7 @@ from src.editing.domain.pipeline.subtitles import SubtitleTrack
 
 
 @dataclass(frozen=True)
-class RenderPlan:
+class FinalizedEdit:
     """
     Represents the final editing output produced by Milestone 5.
     Represents editorial execution intent, not renderer instructions.

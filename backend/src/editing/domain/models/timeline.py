@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Tuple
 from uuid import UUID
 
 from src.editing.domain.enums.tracks import TrackType
@@ -16,7 +16,7 @@ class Track:
     name: str
     type: TrackType
     layer_index: int
-    items: List[TimelineItem]
+    items: Tuple[TimelineItem, ...]
     is_muted: bool = False
     is_hidden: bool = False
 
@@ -27,5 +27,5 @@ class Timeline:
     The core timeline containing all tracks and explicit duration.
     """
     id: UUID
-    tracks: List[Track]
+    tracks: Tuple[Track, ...]
     duration: Time

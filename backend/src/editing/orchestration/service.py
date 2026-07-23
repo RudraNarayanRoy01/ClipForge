@@ -1,7 +1,7 @@
 from src.editing.domain.models.project import EditingProject
 from src.editing.domain.pipeline.clips import ClipSequence
 from src.editing.domain.pipeline.editing import EditingSequence
-from src.editing.domain.pipeline.export import RenderPlan
+from src.editing.domain.pipeline.export import FinalizedEdit
 from src.editing.domain.pipeline.subtitles import SubtitleTrack
 from src.editing.domain.pipeline.timeline import TimelinePlanningResult
 from src.editing.domain.services.clip_building_service import IClipBuildingService
@@ -46,10 +46,10 @@ class DefaultEditingOrchestrator(IEditingOrchestrator):
         clip_sequence = await self._build_clips(command.project, timeline_result)
         editing_sequence = await self._generate_edit_sequence(command.project, clip_sequence)
         subtitle_track = await self._generate_subtitles(command.project)
-        render_plan = await self._plan_export(command.project, editing_sequence, subtitle_track)
+        finalized_edit = await self._plan_export(command.project, editing_sequence, subtitle_track)
 
         return EditingOrchestrationResult(
-            render_plan=render_plan,
+            finalized_edit=finalized_edit,
         )
 
     async def _plan_timeline(
@@ -88,9 +88,9 @@ class DefaultEditingOrchestrator(IEditingOrchestrator):
         project: EditingProject,
         editing_sequence: EditingSequence,
         subtitle_track: SubtitleTrack,
-    ) -> RenderPlan:
+    ) -> FinalizedEdit:
         export_profile = await self._export_planning_service.plan_export(project)
-        return RenderPlan(
+        return FinalizedEdit(
             editing_sequence=editing_sequence,
             subtitle_track=subtitle_track,
             export_profile=export_profile

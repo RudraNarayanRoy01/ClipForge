@@ -8,7 +8,7 @@ from src.editing.domain.pipeline.editing import (
 )
 from src.editing.domain.pipeline.export import (
     ExportPlanningRequest,
-    RenderPlan,
+    FinalizedEdit,
 )
 from src.editing.domain.pipeline.subtitles import (
     SubtitleGenerationRequest,
@@ -28,6 +28,6 @@ __all__ = [
     "EditingRequest",
     "SubtitleTrack",
     "SubtitleGenerationRequest",
-    "RenderPlan",
+    "FinalizedEdit",
     "ExportPlanningRequest",
 ]

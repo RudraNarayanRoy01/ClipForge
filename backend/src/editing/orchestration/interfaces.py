@@ -18,6 +18,6 @@ class IEditingOrchestrator(ABC):
         Coordinates the complete editing workflow.
 
         Receives an immutable orchestration command and produces 
-        an immutable orchestration result containing the final RenderPlan.
+        an immutable orchestration result containing the FinalizedEdit.
         """
         pass
