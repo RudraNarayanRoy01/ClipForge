@@ -78,8 +78,10 @@ async def validate_startup(app: FastAPI):
 
     # 5. Ollama
     try:
+        from src.config.ai_settings import AISettings
+        ai_settings = AISettings()
         async with httpx.AsyncClient() as client:
-            response = await client.get("http://localhost:11434/", timeout=2.0)
+            response = await client.get(ai_settings.ollama_host, timeout=2.0)
             if response.status_code != 200:
                 raise RuntimeError(f"Ollama returned unexpected status: {response.status_code}")
         logger.info("[SUCCESS] Ollama connected.")
