@@ -63,11 +63,19 @@ async def lifespan(app: FastAPI):
     
     # Shutdown: Clean up resources
     import httpx
+    from src.infrastructure.database import engine
+    
     try:
         http_client = container.resolve(httpx.AsyncClient)
         await http_client.aclose()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"Failed to close HTTP client: {e}")
+        
+    try:
+        await engine.dispose()
+        logger.info("Database connection pool disposed.")
+    except Exception as e:
+        logger.warning(f"Failed to dispose database engine: {e}")
     
     logger.info("Shutting down AI Clipping Platform API...")
 
