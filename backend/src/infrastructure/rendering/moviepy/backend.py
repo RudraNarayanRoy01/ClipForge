@@ -1,11 +1,9 @@
 import time
 from typing import Optional
 
-from src.domain.contracts.render_backend import IRenderBackend
-from src.application.execution_models import (
-    RenderExecutionRequest, 
-    RenderExecutionResult,
-)
+from src.domain.ports import IRenderBackend
+from src.domain.render_plan import RenderPlan
+from src.domain.models.render_result import RenderResult, RenderStatus
 from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTranslator
 from src.infrastructure.rendering.moviepy.exceptions import MoviePyExceptionTranslator
 from src.infrastructure.rendering.moviepy.loader import MoviePyAssetLoader
@@ -34,7 +32,7 @@ class MoviePyRenderingBackend(IRenderBackend):
         """
         self._translator = translator or MoviePyRequestTranslator()
 
-    async def execute(self, request: RenderExecutionRequest) -> RenderExecutionResult:
+    async def execute(self, plan: RenderPlan, output_path: str) -> RenderResult:
         """
         Orchestrates rendering asynchronously by delegating to the executor.
         """
@@ -42,64 +40,62 @@ class MoviePyRenderingBackend(IRenderBackend):
         moviepy_task = None
         
         try:
-            # 1. Translate backend-agnostic request to MoviePy-specific task structure
+            # 1. Translate backend-agnostic plan to MoviePy-specific task structure
             moviepy_task = self._translator.translate(
-                request.validated_plan, 
-                request.output_destination
+                plan, 
+                output_path
             )
             
             # 2. Resource loading
             MoviePyAssetLoader.load_assets(
-                request.validated_plan.plan, 
+                plan, 
                 moviepy_task.resources
             )
             
             # 3. Timeline Composition
             timeline = MoviePyTimelineComposer.compose(
-                plan=request.validated_plan.plan, 
+                plan=plan, 
                 resources=moviepy_task.resources
             )
             
             # 4. Output Composition (Specification)
             render_output = MoviePyOutputComposer.compose_output(
                 timeline=timeline,
-                custom_metadata=request.execution_options.get("metadata")
+                custom_metadata=None # Passing None or generic metadata
             )
             
             # 5. Prepare Execution Context
             context = MoviePyExecutionContext(
-                execution_destination=request.output_destination,
+                execution_destination=output_path,
                 resource_pool=moviepy_task.resources,
-                runtime_options=request.execution_options
+                runtime_options={}
             )
             
             # 6. Execute Render (Executor handles its own exceptions and cleanup)
             execution_result = MoviePyRenderExecutor.execute(render_output, context)
             
-            # 7. Translate Execution Result
+            # 7. Translate Execution Result to Domain Result
             if execution_result.success:
-                return RenderExecutionResult.success(
-                    duration_seconds=execution_result.elapsed_time_seconds,
-                    output_artifact_path=request.output_destination
+                return RenderResult(
+                    status=RenderStatus.COMPLETED,
+                    rendered_output_location=output_path,
+                    rendered_duration=execution_result.elapsed_time_seconds
                 )
             else:
-                return RenderExecutionResult.failure(
-                    duration_seconds=execution_result.elapsed_time_seconds,
-                    category=execution_result.failure_category,
+                return RenderResult(
+                    status=RenderStatus.FAILED,
                     message=execution_result.failure_message,
-                    details=execution_result.diagnostics
+                    rendering_metadata=execution_result.diagnostics
                 )
             
         except Exception as e:
             # Catch exceptions that occur BEFORE execution (e.g., during translation, loading, composition)
             category, message, details = MoviePyExceptionTranslator.translate(e)
             
-            duration = time.monotonic() - start_time
-            return RenderExecutionResult.failure(
-                duration_seconds=duration,
-                category=category,
+            return RenderResult(
+                status=RenderStatus.FAILED,
                 message=message,
-                details=details
+                rendering_metadata=details
             )
             
         finally:

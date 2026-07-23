@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request
 import uuid
 import os
 import tempfile
@@ -33,15 +33,6 @@ from src.intelligence.orchestration.default_service import DefaultAIService
 from src.intelligence.prompts.manager import PromptManager
 from src.intelligence.providers.factory import ProviderFactory
 
-# Singletons for AI Infrastructure
-_ai_settings = AISettings()
-_prompt_manager = PromptManager(base_dir=os.path.join(os.path.dirname(__file__), '..', '..', 'intelligence', 'prompts'))
-_provider_factory = ProviderFactory(_ai_settings)
-_ai_service = DefaultAIService(prompt_manager=_prompt_manager, provider_factory=_provider_factory)
-
-def get_ai_service() -> IAIService:
-    return _ai_service
-
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
@@ -49,13 +40,18 @@ router = APIRouter(
     tags=["Campaigns"]
 )
 
-# --- Dependency Injection ---
-def get_campaign_repository(db: AsyncSession = Depends(get_db)) -> ICampaignRepository:
-    return CampaignRepository(db)
+# --- Dependency Injection via Container ---
+def get_request_container(request: Request, db: AsyncSession = Depends(get_db)):
+    """Creates a request-scoped container holding the current AsyncSession."""
+    container = request.app.state.container.create_child()
+    container.register_singleton(AsyncSession, db)
+    return container
 
-def get_campaign_intelligence(ai_service: IAIService = Depends(get_ai_service)) -> CampaignIntelligenceService:
-    structured_llm = CapabilityRouter().resolve([IStructuredOutput])
-    return CampaignIntelligenceService(structured_llm, ai_service)
+def get_campaign_repository(container = Depends(get_request_container)) -> ICampaignRepository:
+    return container.resolve(ICampaignRepository)
+
+def get_campaign_intelligence(container = Depends(get_request_container)) -> CampaignIntelligenceService:
+    return container.resolve(CampaignIntelligenceService)
 
 def get_import_campaign_use_case(
     repo: ICampaignRepository = Depends(get_campaign_repository),

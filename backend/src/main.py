@@ -51,11 +51,10 @@ async def lifespan(app: FastAPI):
     # Startup: Initialize resources (DB pools, ML models, background tasks)
     logger.info("Starting AI Clipping Platform API...")
     
-    # Initialize shared HTTP client for providers
-    http_client = httpx.AsyncClient(limits=httpx.Limits(max_keepalive_connections=20, max_connections=100))
-    
-    # Register providers with injected dependencies
-    ProviderRegistry.register("ollama", lambda settings: OllamaProvider(settings, http_client))
+    # Initialize DI Container
+    from src.bootstrap.startup import initialize_container
+    container = initialize_container()
+    app.state.container = container
     
     # Run strict startup validation
     await validate_startup(app)
@@ -63,7 +62,13 @@ async def lifespan(app: FastAPI):
     yield  # Application runs while yielded
     
     # Shutdown: Clean up resources
-    await http_client.aclose()
+    import httpx
+    try:
+        http_client = container.resolve(httpx.AsyncClient)
+        await http_client.aclose()
+    except Exception:
+        pass
+    
     logger.info("Shutting down AI Clipping Platform API...")
 
 # --- Bootstrapping ---

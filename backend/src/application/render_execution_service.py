@@ -8,7 +8,7 @@ from src.application.execution_models import (
     RenderExecutionResult,
     RenderFailureCategory,
 )
-from src.domain.contracts.render_backend import IRenderBackend
+from src.domain.ports import IRenderBackend
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class RenderExecutionService:
         execution_options: Optional[Dict[str, Any]] = None
     ) -> RenderExecutionResult:
         """
-        Orchestrates the rendering process by creating a request and passing it to the backend.
+        Orchestrates the rendering process by extracting domain primitives and passing them to the backend.
         
         Args:
             validated_plan: A RenderPlan wrapped in ValidatedRenderPlan, ensuring it has passed validation.
@@ -39,18 +39,32 @@ class RenderExecutionService:
         Returns:
             RenderExecutionResult: Structured result of the execution.
         """
-        request = RenderExecutionRequest(
-            validated_plan=validated_plan,
-            output_destination=output_destination,
-            execution_options=execution_options or {}
-        )
-        
         start_time = time.monotonic()
         
         try:
             logger.info(f"Starting execution of RenderPlan {validated_plan.plan.id}")
-            result = await self._backend.execute(request)
-            return result
+            
+            # Application layer translates and delegates to Domain port
+            domain_result = await self._backend.execute(
+                plan=validated_plan.plan, 
+                output_path=output_destination
+            )
+            
+            duration = time.monotonic() - start_time
+            
+            if domain_result.status.value == "completed":
+                return RenderExecutionResult.success(
+                    duration_seconds=duration,
+                    output_artifact_path=domain_result.rendered_output_location or output_destination
+                )
+            else:
+                return RenderExecutionResult.failure(
+                    duration_seconds=duration,
+                    category=RenderFailureCategory.BACKEND_FAILURE,
+                    message=domain_result.message or "Backend rendering failed.",
+                    details=domain_result.rendering_metadata
+                )
+                
         except Exception as e:
             # Catching generic Exception because backends might raise anything (e.g. ffmpeg errors, etc.)
             # The service translates these to a structured, backend-agnostic failure result.
