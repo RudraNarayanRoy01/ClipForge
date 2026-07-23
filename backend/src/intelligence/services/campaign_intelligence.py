@@ -300,7 +300,7 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         if not self._ai_service:
             raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
             
-        plan_text = json.dumps(dataclasses.asdict(plan))
+        plan_text = json.dumps(dataclasses.asdict(plan), default=str)
         
         command = AIExecutionCommand(
             prompt_identifier="campaign_intelligence/generate_clip_strategy",
@@ -342,8 +342,8 @@ class CampaignIntelligenceService(ICampaignIntelligence):
         if not self._ai_service:
             raise PlanningGenerationError("IAIService is not configured for CampaignIntelligenceService.")
             
-        plan_text = json.dumps(dataclasses.asdict(plan))
-        strategy_text = json.dumps(dataclasses.asdict(strategy))
+        plan_text = json.dumps(dataclasses.asdict(plan), default=str)
+        strategy_text = json.dumps(dataclasses.asdict(strategy), default=str)
         
         command = AIExecutionCommand(
             prompt_identifier="campaign_intelligence/generate_prompt_template",
