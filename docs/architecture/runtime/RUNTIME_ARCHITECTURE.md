@@ -41,6 +41,10 @@ PolicyDecision
 RuntimeConstraintEngine
 ↓
 ConstraintDecision
+↓
+RuntimeBudgetPlanner
+↓
+BudgetDecision
 ```
 
 This pipeline is strictly certified to guarantee:
@@ -48,13 +52,17 @@ This pipeline is strictly certified to guarantee:
 - **Deterministic strategy generation**: The generator produces a deterministic strategy.
 - **Immutable policy definition**: The policy architecture provides strict, unchanging governance.
 - **Deterministic policy evaluation**: Policy constraints evaluate predictably based solely on the PlanningDecision.
+- **Immutable budget definition**: The runtime budget is strictly defined as an immutable artifact.
+- **Deterministic budget evaluation**: The budget architecture evaluates predictably based solely on the ConstraintDecision.
 - **Append-only evolution**: Decisions do not overwrite past states.
 - **No RuntimeKnowledge mutation**: The input knowledge is consumed, never modified or embedded.
 - **No PlanningStrategy mutation**: Strategy is consumed, never modified.
 - **No PlanningDecision mutation**: The output of planning is strictly consumed, never altered.
 - **No PolicyDecision mutation**: The governance approval is immutable and final.
-- **No skipped layers**: `RuntimeKnowledge` must pass through the full pipeline to become actionable governance.
-- **No reverse dependencies**: Planning strictly follows Learning and Strategy, Policy strictly follows Planning.
+- **No ConstraintDecision mutation**: The architectural constraints are immutable and strictly consumed.
+- **No BudgetDecision mutation**: The architectural budget is immutable and strictly consumed.
+- **No skipped layers**: `RuntimeKnowledge` must pass through the full pipeline to become actionable governance and budget.
+- **No reverse dependencies**: Planning strictly follows Learning and Strategy, Policy strictly follows Planning, Constraint strictly follows Policy, Budget strictly follows Constraint.
 
 ### Planning Strategy Layer
 The `RuntimePlanningStrategy` subsystem provides exactly one architectural answer: "Which planning philosophy should guide RuntimePlanning?"
@@ -75,6 +83,14 @@ It produces an immutable `ConstraintDecision` artifact representing the architec
 
 **ConstraintDecision Reusability:**
 `ConstraintDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeBudgetPlanner`, `RuntimeRouting`, and `RuntimeScheduler`—may freely consume a `ConstraintDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+
+### Runtime Budget Layer
+The `RuntimeBudgetPlanner` subsystem evaluates the output of `RuntimeConstraintEngine`.
+It provides exactly one architectural answer: "What execution budget is available?"
+It produces an immutable `BudgetDecision` artifact representing the architectural execution budget. It explicitly rejects responsibility leakage into Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+
+**BudgetDecision Reusability:**
+`BudgetDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeRouting` and `RuntimeScheduler`—may freely consume a `BudgetDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
 
 ## Runtime Dependency Direction
 
@@ -136,6 +152,8 @@ Runtime Planning
 Runtime Policy
 ↓
 Runtime Constraint Engine
+↓
+Runtime Budget Planner
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -204,6 +222,7 @@ flowchart TD
     Context --> RuntimePlanning
     Context --> RuntimePolicy
     Context --> RuntimeConstraintEngine
+    Context --> RuntimeBudgetPlanner
     
     Results -.-> ProviderRegistry
 ```
@@ -278,6 +297,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Planning** → What should happen next? (Planning Layer)
 - **Runtime Policy** → Is this PlanningDecision permitted? (Policy Layer)
 - **Runtime Constraint Engine** → What architectural constraints apply? (Constraint Layer)
+- **Runtime Budget Planner** → What execution budget is available? (Budget Layer)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -354,13 +374,12 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.4 establishes **only** the Runtime Constraint architecture. The objective is to permanently freeze RuntimeConstraintEngine as the architectural Constraint Layer.
+Batch 6.4.5 establishes **only** the Runtime Budget architecture. The objective is to permanently freeze RuntimeBudgetPlanner as the architectural Budget Layer.
 
-The following remain explicitly out of scope for Batch 6.4.4:
-- **Sprint 6.4.5**: Budget Planning
+The following remain explicitly out of scope for Batch 6.4.5:
 - **Sprint 6.4.6**: Routing & Fallback Planning
 - **Sprint 6.4.7**: Runtime Context Expansion
 - **Sprint 6.4.8**: Planning Governance
 - **Sprint 6.4.9**: Planning & Policy Certification
 
-Runtime Constraints will remain architecturally complete while intentionally minimal until these future sprints.
+Runtime Budgets will remain architecturally complete while intentionally minimal until these future sprints.

@@ -28,6 +28,7 @@ from .runtime_learning import RuntimeLearning
 from .runtime_planning import RuntimePlanning, RuntimePlanningStrategy
 from .runtime_policy import RuntimePolicy
 from .runtime_constraint_engine import RuntimeConstraintEngine
+from .runtime_budget_planner import RuntimeBudgetPlanner
 
 class RuntimeContext:
     """
@@ -72,6 +73,7 @@ class RuntimeContext:
         self._runtime_planning = RuntimePlanning()
         self._runtime_policy = RuntimePolicy()
         self._runtime_constraint_engine = RuntimeConstraintEngine()
+        self._runtime_budget_planner = RuntimeBudgetPlanner()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -345,6 +347,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeConstraintEngine instances.
         """
         return self._runtime_constraint_engine
+
+    @property
+    def runtime_budget_planner(self) -> RuntimeBudgetPlanner:
+        """
+        Expose the canonical Runtime Budget Planner subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for runtime execution budgets.
+        Future Runtime components must obtain budget services through RuntimeContext
+        rather than constructing independent RuntimeBudgetPlanner instances.
+        """
+        return self._runtime_budget_planner
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

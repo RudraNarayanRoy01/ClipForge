@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.4 | Batch: 6.4.3**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.4 | Batch: 6.4.5**
 
 ## 1. Resolved During Sprint 6.4
 
@@ -161,9 +161,16 @@
 - **Certification Impact**: Was blocking runtime execution boundaries definition.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.21 Runtime Budget Planner
+- **Description**: The Runtime lacked a canonical subsystem for answering "What execution budget is available?" based on a ConstraintDecision.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.5)
+- **Certification Impact**: Was blocking runtime execution budget definitions.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.4
 
-- Budget Planning (Sprint 6.4.5)
 - Routing & Fallback Planning (Sprint 6.4.6)
 - Runtime Context Expansion (Sprint 6.4.7)
 - Planning Governance (Sprint 6.4.8)
