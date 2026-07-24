@@ -23,24 +23,28 @@ flowchart TD
     Core --> Editing[Editing Engine]
     Core --> Timeline[Timeline Engine]
     
-    Runtime → Registry[Capability Registry]
-    Runtime → Planner[Execution Planning]
-    Runtime → Graph[Execution Graph Builder]
-    Runtime → Sched[Scheduler]
-    Runtime → Adapt[Adaptive Runtime]
-    Runtime → Monitor[Runtime Monitoring]
-    Runtime → Telemetry[Runtime Telemetry]
-    Runtime → Metrics[Runtime Metrics]
-    Runtime → Health[Runtime Health]
-    Runtime → Diagnostics[Runtime Diagnostics]
-    Runtime → Optimization[Runtime Optimization]
-    Runtime → Learning[Runtime Learning]
-    Runtime → PlanningStrategy[Runtime Planning Strategy]
-    Runtime → Planning[Runtime Planning]
-    Runtime → Policy[Runtime Policy]
-    Runtime → Constraint[Runtime Constraint Engine]
-    Runtime → Budget[Runtime Budget Planner]
-    Runtime → Routing[Runtime Routing]
+    Runtime --> Registry[Capability Registry]
+    Runtime --> Context[Runtime Context]
+    Context --> DecisionPipeline[Runtime Decision Pipeline]
+    
+    DecisionPipeline --> PlanningStrategy[Runtime Planning Strategy]
+    DecisionPipeline --> Planning[Runtime Planning]
+    DecisionPipeline --> Policy[Runtime Policy]
+    DecisionPipeline --> Constraint[Runtime Constraint Engine]
+    DecisionPipeline --> Budget[Runtime Budget Planner]
+    DecisionPipeline --> Routing[Runtime Routing]
+    
+    Runtime --> Planner[Execution Planning]
+    Runtime --> Graph[Execution Graph Builder]
+    Runtime --> Sched[Scheduler]
+    Runtime --> Adapt[Adaptive Runtime]
+    Runtime --> Monitor[Runtime Monitoring]
+    Runtime --> Telemetry[Runtime Telemetry]
+    Runtime --> Metrics[Runtime Metrics]
+    Runtime --> Health[Runtime Health]
+    Runtime --> Diagnostics[Runtime Diagnostics]
+    Runtime --> Optimization[Runtime Optimization]
+    Runtime --> Learning[Runtime Learning]
     
     Sched --> Providers[Provider Ecosystem]
     
@@ -51,9 +55,9 @@ flowchart TD
 ## Data Flow & Dependencies
 
 **Dependency Direction (Inversion Principle):**
-Application → Runtime Contracts
-Application → Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Runtime Scheduler → Runtime Execution Planner → Runtime Execution Graph Builder → Runtime Resource Allocator → Runtime Execution Context Factory → Runtime Orchestrator → Runtime Execution Engine → Adaptive Runtime → Runtime Monitoring → Runtime Telemetry → Runtime Metrics → Runtime Health → Runtime Diagnostics → Runtime Optimization → Runtime Learning → Runtime Planning Strategy → Runtime Planning → Runtime Policy → Runtime Constraint Engine → Runtime Budget Planner → Runtime Routing
-Runtime → Provider Ecosystem → Hardware
+Application -> Runtime Contracts
+Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Execution Engine -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
+Runtime -> Provider Ecosystem -> Hardware
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.

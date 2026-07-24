@@ -192,7 +192,17 @@ This dependency direction must remain stable. The Runtime must NEVER depend upwa
 ## Runtime Core Composition
 
 The Runtime is structured around a stable `core` package, which defines the foundational architectural framework. 
-The canonical representation of the Runtime instance is the **Runtime Context**. 
+The `RuntimeContext` serves as the canonical Runtime Decision Environment for the AI Clipping Platform.
+It acts as the single, immutable composition root for the entire Adaptive AI Runtime.
+
+It formally owns:
+- **Runtime Service Composition**
+- **Runtime Lifecycle Ownership**
+- **Runtime Governance Ownership**
+- **Runtime Decision Pipeline Ownership**
+
+It explicitly does NOT execute workloads, schedule execution, route execution, optimize workloads, or own Runtime decisions themselves. Individual Runtime subsystems (e.g., RuntimePlanning, RuntimePolicy) own their respective artifacts (PlanningDecision, PolicyDecision) while `RuntimeContext` acts as the passive architectural environment.
+
 Every future Runtime subsystem should communicate through the `RuntimeContext` rather than directly referencing `RuntimeBootstrap`, `RuntimeLifecycleCoordinator`, or Extension Points.
 
 ### Ownership Model
@@ -323,6 +333,9 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Budget Planner** → What execution budget is available? (Budget Layer)
 - **Runtime Routing** → Where should this workload execute? (Routing Layer)
 
+### Runtime Decision Environment
+The Decision Pipeline (`RuntimePlanningStrategy` → `RuntimePlanning` → `RuntimePolicy` → `RuntimeConstraintEngine` → `RuntimeBudgetPlanner` → `RuntimeRouting`) is formally owned by the `RuntimeContext`. `RuntimeKnowledge` acts as the initial artifact consumed by this pipeline but remains an independent subsystem artifact not permanently owned by `RuntimeContext` state.
+
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
 `UNINITIALIZED -> BOOTSTRAPPING -> INITIALIZED -> SHUTTING_DOWN -> SHUTDOWN`
@@ -398,11 +411,10 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.6 establishes **only** the Runtime Routing architecture. The objective is to permanently freeze RuntimeRouting as the architectural Routing Layer.
+Batch 6.4.7 establishes **only** the Runtime Context Expansion. The objective is to formally expand `RuntimeContext` into the canonical Runtime Decision Environment.
 
-The following remain explicitly out of scope for Batch 6.4.6:
-- **Sprint 6.4.7**: Runtime Context Expansion
+The following remain explicitly out of scope for Batch 6.4.7:
 - **Sprint 6.4.8**: Planning Governance
 - **Sprint 6.4.9**: Planning & Policy Certification
 
-Runtime Routing will remain architecturally complete while intentionally minimal until these future sprints.
+RuntimeContext will remain architecturally complete as a passive composition root without executing workloads or scheduling execution.

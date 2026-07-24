@@ -33,10 +33,21 @@ from .runtime_routing import RuntimeRouting
 
 class RuntimeContext:
     """
-    The canonical representation of a Runtime instance.
+    The canonical Runtime Decision Environment.
     
     This is the central architectural object shared across future Runtime components.
-    It provides a stable composition of the Runtime's core services.
+    It provides a stable composition of the Runtime's core services and formally owns
+    the Runtime Decision Pipeline.
+    
+    Responsibilities:
+    - Runtime service composition
+    - Runtime Decision Pipeline ownership
+    - Runtime lifecycle ownership
+    - Runtime governance ownership
+    
+    It strictly remains a passive composition root. It does NOT coordinate, orchestrate,
+    execute, schedule, route, or optimize workloads. It merely owns the architectural 
+    environment in which these decisions occur.
     
     After construction, these references remain stable. 
     Future modules should consume these references rather than replacing them.
@@ -306,6 +317,13 @@ class RuntimeContext:
         """
         return self._runtime_learning
 
+    # -------------------------------------------------------------------------
+    # Runtime Decision Pipeline Ownership
+    # -------------------------------------------------------------------------
+    # RuntimeContext owns the composition and lifecycle of the Decision Pipeline,
+    # but does NOT own the decisions themselves (e.g. PlanningDecision, PolicyDecision).
+    # RuntimeKnowledge remains an independent artifact consumed by this pipeline.
+    
     @property
     def runtime_planning_strategy(self) -> RuntimePlanningStrategy:
         """

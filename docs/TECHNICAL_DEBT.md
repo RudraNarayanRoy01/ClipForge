@@ -177,9 +177,16 @@
 - **Certification Impact**: Was blocking runtime architectural routing.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.23 Runtime Context Expansion
+- **Description**: The Runtime lacked a canonical Runtime Decision Environment formally owning the decision pipeline.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.7)
+- **Certification Impact**: Was blocking runtime governance and pipeline ownership.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.4
 
-- Runtime Context Expansion (Sprint 6.4.7)
 - Planning Governance (Sprint 6.4.8)
 - Planning & Policy Certification (Sprint 6.4.9)
 
