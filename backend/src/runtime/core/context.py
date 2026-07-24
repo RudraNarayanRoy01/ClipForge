@@ -29,6 +29,7 @@ from .runtime_planning import RuntimePlanning, RuntimePlanningStrategy
 from .runtime_policy import RuntimePolicy
 from .runtime_constraint_engine import RuntimeConstraintEngine
 from .runtime_budget_planner import RuntimeBudgetPlanner
+from .runtime_routing import RuntimeRouting
 
 class RuntimeContext:
     """
@@ -74,6 +75,7 @@ class RuntimeContext:
         self._runtime_policy = RuntimePolicy()
         self._runtime_constraint_engine = RuntimeConstraintEngine()
         self._runtime_budget_planner = RuntimeBudgetPlanner()
+        self._runtime_routing = RuntimeRouting()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -358,6 +360,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeBudgetPlanner instances.
         """
         return self._runtime_budget_planner
+
+    @property
+    def runtime_routing(self) -> RuntimeRouting:
+        """
+        Expose the canonical Runtime Routing subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for runtime execution routing decisions.
+        Future Runtime components must obtain routing services through RuntimeContext
+        rather than constructing independent RuntimeRouting instances.
+        """
+        return self._runtime_routing
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

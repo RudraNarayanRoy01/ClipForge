@@ -45,6 +45,10 @@ ConstraintDecision
 RuntimeBudgetPlanner
 ↓
 BudgetDecision
+↓
+RuntimeRouting
+↓
+RoutingDecision
 ```
 
 This pipeline is strictly certified to guarantee:
@@ -54,6 +58,8 @@ This pipeline is strictly certified to guarantee:
 - **Deterministic policy evaluation**: Policy constraints evaluate predictably based solely on the PlanningDecision.
 - **Immutable budget definition**: The runtime budget is strictly defined as an immutable artifact.
 - **Deterministic budget evaluation**: The budget architecture evaluates predictably based solely on the ConstraintDecision.
+- **Immutable routing definition**: The runtime routing is strictly defined as an immutable artifact.
+- **Deterministic routing evaluation**: The routing architecture evaluates predictably based solely on the BudgetDecision.
 - **Append-only evolution**: Decisions do not overwrite past states.
 - **No RuntimeKnowledge mutation**: The input knowledge is consumed, never modified or embedded.
 - **No PlanningStrategy mutation**: Strategy is consumed, never modified.
@@ -61,8 +67,9 @@ This pipeline is strictly certified to guarantee:
 - **No PolicyDecision mutation**: The governance approval is immutable and final.
 - **No ConstraintDecision mutation**: The architectural constraints are immutable and strictly consumed.
 - **No BudgetDecision mutation**: The architectural budget is immutable and strictly consumed.
-- **No skipped layers**: `RuntimeKnowledge` must pass through the full pipeline to become actionable governance and budget.
-- **No reverse dependencies**: Planning strictly follows Learning and Strategy, Policy strictly follows Planning, Constraint strictly follows Policy, Budget strictly follows Constraint.
+- **No RoutingDecision mutation**: The architectural routing is immutable and strictly consumed.
+- **No skipped layers**: `RuntimeKnowledge` must pass through the full pipeline to become actionable governance, budget, and routing.
+- **No reverse dependencies**: Planning strictly follows Learning and Strategy, Policy strictly follows Planning, Constraint strictly follows Policy, Budget strictly follows Constraint, Routing strictly follows Budget.
 
 ### Planning Strategy Layer
 The `RuntimePlanningStrategy` subsystem provides exactly one architectural answer: "Which planning philosophy should guide RuntimePlanning?"
@@ -91,6 +98,19 @@ It produces an immutable `BudgetDecision` artifact representing the architectura
 
 **BudgetDecision Reusability:**
 `BudgetDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeRouting` and `RuntimeScheduler`—may freely consume a `BudgetDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+
+### Runtime Routing Layer
+The `RuntimeRouting` subsystem evaluates the output of `RuntimeBudgetPlanner`.
+It provides exactly one architectural answer: "Where should this workload execute?"
+It produces an immutable `RoutingDecision` artifact representing the architectural execution route, including primary and fallback route identifiers. It explicitly rejects responsibility leakage into RuntimeScheduler, RuntimeExecution, Provider Selection, Hardware Selection, Retry Execution, or Optimization.
+
+**RoutingDecision Reusability:**
+`RoutingDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeScheduler` and `RuntimeExecution`—may freely consume a `RoutingDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+
+**Fallback Contract:**
+`RoutingDecision` establishes only the architectural fallback contract.
+Allowed elements are strictly limited to `primary_route_identifier` and `fallback_route_identifier`.
+It explicitly rejects the implementation of retry execution, failover implementation, recovery logic, or scheduling fallback. Actual fallback behavior belongs entirely to future RuntimeExecution.
 
 ## Runtime Dependency Direction
 
@@ -154,6 +174,8 @@ Runtime Policy
 Runtime Constraint Engine
 ↓
 Runtime Budget Planner
+↓
+Runtime Routing
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -223,6 +245,7 @@ flowchart TD
     Context --> RuntimePolicy
     Context --> RuntimeConstraintEngine
     Context --> RuntimeBudgetPlanner
+    Context --> RuntimeRouting
     
     Results -.-> ProviderRegistry
 ```
@@ -298,6 +321,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Policy** → Is this PlanningDecision permitted? (Policy Layer)
 - **Runtime Constraint Engine** → What architectural constraints apply? (Constraint Layer)
 - **Runtime Budget Planner** → What execution budget is available? (Budget Layer)
+- **Runtime Routing** → Where should this workload execute? (Routing Layer)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -374,12 +398,11 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.5 establishes **only** the Runtime Budget architecture. The objective is to permanently freeze RuntimeBudgetPlanner as the architectural Budget Layer.
+Batch 6.4.6 establishes **only** the Runtime Routing architecture. The objective is to permanently freeze RuntimeRouting as the architectural Routing Layer.
 
-The following remain explicitly out of scope for Batch 6.4.5:
-- **Sprint 6.4.6**: Routing & Fallback Planning
+The following remain explicitly out of scope for Batch 6.4.6:
 - **Sprint 6.4.7**: Runtime Context Expansion
 - **Sprint 6.4.8**: Planning Governance
 - **Sprint 6.4.9**: Planning & Policy Certification
 
-Runtime Budgets will remain architecturally complete while intentionally minimal until these future sprints.
+Runtime Routing will remain architecturally complete while intentionally minimal until these future sprints.

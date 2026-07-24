@@ -169,9 +169,16 @@
 - **Certification Impact**: Was blocking runtime execution budget definitions.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.22 Runtime Routing
+- **Description**: The Runtime lacked a canonical subsystem for answering "Where should this workload execute?" based on a BudgetDecision.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.6)
+- **Certification Impact**: Was blocking runtime architectural routing.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.4
 
-- Routing & Fallback Planning (Sprint 6.4.6)
 - Runtime Context Expansion (Sprint 6.4.7)
 - Planning Governance (Sprint 6.4.8)
 - Planning & Policy Certification (Sprint 6.4.9)
