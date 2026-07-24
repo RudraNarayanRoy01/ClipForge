@@ -6,6 +6,7 @@ from .context import RuntimeContext
 from .metadata import RuntimeMetadata
 from .capabilities import CapabilityCategory, CapabilityDescriptor, RuntimeCapabilityRegistry
 from .discovery import ResourceCategory, ResourceDescriptor, DiscoveryResult, RuntimeResourceDiscovery
+from .providers import ProviderCategory, ProviderIdentity, ProviderDescriptor, ProviderRegistration, RuntimeProviderRegistry
 __all__ = [
     "RuntimeBootstrap",
     "RuntimeLifecycleState",
@@ -21,4 +22,9 @@ __all__ = [
     "ResourceDescriptor",
     "DiscoveryResult",
     "RuntimeResourceDiscovery",
+    "ProviderCategory",
+    "ProviderIdentity",
+    "ProviderDescriptor",
+    "ProviderRegistration",
+    "RuntimeProviderRegistry",
 ]

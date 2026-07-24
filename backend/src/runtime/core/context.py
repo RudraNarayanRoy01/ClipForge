@@ -7,7 +7,7 @@ from .capabilities import RuntimeCapabilityRegistry
 
 
 from .discovery import RuntimeResourceDiscovery
-
+from .providers import RuntimeProviderRegistry
 
 class RuntimeContext:
     """
@@ -26,7 +26,7 @@ class RuntimeContext:
         self._extension_points: Dict[str, IRuntimeExtensionPoint] = {}
         self._capability_registry = RuntimeCapabilityRegistry()
         self._resource_discovery = RuntimeResourceDiscovery()
-
+        self._provider_registry = RuntimeProviderRegistry()
     @property
     def metadata(self) -> RuntimeMetadata:
         """Expose descriptive metadata about this Runtime instance."""
@@ -56,6 +56,16 @@ class RuntimeContext:
         rather than constructing independent discovery services.
         """
         return self._resource_discovery
+
+    @property
+    def provider_registry(self) -> RuntimeProviderRegistry:
+        """
+        Expose the canonical Provider Registry for this Runtime instance.
+        
+        Future Runtime systems should access the provider catalog through this context
+        rather than constructing independent provider registries.
+        """
+        return self._provider_registry
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """
