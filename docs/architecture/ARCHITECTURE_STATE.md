@@ -25,15 +25,15 @@ This document provides a living snapshot of the platform's current architectural
 - **Editing Engine**: Orchestrates video rendering and manipulation pipelines.
 
 ## Runtime Implementation Status
-- **Phase**: Foundation (Lifecycle & Core Architecture)
-- **Status**: The Runtime subsystem has been established as an architectural boundary. The core lifecycle model, bootstrap mechanism, and extension philosophy are defined. No execution logic, capability registries, or provider integrations exist yet.
+- **Phase**: Foundation (Lifecycle, Context & Core Architecture)
+- **Status**: The Runtime subsystem has been established as an architectural boundary. The core lifecycle model, bootstrap mechanism, extension philosophy, and the central canonical Runtime Context have been defined. No execution logic, capability registries, or provider integrations exist yet. The composition and ownership model of the Runtime is strictly established.
 
 ## Current Architecture Snapshot
-The platform operates on a Hexagonal Architecture. The core application logic is isolated from the database and AI execution layers. The newly introduced Adaptive AI Runtime acts as the sole orchestrator for all future AI computations, strictly separating application logic from provider details.
+The platform operates on a Hexagonal Architecture. The core application logic is isolated from the database and AI execution layers. The newly introduced Adaptive AI Runtime acts as the sole orchestrator for all future AI computations, strictly separating application logic from provider details. The Runtime architecture relies on a clear dependency flow from Bootstrap through the Runtime Context to its Lifecycle and Extension Points.
 
 ## Known Technical Debt
-- **Accepted Debt**: Runtime implementation (Capability Registry, Scheduling, Execution) is intentionally deferred to subsequent sprints within Milestone 6.
-- **Identified Debt**: Ambiguity regarding ownership of AI execution has been eliminated with the introduction of the Runtime boundary.
+- **Accepted Debt**: Runtime implementation (Capability Registry, Scheduling, Execution, Resource Discovery, Provider Ecosystem) is intentionally deferred to subsequent sprints/batches within Milestone 6.
+- **Identified Debt**: Ambiguity regarding ownership of AI execution and Runtime component composition has been eliminated with the introduction of the Runtime Context and Boundary.
 
 ## Known Architectural Risks
 - Maturing the Runtime without over-engineering interfaces prematurely. (Mitigated by deferring concrete interfaces until Sprint 6.2+).

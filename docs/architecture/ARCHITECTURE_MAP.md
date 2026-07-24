@@ -37,9 +37,11 @@ flowchart TD
 
 **Dependency Direction (Inversion Principle):**
 Application → Runtime Contracts
+Runtime Bootstrap → Runtime Context → Runtime Lifecycle & Extensions → Future Runtime Components
 Runtime → Provider Ecosystem → Hardware
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.
 - **Adaptive AI Runtime**: Owned by Platform Engineering / Architecture.
 - **Data Persistence**: Owned by Infrastructure layer.
+

@@ -28,6 +28,6 @@ This document serves as the architectural inventory of ClipForge, cataloging maj
 - **Responsibility**: Orchestrating AI computation independently of specific providers and hardware.
 - **Public Interfaces**: (Deferred to subsequent batches)
 - **Dependencies**: Depends ONLY on Application-defined abstract contracts. No outward dependencies to providers yet.
-- **Lifecycle**: Global / Platform-wide execution engine, managed by `RuntimeLifecycleCoordinator`.
-- **Current Implementation Status**: Foundation phase (Architecture boundary, bootstrap, and lifecycle established).
+- **Lifecycle**: Global / Platform-wide execution engine, managed by `RuntimeLifecycleCoordinator` (owned by `RuntimeContext`).
+- **Current Implementation Status**: Foundation phase (Architecture boundary, canonical Runtime Context, bootstrap, and lifecycle established).
 - **Future Extension Points**: Capability Registry, Execution Planning, Resource Discovery, Provider Ecosystem.

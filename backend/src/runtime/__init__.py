@@ -9,11 +9,13 @@ It ensures that the application only requests Capabilities (e.g. "Reasoning"),
 leaving the Runtime to determine the optimal Provider and Schedule for execution.
 """
 
-from .core import RuntimeBootstrap, RuntimeLifecycleState
+from .core import RuntimeBootstrap, RuntimeLifecycleState, RuntimeContext, RuntimeMetadata
 from .contracts import ILifecycleAware
 
 __all__ = [
     "RuntimeBootstrap",
     "RuntimeLifecycleState",
+    "RuntimeContext",
+    "RuntimeMetadata",
     "ILifecycleAware",
 ]
