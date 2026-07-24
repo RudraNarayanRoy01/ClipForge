@@ -34,11 +34,21 @@ Runtime Capability Registry
 ↓
 Runtime Resource Discovery
 ↓
-Discovery Results
+Runtime Provider Registry
 ↓
-Future Provider Registry
+Runtime Hardware Discovery
 ↓
-Future Execution
+Hardware Registrations
+↓
+Future Provider Selection
+↓
+Future Scheduler
+↓
+Future Planning Engine
+↓
+Future Execution Engine
+↓
+Future Runtime Optimization
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -77,13 +87,16 @@ flowchart TD
     Context --> Extensions
     Context --> Registry
     Context --> Discovery
+    Context --> HardwareDiscovery
     
     Discovery[Runtime Resource Discovery]
     Results[Discovery Results]
     Discovery --> Results
     
-    Runtime[Future Provider Registry]
-    Results -.-> Runtime
+    ProviderRegistry[Runtime Provider Registry]
+    HardwareDiscovery[Runtime Hardware Discovery]
+    
+    Results -.-> ProviderRegistry
 ```
 
 ### Runtime Context Stability
@@ -119,6 +132,29 @@ Extension Points **should NOT**:
 - Instantiate providers.
 These responsibilities belong to future Runtime components.
 
+### Hardware Discovery Architectural Boundary
+Runtime Hardware Discovery is the final **Runtime Knowledge** layer. It exists solely to provide the Runtime with architectural knowledge of available compute resources. 
+
+Its responsibility is limited to:
+- discovering hardware
+- registering hardware
+- exposing immutable hardware definitions
+- enumerating discovered hardware
+- looking up registered hardware
+
+Runtime Hardware Discovery intentionally performs **no runtime decision making**.
+It MUST NOT match providers to hardware, evaluate provider compatibility, allocate/reserve hardware, benchmark hardware, monitor utilization, schedule execution, execute workloads, or optimize runtime behavior.
+
+### Future Runtime Responsibility Separation
+The boundary between **Runtime Knowledge** and **Runtime Decision Making** is strictly enforced. Decision-making begins only in Provider Selection.
+
+- **Runtime Hardware Discovery** → What hardware exists? (Knowledge)
+- **Future Provider Selection** → Which provider should be used? (Decision Making)
+- **Future Scheduler** → Where and when should work execute? (Decision Making)
+- **Future Planning Engine** → How should execution be orchestrated? (Decision Making)
+- **Future Execution Engine** → Execute the workload. (Execution)
+- **Future Runtime Optimization** → Improve future execution decisions. (Optimization)
+
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
 `UNINITIALIZED -> BOOTSTRAPPING -> INITIALIZED -> SHUTTING_DOWN -> SHUTDOWN`
@@ -133,16 +169,16 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Composition
 - Capability Registry
 - Resource Discovery
-
-**Deferred to Batch 6.1.6**
 - Provider Registry
-
-**Deferred to later Sprint**
 - Hardware Discovery
+
+**Deferred to Next Batch**
+- Provider Selection
+
+**Deferred to Later Sprint**
 - Scheduler
 - Planning Engine
 - Execution Engine
-- Provider Selection
 - Runtime Optimization
 
 ## Runtime Sprint Evolution (Milestone 6)

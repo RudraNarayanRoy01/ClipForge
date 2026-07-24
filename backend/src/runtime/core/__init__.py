@@ -7,6 +7,8 @@ from .metadata import RuntimeMetadata
 from .capabilities import CapabilityCategory, CapabilityDescriptor, RuntimeCapabilityRegistry
 from .discovery import ResourceCategory, ResourceDescriptor, DiscoveryResult, RuntimeResourceDiscovery
 from .providers import ProviderCategory, ProviderIdentity, ProviderDescriptor, ProviderRegistration, RuntimeProviderRegistry
+from .hardware import HardwareCategory, HardwareIdentity, HardwareDescriptor, HardwareRegistration, RuntimeHardwareDiscovery
+
 __all__ = [
     "RuntimeBootstrap",
     "RuntimeLifecycleState",
@@ -27,4 +29,9 @@ __all__ = [
     "ProviderDescriptor",
     "ProviderRegistration",
     "RuntimeProviderRegistry",
+    "HardwareCategory",
+    "HardwareIdentity",
+    "HardwareDescriptor",
+    "HardwareRegistration",
+    "RuntimeHardwareDiscovery",
 ]

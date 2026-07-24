@@ -8,6 +8,7 @@ from .capabilities import RuntimeCapabilityRegistry
 
 from .discovery import RuntimeResourceDiscovery
 from .providers import RuntimeProviderRegistry
+from .hardware import RuntimeHardwareDiscovery
 
 class RuntimeContext:
     """
@@ -27,6 +28,7 @@ class RuntimeContext:
         self._capability_registry = RuntimeCapabilityRegistry()
         self._resource_discovery = RuntimeResourceDiscovery()
         self._provider_registry = RuntimeProviderRegistry()
+        self._hardware_discovery = RuntimeHardwareDiscovery()
     @property
     def metadata(self) -> RuntimeMetadata:
         """Expose descriptive metadata about this Runtime instance."""
@@ -66,6 +68,19 @@ class RuntimeContext:
         rather than constructing independent provider registries.
         """
         return self._provider_registry
+
+    @property
+    def hardware_discovery(self) -> RuntimeHardwareDiscovery:
+        """
+        Expose the canonical Hardware Discovery subsystem for this Runtime instance.
+        
+        This serves as the single source of truth for architectural knowledge of 
+        available hardware resources.
+        
+        Future Runtime systems should access hardware information through this context
+        rather than constructing independent hardware discovery services.
+        """
+        return self._hardware_discovery
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """
