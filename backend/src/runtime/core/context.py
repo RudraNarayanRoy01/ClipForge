@@ -26,7 +26,7 @@ from .runtime_diagnostics import RuntimeDiagnostics
 from .runtime_optimization import RuntimeOptimization
 from .runtime_learning import RuntimeLearning
 from .runtime_planning import RuntimePlanning, RuntimePlanningStrategy
-
+from .runtime_policy import RuntimePolicy
 class RuntimeContext:
     """
     The canonical representation of a Runtime instance.
@@ -68,6 +68,7 @@ class RuntimeContext:
         self._runtime_learning = RuntimeLearning()
         self._runtime_planning_strategy = RuntimePlanningStrategy()
         self._runtime_planning = RuntimePlanning()
+        self._runtime_policy = RuntimePolicy()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -319,6 +320,17 @@ class RuntimeContext:
         rather than constructing independent RuntimePlanning instances.
         """
         return self._runtime_planning
+
+    @property
+    def runtime_policy(self) -> RuntimePolicy:
+        """
+        Expose the canonical Runtime Policy subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for runtime policy decisions.
+        Future Runtime components must obtain policy services through RuntimeContext
+        rather than constructing independent RuntimePolicy instances.
+        """
+        return self._runtime_policy
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

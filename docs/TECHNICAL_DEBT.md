@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.4 | Batch: 6.4.2**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.4 | Batch: 6.4.3**
 
 ## 1. Resolved During Sprint 6.4
 
@@ -145,9 +145,16 @@
 - **Certification Impact**: Was blocking strategy-driven planning.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.19 Runtime Policy Foundation
+- **Description**: The Runtime lacked a canonical subsystem for answering "Is this PlanningDecision permitted?"
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.3)
+- **Certification Impact**: Was blocking runtime architectural governance and policy evaluation.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.4
 
-- Policy Engine (Sprint 6.4.3)
 - Constraint Engine (Sprint 6.4.4)
 - Budget Planning (Sprint 6.4.5)
 - Routing & Fallback Planning (Sprint 6.4.6)

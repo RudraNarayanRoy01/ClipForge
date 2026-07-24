@@ -33,20 +33,36 @@ PlanningStrategy
 RuntimePlanning
 ↓
 PlanningDecision
+↓
+RuntimePolicy
+↓
+PolicyDecision
 ```
 
 This pipeline is strictly certified to guarantee:
 - **Immutable strategy definition**: The planning philosophy is immutable.
 - **Deterministic strategy generation**: The generator produces a deterministic strategy.
+- **Immutable policy definition**: The policy architecture provides strict, unchanging governance.
+- **Deterministic policy evaluation**: Policy constraints evaluate predictably based solely on the PlanningDecision.
 - **Append-only evolution**: Decisions do not overwrite past states.
 - **No RuntimeKnowledge mutation**: The input knowledge is consumed, never modified or embedded.
 - **No PlanningStrategy mutation**: Strategy is consumed, never modified.
-- **No skipped layers**: `RuntimeKnowledge` must pass through the pipeline to become actionable.
-- **No reverse dependencies**: Planning strictly follows Learning and Strategy.
+- **No PlanningDecision mutation**: The output of planning is strictly consumed, never altered.
+- **No PolicyDecision mutation**: The governance approval is immutable and final.
+- **No skipped layers**: `RuntimeKnowledge` must pass through the full pipeline to become actionable governance.
+- **No reverse dependencies**: Planning strictly follows Learning and Strategy, Policy strictly follows Planning.
 
 ### Planning Strategy Layer
 The `RuntimePlanningStrategy` subsystem provides exactly one architectural answer: "Which planning philosophy should guide RuntimePlanning?"
-It produces a reusable, immutable `PlanningStrategy` artifact containing assumptions and preferences. It explicitly rejects responsibility leakage into Policy, Constraint Engine, Budget Planning, Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+It produces a reusable, immutable `PlanningStrategy` artifact containing assumptions and preferences.
+
+### Runtime Policy Layer
+The `RuntimePolicy` subsystem evaluates the output of `RuntimePlanning`.
+It provides exactly one architectural answer: "Is this PlanningDecision permitted?"
+It produces an immutable `PolicyDecision` artifact representing the architectural governance approval. It explicitly rejects responsibility leakage into Constraint Engine, Budget Planning, Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+
+**PolicyDecision Reusability:**
+`PolicyDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeConstraintEngine`, `RuntimeBudgetPlanner`, `RuntimeRouting`, and `RuntimeScheduler`—may freely consume a `PolicyDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
 
 ## Runtime Dependency Direction
 
@@ -104,6 +120,8 @@ Runtime Learning
 Runtime Planning Strategy
 ↓
 Runtime Planning
+↓
+Runtime Policy
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -170,6 +188,7 @@ flowchart TD
     Context --> RuntimeLearning
     Context --> RuntimePlanningStrategy
     Context --> RuntimePlanning
+    Context --> RuntimePolicy
     
     Results -.-> ProviderRegistry
 ```
@@ -242,6 +261,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Learning** → What Runtime knowledge should persist? (Knowledge Persistence Layer)
 - **Runtime Planning Strategy** → Which planning philosophy should guide RuntimePlanning? (Strategy Layer)
 - **Runtime Planning** → What should happen next? (Planning Layer)
+- **Runtime Policy** → Is this PlanningDecision permitted? (Policy Layer)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
