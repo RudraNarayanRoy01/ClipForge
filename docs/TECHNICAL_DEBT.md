@@ -81,13 +81,21 @@
 - **Certification Impact**: Was blocking execution observation.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.8)
-
-### 2.1 Runtime Telemetry Foundation
-- **Description**: The Runtime lacks a canonical subsystem to capture continuous execution signals.
+### 1.11 Runtime Telemetry Foundation
+- **Description**: The Runtime lacked a canonical subsystem to capture continuous execution signals.
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Next Batch)
+- **Recommended Milestone**: N/A (Resolved in Batch 6.3.2)
+- **Certification Impact**: Was blocking execution signal capture.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.8)
+
+### 2.1 Runtime Metrics Foundation
+- **Description**: The Runtime lacks a canonical subsystem to calculate and aggregate metrics from captured telemetry signals.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.3)
 - **Blocking Status**: Deferred
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones

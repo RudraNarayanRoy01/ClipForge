@@ -60,9 +60,17 @@ Adaptive Runtime
 ↓
 Runtime Monitoring
 ↓
-Future Telemetry
+Runtime Telemetry
+↓
+Future Runtime Metrics
+↓
+Future Runtime Health
+↓
+Future Runtime Diagnostics
 ↓
 Future Optimization
+↓
+Future Learning
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -186,7 +194,10 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Execution Engine** → Execute exactly those prepared stages deterministically. (Execution)
 - **Adaptive Runtime** → Dynamically evaluate execution and recommend future adaptations. (Adaptive)
 - **Runtime Monitoring** → Produce immutable observations of completed execution and adaptation. (Observation)
-- **Future Telemetry** → Capture continuous execution signals. (Telemetry)
+- **Runtime Telemetry** → Capture Runtime signals. (Signal Capture)
+- **Future Runtime Metrics** → What measurements should be calculated? (Measurement)
+- **Future Runtime Health** → What is the Runtime's health? (Health Evaluation)
+- **Future Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostics)
 - **Future Optimization** → Improve future runtime behavior. (Optimization)
 - **Future Learning** → Retain permanent runtime intelligence. (Learning)
 
@@ -215,9 +226,12 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Execution Engine
 - Adaptive Runtime
 - Runtime Monitoring
+- Runtime Telemetry
 
 **Deferred to Next Batch**
-- Runtime Telemetry
+- Runtime Metrics
+- Runtime Health
+- Runtime Diagnostics
 
 **Deferred to Later Sprint**
 - Runtime Optimization

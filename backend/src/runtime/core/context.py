@@ -19,6 +19,7 @@ from .orchestrator import RuntimeOrchestrator
 from .execution_engine import RuntimeExecutionEngine
 from .adaptive_runtime import AdaptiveRuntime
 from .runtime_monitoring import RuntimeMonitoring
+from .runtime_telemetry import RuntimeTelemetry
 
 class RuntimeContext:
     """
@@ -53,6 +54,7 @@ class RuntimeContext:
         self._execution_engine = RuntimeExecutionEngine()
         self._adaptive_runtime = AdaptiveRuntime()
         self._runtime_monitoring = RuntimeMonitoring()
+        self._runtime_telemetry = RuntimeTelemetry()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -216,6 +218,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeMonitoring instances.
         """
         return self._runtime_monitoring
+
+    @property
+    def runtime_telemetry(self) -> RuntimeTelemetry:
+        """
+        Expose the canonical Runtime Telemetry subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for signal capture.
+        Future Runtime components must obtain telemetry services through RuntimeContext 
+        rather than constructing independent RuntimeTelemetry instances.
+        """
+        return self._runtime_telemetry
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

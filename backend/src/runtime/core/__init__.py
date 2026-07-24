@@ -18,6 +18,7 @@ from .orchestrator import StageOrchestrationStatus, SessionValidationStatus, Sta
 from .execution_engine import ExecutionStatus, StageExecutionResult, ExecutionResult, RuntimeExecutionEngine
 from .adaptive_runtime import AdaptationStatus, StageAdaptationDecision, AdaptationDecision, AdaptiveRuntime
 from .runtime_monitoring import MonitoringStatus, StageMonitoringResult, MonitoringResult, RuntimeMonitoring
+from .runtime_telemetry import TelemetryStatus, StageTelemetrySnapshot, TelemetrySnapshot, RuntimeTelemetry
 
 __all__ = [
     "RuntimeBootstrap",
@@ -87,4 +88,8 @@ __all__ = [
     "StageMonitoringResult",
     "MonitoringResult",
     "RuntimeMonitoring",
+    "TelemetryStatus",
+    "StageTelemetrySnapshot",
+    "TelemetrySnapshot",
+    "RuntimeTelemetry",
 ]
