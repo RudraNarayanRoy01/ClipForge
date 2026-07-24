@@ -25,8 +25,8 @@ This document provides a living snapshot of the platform's current architectural
 - **Editing Engine**: Orchestrates video rendering and manipulation pipelines.
 
 ## Runtime Implementation Status
-- **Phase**: Foundation
-- **Status**: The Runtime subsystem has been established as an architectural boundary. No execution logic, capability registries, or provider integrations exist yet.
+- **Phase**: Foundation (Lifecycle & Core Architecture)
+- **Status**: The Runtime subsystem has been established as an architectural boundary. The core lifecycle model, bootstrap mechanism, and extension philosophy are defined. No execution logic, capability registries, or provider integrations exist yet.
 
 ## Current Architecture Snapshot
 The platform operates on a Hexagonal Architecture. The core application logic is isolated from the database and AI execution layers. The newly introduced Adaptive AI Runtime acts as the sole orchestrator for all future AI computations, strictly separating application logic from provider details.

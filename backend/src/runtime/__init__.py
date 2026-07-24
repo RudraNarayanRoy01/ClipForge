@@ -1,10 +1,19 @@
 """
-Adaptive AI Runtime Subsystem
+Adaptive AI Runtime
 
-This package serves as the primary architectural foundation for all AI orchestration
-and execution within ClipForge. It is responsible for orchestrating AI computation
-independently of specific providers (e.g., Ollama, Gemini) and hardware.
+This subsystem acts as the sole orchestrator for all AI computation within the 
+ClipForge platform. It abstracts away specific AI providers (Ollama, Gemini, OpenAI) 
+and hardware considerations (CUDA, VRAM) from the core Application layer.
 
-Currently in the "Foundation" phase (Batch 6.1.1).
-Concrete capabilities, registries, and execution planners will emerge in subsequent batches.
+It ensures that the application only requests Capabilities (e.g. "Reasoning"), 
+leaving the Runtime to determine the optimal Provider and Schedule for execution.
 """
+
+from .core import RuntimeBootstrap, RuntimeLifecycleState
+from .contracts import ILifecycleAware
+
+__all__ = [
+    "RuntimeBootstrap",
+    "RuntimeLifecycleState",
+    "ILifecycleAware",
+]
