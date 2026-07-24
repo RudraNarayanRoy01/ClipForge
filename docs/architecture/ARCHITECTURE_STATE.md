@@ -10,7 +10,7 @@ This document provides a living snapshot of the platform's current architectural
 
 ## Current Milestone
 - **Milestone 6**: Adaptive AI Runtime 
-- **Current Sprint**: 6.1 (Runtime Foundation - Provider Selection)
+- **Current Sprint**: 6.2 (Runtime Foundation - Scheduler)
 
 ## Completed Milestones
 - Foundation
@@ -25,8 +25,8 @@ This document provides a living snapshot of the platform's current architectural
 - **Editing Engine**: Orchestrates video rendering and manipulation pipelines.
 
 ## Runtime Implementation Status
-- **Phase**: Foundation (Lifecycle, Context, Capability Registry, Resource Discovery, Provider Registry, Hardware Discovery, Provider Selection)
-- **Status**: The Runtime subsystem has been established as an architectural boundary. The core lifecycle model, bootstrap mechanism, extension philosophy, and the central canonical Runtime Context have been defined. The Capability Registry exists to catalog architectural capabilities. The Runtime Resource Discovery subsystem is established to discover and expose immutable runtime resources. The canonical Runtime Provider Registry has been established to own and manage provider implementations. The Runtime Hardware Discovery subsystem is established as the canonical catalog of available hardware resources. The Provider Selection subsystem has been introduced to perform architectural matching of provider eligibility without orchestrating execution. No execution logic, scheduling behavior, or optimization exists yet. The composition and ownership model of the Runtime is strictly established.
+- **Phase**: Foundation (Lifecycle, Context, Capability Registry, Resource Discovery, Provider Registry, Hardware Discovery, Provider Selection, Scheduler)
+- **Status**: The Runtime subsystem has been established as an architectural boundary. The core lifecycle model, bootstrap mechanism, extension philosophy, and the central canonical Runtime Context have been defined. The Capability Registry exists to catalog architectural capabilities. The Runtime Resource Discovery subsystem is established to discover and expose immutable runtime resources. The canonical Runtime Provider Registry has been established to own and manage provider implementations. The Runtime Hardware Discovery subsystem is established as the canonical catalog of available hardware resources. The Provider Selection subsystem has been introduced to perform architectural matching of provider eligibility. The Runtime Scheduler has been introduced to make operational decisions on *where* and *when* work should execute. No execution logic, execution planning, or optimization exists yet. The composition and ownership model of the Runtime is strictly established.
 
 ## Current Architecture Snapshot
 The platform operates on a Hexagonal Architecture. The core application logic is isolated from the database and AI execution layers. The newly introduced Adaptive AI Runtime acts as the sole orchestrator for all future AI computations, strictly separating application logic from provider details. The Runtime architecture relies on a clear dependency flow from Bootstrap through the Runtime Context to its Lifecycle and Extension Points.

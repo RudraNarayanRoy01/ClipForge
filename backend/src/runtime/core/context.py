@@ -10,6 +10,7 @@ from .discovery import RuntimeResourceDiscovery
 from .providers import RuntimeProviderRegistry
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
+from .scheduler import RuntimeScheduler
 
 class RuntimeContext:
     """
@@ -35,6 +36,7 @@ class RuntimeContext:
             self._provider_registry,
             self._hardware_discovery
         )
+        self._scheduler = RuntimeScheduler()
     @property
     def metadata(self) -> RuntimeMetadata:
         """Expose descriptive metadata about this Runtime instance."""
@@ -98,6 +100,17 @@ class RuntimeContext:
         rather than constructing independent matching engines.
         """
         return self._provider_selection
+
+    @property
+    def scheduler(self) -> RuntimeScheduler:
+        """
+        Expose the canonical Scheduler subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for scheduling decisions.
+        Future Runtime components must obtain scheduling services through RuntimeContext 
+        rather than constructing independent Scheduler instances.
+        """
+        return self._scheduler
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

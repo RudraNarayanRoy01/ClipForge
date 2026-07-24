@@ -42,11 +42,17 @@ Hardware Registrations
 ↓
 Runtime Provider Selection
 ↓
-Future Scheduler
+Runtime Scheduler
 ↓
-Future Planning Engine
+Future Execution Planning
 ↓
-Future Execution Engine
+Future Execution Graph
+↓
+Future Resource Allocation
+↓
+Future Execution Context
+↓
+Future Runtime Orchestrator
 ↓
 Future Runtime Optimization
 ```
@@ -155,10 +161,11 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 
 - **Runtime Hardware Discovery** → What hardware exists? (Knowledge)
 - **Runtime Provider Selection** → Which provider is eligible? (Architectural Decision)
-- **Future Scheduler** → Where and when should work execute? (Execution Decision)
-- **Future Planning Engine** → How should execution be orchestrated? (Execution Decision)
+- **Runtime Scheduler** → Where and when should work execute? (Operational Decision)
+- **Future Execution Planning** → How should execution be structured? (Execution Planning)
+- **Future Execution Graph** → What are the execution dependencies? (Execution Planning)
 - **Future Execution Engine** → Execute the workload. (Execution)
-- **Future Runtime Optimization** → Improve future execution decisions. (Optimization)
+- **Future Runtime Optimization** → Improve future runtime behavior. (Optimization)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -177,14 +184,20 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Provider Registry
 - Hardware Discovery
 - Provider Selection
+- Runtime Scheduler
 
 **Deferred to Next Batch**
-- Scheduler
+- Execution Planning
 
 **Deferred to Later Sprint**
-- Planning Engine
-- Execution Engine
+- Execution Graph
+- Resource Allocation
+- Execution Context
+- Runtime Orchestrator
 - Runtime Optimization
+- Runtime Monitoring
+- Runtime Metrics
+- Benchmarking
 
 ## Runtime Sprint Evolution (Milestone 6)
 

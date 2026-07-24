@@ -24,8 +24,8 @@ flowchart TD
     Core --> Timeline[Timeline Engine]
     
     Runtime --> Registry[Capability Registry]
-    Runtime --> Planner[Planning Engine]
-    Runtime --> Sched[Scheduler / Execution Engine]
+    Runtime --> Planner[Execution Planning]
+    Runtime --> Sched[Scheduler]
     
     Sched --> Providers[Provider Ecosystem]
     
@@ -37,7 +37,7 @@ flowchart TD
 
 **Dependency Direction (Inversion Principle):**
 Application → Runtime Contracts
-Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Future Scheduler → Future Planning Engine → Future Execution Engine → Future Runtime Optimization
+Application → Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Runtime Scheduler → Future Execution Planning → Future Execution Graph → Future Resource Allocation → Future Execution Context → Future Runtime Orchestrator → Future Runtime Optimization
 Runtime → Provider Ecosystem → Hardware
 
 **Ownership:**
