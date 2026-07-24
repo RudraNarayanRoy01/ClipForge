@@ -15,6 +15,7 @@ from .execution_graph import GraphValidationStatus, ExecutionGraphNode, Executio
 from .resource_allocator import LogicalResourceProfile, AllocationValidationStatus, StageAllocation, AllocationResult, RuntimeResourceAllocator
 from .execution_context import ContextValidationStatus, StageExecutionContext, ExecutionContext, RuntimeExecutionContextFactory
 from .orchestrator import StageOrchestrationStatus, SessionValidationStatus, StageExecutionState, ExecutionSession, RuntimeOrchestrator
+from .execution_engine import ExecutionStatus, StageExecutionResult, ExecutionResult, RuntimeExecutionEngine
 
 __all__ = [
     "RuntimeBootstrap",
@@ -72,4 +73,8 @@ __all__ = [
     "StageExecutionState",
     "ExecutionSession",
     "RuntimeOrchestrator",
+    "ExecutionStatus",
+    "StageExecutionResult",
+    "ExecutionResult",
+    "RuntimeExecutionEngine",
 ]

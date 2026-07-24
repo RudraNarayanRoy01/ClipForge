@@ -54,7 +54,9 @@ Runtime Execution Context Factory
 ↓
 Runtime Orchestrator
 ↓
-Future Runtime Execution Engine
+Runtime Execution Engine
+↓
+Future Adaptive Runtime
 ↓
 Future Runtime Optimization
 ```
@@ -177,7 +179,8 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Resource Allocator** → What logical computational resources are required? (Resource Coordination)
 - **Runtime Execution Context Factory** → What prepared execution environment exists? (Execution Preparation)
 - **Runtime Orchestrator** → Which prepared stages are ready to coordinate? (Execution Coordination)
-- **Future Runtime Execution Engine** → Execute the workload. (Execution)
+- **Runtime Execution Engine** → Execute exactly those prepared stages deterministically. (Execution)
+- **Future Adaptive Runtime** → Dynamically adjust execution based on observations. (Adaptive)
 - **Future Runtime Optimization** → Improve future runtime behavior. (Optimization)
 
 ### Runtime Lifecycle
@@ -202,9 +205,10 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Resource Allocation
 - Runtime Execution Context
 - Runtime Orchestrator
+- Runtime Execution Engine
 
 **Deferred to Next Batch**
-- Runtime Execution Engine
+- Adaptive Runtime
 
 **Deferred to Later Sprint**
 - Runtime Optimization

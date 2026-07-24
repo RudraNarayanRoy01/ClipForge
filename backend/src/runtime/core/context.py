@@ -16,6 +16,7 @@ from .execution_graph import RuntimeExecutionGraphBuilder
 from .resource_allocator import RuntimeResourceAllocator
 from .execution_context import RuntimeExecutionContextFactory
 from .orchestrator import RuntimeOrchestrator
+from .execution_engine import RuntimeExecutionEngine
 
 class RuntimeContext:
     """
@@ -47,6 +48,7 @@ class RuntimeContext:
         self._resource_allocator = RuntimeResourceAllocator()
         self._execution_context_factory = RuntimeExecutionContextFactory()
         self._orchestrator = RuntimeOrchestrator()
+        self._execution_engine = RuntimeExecutionEngine()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -177,6 +179,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeOrchestrator instances.
         """
         return self._orchestrator
+
+    @property
+    def execution_engine(self) -> RuntimeExecutionEngine:
+        """
+        Expose the canonical Runtime Execution Engine subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for deterministic execution.
+        Future Runtime components must obtain execution services through RuntimeContext 
+        rather than constructing independent RuntimeExecutionEngine instances.
+        """
+        return self._execution_engine
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

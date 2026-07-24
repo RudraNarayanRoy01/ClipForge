@@ -57,13 +57,21 @@
 - **Certification Impact**: Was blocking execution orchestration.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.6)
-
-### 2.1 Runtime Execution Engine
+### 1.8 Runtime Execution Engine Foundation
 - **Description**: Execution of the coordinated stages via providers and hardware.
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Later Sprint)
+- **Recommended Milestone**: N/A (Resolved in Batch 6.2.7)
+- **Certification Impact**: Was blocking execution of coordinated workflows.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.7)
+
+### 2.1 Adaptive Runtime Foundation
+- **Description**: Dynamic observation and modification of execution flow based on metrics and learning.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Next Batch)
 - **Blocking Status**: Deferred
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones
