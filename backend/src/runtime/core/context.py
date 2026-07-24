@@ -15,6 +15,7 @@ from .planner import RuntimeExecutionPlanner
 from .execution_graph import RuntimeExecutionGraphBuilder
 from .resource_allocator import RuntimeResourceAllocator
 from .execution_context import RuntimeExecutionContextFactory
+from .orchestrator import RuntimeOrchestrator
 
 class RuntimeContext:
     """
@@ -45,6 +46,7 @@ class RuntimeContext:
         self._execution_graph_builder = RuntimeExecutionGraphBuilder()
         self._resource_allocator = RuntimeResourceAllocator()
         self._execution_context_factory = RuntimeExecutionContextFactory()
+        self._orchestrator = RuntimeOrchestrator()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -164,6 +166,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeExecutionContextFactory instances.
         """
         return self._execution_context_factory
+
+    @property
+    def orchestrator(self) -> RuntimeOrchestrator:
+        """
+        Expose the canonical Runtime Orchestrator subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for execution coordination.
+        Future Runtime components must obtain orchestration services through RuntimeContext 
+        rather than constructing independent RuntimeOrchestrator instances.
+        """
+        return self._orchestrator
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

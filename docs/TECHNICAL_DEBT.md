@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.2 | Batch: 6.2.5**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.2 | Batch: 6.2.6**
 
 ## 1. Resolved During Sprint 6.2 (Batch 6.2.2)
 
@@ -49,10 +49,18 @@
 - **Certification Impact**: Was blocking architectural execution preparation.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.5)
+### 1.7 Runtime Orchestrator Foundation
+- **Description**: Setup of execution orchestration and coordination.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.2.6)
+- **Certification Impact**: Was blocking execution orchestration.
+- **Blocking Status**: Resolved (No longer blocking)
 
-### 2.1 Runtime Orchestrator
-- **Description**: Setup of execution orchestration and actual execution of the graph.
+## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.6)
+
+### 2.1 Runtime Execution Engine
+- **Description**: Execution of the coordinated stages via providers and hardware.
 - **Severity**: High
 - **Owner**: Architecture Team
 - **Recommended Milestone**: Milestone 6 (Later Sprint)
