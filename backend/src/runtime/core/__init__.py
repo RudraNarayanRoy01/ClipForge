@@ -4,6 +4,7 @@ from .lifecycle import RuntimeLifecycleState, RuntimeLifecycleCoordinator
 from .extension import IRuntimeExtension, IRuntimeExtensionPoint
 from .context import RuntimeContext
 from .metadata import RuntimeMetadata
+from .capabilities import CapabilityCategory, CapabilityDescriptor, RuntimeCapabilityRegistry
 
 __all__ = [
     "RuntimeBootstrap",
@@ -13,4 +14,7 @@ __all__ = [
     "IRuntimeExtensionPoint",
     "RuntimeContext",
     "RuntimeMetadata",
+    "CapabilityCategory",
+    "CapabilityDescriptor",
+    "RuntimeCapabilityRegistry",
 ]

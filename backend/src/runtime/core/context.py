@@ -3,6 +3,7 @@ from typing import Dict
 from .metadata import RuntimeMetadata
 from .lifecycle import RuntimeLifecycleCoordinator
 from .extension import IRuntimeExtensionPoint
+from .capabilities import RuntimeCapabilityRegistry
 
 
 class RuntimeContext:
@@ -20,6 +21,7 @@ class RuntimeContext:
         self._metadata = RuntimeMetadata()
         self._lifecycle_coordinator = RuntimeLifecycleCoordinator()
         self._extension_points: Dict[str, IRuntimeExtensionPoint] = {}
+        self._capability_registry = RuntimeCapabilityRegistry()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -30,6 +32,16 @@ class RuntimeContext:
     def lifecycle(self) -> RuntimeLifecycleCoordinator:
         """Expose the canonical lifecycle coordinator for this Runtime instance."""
         return self._lifecycle_coordinator
+
+    @property
+    def capability_registry(self) -> RuntimeCapabilityRegistry:
+        """
+        Expose the canonical capability registry for this Runtime instance.
+        
+        This serves as the single source of truth for architectural capabilities
+        understood by this Runtime.
+        """
+        return self._capability_registry
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

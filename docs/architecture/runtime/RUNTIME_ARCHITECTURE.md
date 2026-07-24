@@ -21,7 +21,7 @@ The Adaptive AI Runtime is a first-class subsystem designed to orchestrate AI co
 
 ## Runtime Dependency Direction
 
-The explicit dependency direction introduced by Runtime Context:
+The explicit dependency direction introduced by Runtime Context and Capability Registry:
 
 ```text
 Application
@@ -30,17 +30,20 @@ Runtime Bootstrap
 ↓
 Runtime Context
 ↓
-Runtime Lifecycle
+Runtime Capability Registry
 ↓
-Runtime Extension Points
+Capability Descriptors
 ↓
-Future Runtime Components
+Future Discovery
+↓
+Future Providers
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
 
 ## Runtime Terminology
 - **Capability**: A generalized AI function (e.g., "Text Generation", "Transcription").
+- **Capability Identity**: A permanent architectural identifier (e.g., `vision.analysis`) describing WHAT the Runtime understands, strictly divorced from HOW it executes.
 - **Provider**: A concrete implementation capable of providing a Capability (e.g., Ollama, Gemini).
 - **Resource**: Underlying hardware or network constraint (e.g., GPU VRAM).
 - **Planner**: Determines *how* to satisfy a requested Capability.
@@ -65,13 +68,18 @@ flowchart TD
     Metadata[Runtime Metadata]
     Lifecycle[Runtime Lifecycle]
     Extensions[Runtime Extension Points]
+    Registry[Runtime Capability Registry]
     
     Context --> Metadata
     Context --> Lifecycle
     Context --> Extensions
+    Context --> Registry
     
-    Runtime[Adaptive AI Runtime (Future)]
-    Context -.-> Runtime
+    Descriptors[Capability Descriptors]
+    Registry --> Descriptors
+    
+    Runtime[Future Providers / Discovery]
+    Descriptors -.-> Runtime
 ```
 
 ### Runtime Context Stability
@@ -79,6 +87,7 @@ The `RuntimeContext` is designed as a stable composition object. After construct
 - Lifecycle reference remains stable.
 - Metadata reference remains stable.
 - Extension Point collection remains stable.
+- Capability Registry remains stable as the single source of truth for architectural capabilities.
 
 Future Runtime modules should consume these references rather than replacing them.
 
@@ -114,17 +123,24 @@ The Runtime coordinates operations through explicit lifecycle states:
 
 To prevent architectural overlap and provide a clear roadmap, execution and provider features are intentionally deferred:
 
-**Deferred to Batch 6.1.4**
+**Completed**
+- Runtime Identity
+- Runtime Framework
+- Runtime Composition
 - Capability Registry
 
 **Deferred to Batch 6.1.5**
 - Resource Discovery
 
+**Deferred to Batch 6.1.6**
+- Provider Registry
+
 **Deferred to later Sprint**
-- Provider Runtime
 - Scheduler
+- Planning Engine
 - Execution Engine
 - Hardware Discovery
+- Provider Selection
 - Runtime Optimization
 
 ## Runtime Sprint Evolution (Milestone 6)
