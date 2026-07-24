@@ -1,0 +1,33 @@
+---
+Classification: Living Document (Continuously Updated)
+Update Frequency: Continuously
+Primary Owner: CTO / Principal Architect
+---
+
+# Component Catalog
+
+This document serves as the architectural inventory of ClipForge, cataloging major subsystems, their responsibilities, and current implementation states.
+
+## Subsystem: Campaign Intelligence
+- **Responsibility**: Reasoning and evaluation of raw inputs and campaigns to determine eligibility and strategy.
+- **Public Interfaces**: `ICampaignReasoningService`
+- **Dependencies**: Depends on Application contracts, uses local evaluation models.
+- **Lifecycle**: Per-request / Campaign evaluation cycle.
+- **Current Implementation Status**: Active and stable.
+- **Future Extension Points**: Pluggable evaluation rules engines.
+
+## Subsystem: Editing Engine
+- **Responsibility**: Orchestration of video rendering, effects, and manipulation pipelines.
+- **Public Interfaces**: `IVideoProcessor`, `ITimelineBuilder`
+- **Dependencies**: System dependencies (ffmpeg).
+- **Lifecycle**: Task-based worker execution.
+- **Current Implementation Status**: Active and stable.
+- **Future Extension Points**: Distributed rendering, GPU acceleration.
+
+## Subsystem: Adaptive AI Runtime
+- **Responsibility**: Orchestrating AI computation independently of specific providers and hardware.
+- **Public Interfaces**: (Deferred to subsequent batches)
+- **Dependencies**: Depends ONLY on Application-defined abstract contracts. No outward dependencies to providers yet.
+- **Lifecycle**: Global / Platform-wide execution engine.
+- **Current Implementation Status**: Foundation phase (Architecture boundary established).
+- **Future Extension Points**: Capability Registry, Execution Planning, Resource Discovery, Provider Ecosystem.

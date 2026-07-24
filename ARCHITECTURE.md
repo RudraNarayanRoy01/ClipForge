@@ -6,7 +6,11 @@ This document serves as the high-level index for the AI Clipping Platform (ClipF
 
 Detailed architectural decisions, blueprints, and records are maintained in the following locations:
 
-- **[Architecture Certification](docs/ARCHITECTURE_CERTIFICATION.md)**: Sprint-level architectural readiness and health certifications.
+- **[Project Constitution](docs/architecture/PROJECT_CONSTITUTION.md)**: The permanent constitutional foundation, vision, and architectural invariants.
+- **[Architecture State](docs/architecture/ARCHITECTURE_STATE.md)**: Living snapshot of the platform's current architectural state.
+- **[Architecture Map](docs/architecture/ARCHITECTURE_MAP.md)**: High-level navigation map of the platform's topology.
+- **[Component Catalog](docs/architecture/COMPONENT_CATALOG.md)**: Inventory of subsystems, responsibilities, and implementation states.
+- **[Architecture Certification](docs/certification/ARCHITECTURE_CERTIFICATION.md)**: Sprint-level architectural readiness and health certifications.
 - **[Database Migrations](backend/docs/DATABASE_MIGRATIONS.md)**: Alembic configuration, schema versioning, and migration policies.
 - **[Planning Pipeline](backend/docs/planning_pipeline.md)**: Specifications for the multimodal AI processing pipeline.
 - **[Architecture Walkthrough](backend/docs/architecture_walkthrough.md)**: High-level walkthrough of the system layers and boundaries.

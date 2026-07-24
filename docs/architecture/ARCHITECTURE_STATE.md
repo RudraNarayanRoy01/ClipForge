@@ -1,0 +1,46 @@
+---
+Classification: Living Document (Continuously Updated)
+Update Frequency: Continuously
+Primary Owner: CTO / Principal Architect
+---
+
+# Architecture State
+
+This document provides a living snapshot of the platform's current architectural state, milestones, and technical debt.
+
+## Current Milestone
+- **Milestone 6**: Adaptive AI Runtime 
+- **Current Sprint**: 6.1 (Runtime Foundation)
+
+## Completed Milestones
+- Foundation
+- Campaign Intelligence
+- AI Infrastructure
+- Editing Engine
+- Architecture Stabilization
+- Platform Certification
+
+## Completed Subsystems
+- **Campaign Intelligence**: Handles reasoning and evaluation of raw inputs.
+- **Editing Engine**: Orchestrates video rendering and manipulation pipelines.
+
+## Runtime Implementation Status
+- **Phase**: Foundation
+- **Status**: The Runtime subsystem has been established as an architectural boundary. No execution logic, capability registries, or provider integrations exist yet.
+
+## Current Architecture Snapshot
+The platform operates on a Hexagonal Architecture. The core application logic is isolated from the database and AI execution layers. The newly introduced Adaptive AI Runtime acts as the sole orchestrator for all future AI computations, strictly separating application logic from provider details.
+
+## Known Technical Debt
+- **Accepted Debt**: Runtime implementation (Capability Registry, Scheduling, Execution) is intentionally deferred to subsequent sprints within Milestone 6.
+- **Identified Debt**: Ambiguity regarding ownership of AI execution has been eliminated with the introduction of the Runtime boundary.
+
+## Known Architectural Risks
+- Maturing the Runtime without over-engineering interfaces prematurely. (Mitigated by deferring concrete interfaces until Sprint 6.2+).
+- Ensuring future provider adapters strictly adhere to Runtime contracts.
+
+## Planned Future Capabilities
+- Dynamic Hardware Discovery
+- Intelligent Execution Planning
+- Capability-Based Provider Routing
+- Adaptive Optimization & Telemetry
