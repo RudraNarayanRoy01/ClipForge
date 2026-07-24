@@ -23,6 +23,7 @@ from .runtime_metrics import RuntimeMetricStatus, StageRuntimeMetrics, RuntimeMe
 from .runtime_health import RuntimeHealthStatus, StageRuntimeHealth, RuntimeHealthReport, RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnosticStatus, StageRuntimeDiagnostic, RuntimeDiagnosticsReport, RuntimeDiagnostics
 from .runtime_optimization import OptimizationPriority, StageOptimizationDecision, OptimizationDecision, RuntimeOptimization
+from .runtime_learning import KnowledgeClassification, StageRuntimeKnowledge, RuntimeKnowledge, RuntimeLearning
 
 __all__ = [
     "RuntimeBootstrap",
@@ -112,4 +113,8 @@ __all__ = [
     "StageOptimizationDecision",
     "OptimizationDecision",
     "RuntimeOptimization",
+    "KnowledgeClassification",
+    "StageRuntimeKnowledge",
+    "RuntimeKnowledge",
+    "RuntimeLearning",
 ]

@@ -24,6 +24,7 @@ from .runtime_metrics import RuntimeMetrics
 from .runtime_health import RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnostics
 from .runtime_optimization import RuntimeOptimization
+from .runtime_learning import RuntimeLearning
 
 class RuntimeContext:
     """
@@ -63,6 +64,7 @@ class RuntimeContext:
         self._runtime_health = RuntimeHealth()
         self._runtime_diagnostics = RuntimeDiagnostics()
         self._runtime_optimization = RuntimeOptimization()
+        self._runtime_learning = RuntimeLearning()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -281,6 +283,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeOptimization instances.
         """
         return self._runtime_optimization
+
+    @property
+    def runtime_learning(self) -> RuntimeLearning:
+        """
+        Expose the canonical Runtime Learning subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for knowledge persistence.
+        Future Runtime components must obtain knowledge services through RuntimeContext
+        rather than constructing independent RuntimeLearning instances.
+        """
+        return self._runtime_learning
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

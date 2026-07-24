@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.6**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.7**
 
 ## 1. Resolved During Sprint 6.3
 
@@ -121,14 +121,17 @@
 - **Certification Impact**: Was blocking optimization reasoning.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.6)
-
-### 2.1 Runtime Learning Foundation
-- **Description**: The Runtime lacks a canonical subsystem for knowledge persistence and historical runtime intelligence.
+### 1.16 Runtime Learning Foundation
+- **Description**: The Runtime lacked a canonical subsystem for knowledge persistence and historical runtime intelligence.
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.7)
-- **Blocking Status**: Deferred
+- **Recommended Milestone**: N/A (Resolved in Batch 6.3.7)
+- **Certification Impact**: Was blocking runtime knowledge persistence.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.7)
+
+(No remaining reasoning capabilities deferred in Milestone 6)
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones
 

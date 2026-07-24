@@ -70,7 +70,7 @@ Runtime Diagnostics
 ↓
 Runtime Optimization
 ↓
-Future Learning
+Runtime Learning
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -199,7 +199,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Health** → What is the Runtime's operational condition? (Operational Evaluation)
 - **Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostic Reasoning)
 - **Runtime Optimization** → What improvements should Runtime pursue? (Optimization Decision)
-- **Future Learning** → Retain permanent runtime intelligence. (Learning)
+- **Runtime Learning** → What Runtime knowledge should persist? (Knowledge Persistence Layer)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -231,11 +231,9 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Health
 - Runtime Diagnostics
 - Runtime Optimization
-
-**Deferred to Next Batch**
 - Runtime Learning
 
-**Deferred to Later Sprint**
+**Deferred to Next Milestone**
 - Benchmarking
 
 ## Runtime Sprint Evolution (Milestone 6)
