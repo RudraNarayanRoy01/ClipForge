@@ -13,6 +13,7 @@ from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
 from .planner import RuntimeExecutionPlanner
 from .execution_graph import RuntimeExecutionGraphBuilder
+from .resource_allocator import RuntimeResourceAllocator
 
 class RuntimeContext:
     """
@@ -41,6 +42,7 @@ class RuntimeContext:
         self._scheduler = RuntimeScheduler()
         self._execution_planner = RuntimeExecutionPlanner()
         self._execution_graph_builder = RuntimeExecutionGraphBuilder()
+        self._resource_allocator = RuntimeResourceAllocator()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -138,6 +140,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeExecutionGraphBuilder instances.
         """
         return self._execution_graph_builder
+
+    @property
+    def resource_allocator(self) -> RuntimeResourceAllocator:
+        """
+        Expose the canonical Resource Allocator subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for logical resource allocation.
+        Future Runtime components must obtain allocation services through RuntimeContext 
+        rather than constructing independent RuntimeResourceAllocator instances.
+        """
+        return self._resource_allocator
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

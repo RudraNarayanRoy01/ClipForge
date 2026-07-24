@@ -48,7 +48,7 @@ Runtime Execution Planner
 ↓
 Runtime Execution Graph Builder
 ↓
-Future Runtime Resource Allocator
+Runtime Resource Allocator
 ↓
 Future Execution Context
 ↓
@@ -104,12 +104,14 @@ flowchart TD
     ProviderSelection[Runtime Provider Selection]
     ExecutionPlanner[Runtime Execution Planner]
     ExecutionGraphBuilder[Runtime Execution Graph Builder]
+    ResourceAllocator[Runtime Resource Allocator]
     
     Context --> ProviderRegistry
     Context --> HardwareDiscovery
     Context --> ProviderSelection
     Context --> ExecutionPlanner
     Context --> ExecutionGraphBuilder
+    Context --> ResourceAllocator
     
     Results -.-> ProviderRegistry
 ```
@@ -168,7 +170,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Scheduler** → Where and when should work execute? (Operational Decision)
 - **Runtime Execution Planner** → How should execution be structured? (Execution Planning)
 - **Runtime Execution Graph Builder** → Which work depends on which? (Execution Coordination)
-- **Future Runtime Resource Allocator** → Which resources are reserved? (Resource Allocation)
+- **Runtime Resource Allocator** → What logical computational resources are required? (Resource Coordination)
 - **Future Runtime Execution Context** → What execution environment is required? (Execution Context)
 - **Future Runtime Orchestrator** → How should execution be coordinated? (Orchestration)
 - **Future Runtime Execution Engine** → Execute the workload. (Execution)
@@ -194,9 +196,10 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Scheduler
 - Runtime Execution Planner
 - Runtime Execution Graph Foundation
+- Runtime Resource Allocation
 
 **Deferred to Next Batch**
-- Runtime Resource Allocation
+- Runtime Execution Context
 
 **Deferred to Later Sprint**
 - Runtime Execution Context

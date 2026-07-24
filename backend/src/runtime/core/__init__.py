@@ -11,6 +11,8 @@ from .hardware import HardwareCategory, HardwareIdentity, HardwareDescriptor, Ha
 from .selection import ProviderSelectionStatus, ProviderSelectionRequest, ProviderSelectionResult, RuntimeProviderSelection
 from .scheduler import SchedulingStatus, SchedulerRequest, SchedulerResult, RuntimeScheduler
 from .planner import PlanningStatus, PlanningRequest, ExecutionPlan, RuntimeExecutionPlanner
+from .execution_graph import GraphValidationStatus, ExecutionGraphNode, ExecutionDependency, ExecutionGraph, RuntimeExecutionGraphBuilder
+from .resource_allocator import LogicalResourceProfile, AllocationValidationStatus, StageAllocation, AllocationResult, RuntimeResourceAllocator
 
 __all__ = [
     "RuntimeBootstrap",
@@ -54,4 +56,9 @@ __all__ = [
     "ExecutionDependency",
     "ExecutionGraph",
     "RuntimeExecutionGraphBuilder",
+    "LogicalResourceProfile",
+    "AllocationValidationStatus",
+    "StageAllocation",
+    "AllocationResult",
+    "RuntimeResourceAllocator",
 ]
