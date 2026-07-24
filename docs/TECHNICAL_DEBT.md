@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.5**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.6**
 
 ## 1. Resolved During Sprint 6.3
 
@@ -113,13 +113,21 @@
 - **Certification Impact**: Was blocking diagnostic reasoning.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.5)
-
-### 2.1 Runtime Optimization Foundation
-- **Description**: The Runtime lacks a canonical subsystem to optimize runtime operations based on diagnostics.
+### 1.15 Runtime Optimization Foundation
+- **Description**: The Runtime lacked a canonical subsystem to produce optimization decisions based on diagnostics.
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.6)
+- **Recommended Milestone**: N/A (Resolved in Batch 6.3.6)
+- **Certification Impact**: Was blocking optimization reasoning.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.6)
+
+### 2.1 Runtime Learning Foundation
+- **Description**: The Runtime lacks a canonical subsystem for knowledge persistence and historical runtime intelligence.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.7)
 - **Blocking Status**: Deferred
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones

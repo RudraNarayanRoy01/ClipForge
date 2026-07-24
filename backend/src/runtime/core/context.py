@@ -23,6 +23,7 @@ from .runtime_telemetry import RuntimeTelemetry
 from .runtime_metrics import RuntimeMetrics
 from .runtime_health import RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnostics
+from .runtime_optimization import RuntimeOptimization
 
 class RuntimeContext:
     """
@@ -61,6 +62,7 @@ class RuntimeContext:
         self._runtime_metrics = RuntimeMetrics()
         self._runtime_health = RuntimeHealth()
         self._runtime_diagnostics = RuntimeDiagnostics()
+        self._runtime_optimization = RuntimeOptimization()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -268,6 +270,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeDiagnostics instances.
         """
         return self._runtime_diagnostics
+
+    @property
+    def runtime_optimization(self) -> RuntimeOptimization:
+        """
+        Expose the canonical Runtime Optimization subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for optimization reasoning.
+        Future Runtime components must obtain optimization services through RuntimeContext
+        rather than constructing independent RuntimeOptimization instances.
+        """
+        return self._runtime_optimization
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

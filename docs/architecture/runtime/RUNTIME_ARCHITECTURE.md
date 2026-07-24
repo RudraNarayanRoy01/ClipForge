@@ -68,7 +68,7 @@ Runtime Health
 ↓
 Runtime Diagnostics
 ↓
-Future Optimization
+Runtime Optimization
 ↓
 Future Learning
 ```
@@ -198,7 +198,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Metrics** → What quantitative measurements should be calculated? (Quantitative Measurement)
 - **Runtime Health** → What is the Runtime's operational condition? (Operational Evaluation)
 - **Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostic Reasoning)
-- **Future Optimization** → Improve future runtime behavior. (Optimization)
+- **Runtime Optimization** → What improvements should Runtime pursue? (Optimization Decision)
 - **Future Learning** → Retain permanent runtime intelligence. (Learning)
 
 ### Runtime Lifecycle
@@ -230,12 +230,12 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Metrics
 - Runtime Health
 - Runtime Diagnostics
-
-**Deferred to Next Batch**
 - Runtime Optimization
 
-**Deferred to Later Sprint**
+**Deferred to Next Batch**
 - Runtime Learning
+
+**Deferred to Later Sprint**
 - Benchmarking
 
 ## Runtime Sprint Evolution (Milestone 6)
