@@ -17,6 +17,7 @@ from .resource_allocator import RuntimeResourceAllocator
 from .execution_context import RuntimeExecutionContextFactory
 from .orchestrator import RuntimeOrchestrator
 from .execution_engine import RuntimeExecutionEngine
+from .adaptive_runtime import AdaptiveRuntime
 
 class RuntimeContext:
     """
@@ -49,6 +50,7 @@ class RuntimeContext:
         self._execution_context_factory = RuntimeExecutionContextFactory()
         self._orchestrator = RuntimeOrchestrator()
         self._execution_engine = RuntimeExecutionEngine()
+        self._adaptive_runtime = AdaptiveRuntime()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -190,6 +192,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeExecutionEngine instances.
         """
         return self._execution_engine
+
+    @property
+    def adaptive_runtime(self) -> AdaptiveRuntime:
+        """
+        Expose the canonical Adaptive Runtime subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for execution adaptation.
+        Future Runtime components must obtain adaptation services through RuntimeContext 
+        rather than constructing independent AdaptiveRuntime instances.
+        """
+        return self._adaptive_runtime
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

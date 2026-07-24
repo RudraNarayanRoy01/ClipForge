@@ -56,9 +56,11 @@ Runtime Orchestrator
 ↓
 Runtime Execution Engine
 ↓
-Future Adaptive Runtime
+Adaptive Runtime
 ↓
-Future Runtime Optimization
+Future Monitoring
+↓
+Future Optimization
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -180,8 +182,10 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Execution Context Factory** → What prepared execution environment exists? (Execution Preparation)
 - **Runtime Orchestrator** → Which prepared stages are ready to coordinate? (Execution Coordination)
 - **Runtime Execution Engine** → Execute exactly those prepared stages deterministically. (Execution)
-- **Future Adaptive Runtime** → Dynamically adjust execution based on observations. (Adaptive)
-- **Future Runtime Optimization** → Improve future runtime behavior. (Optimization)
+- **Adaptive Runtime** → Dynamically evaluate execution and recommend future adaptations. (Adaptive)
+- **Future Monitoring** → Monitor execution metrics. (Monitoring)
+- **Future Optimization** → Improve future runtime behavior. (Optimization)
+- **Future Learning** → Retain permanent runtime intelligence. (Learning)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -206,13 +210,14 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Execution Context
 - Runtime Orchestrator
 - Runtime Execution Engine
+- Adaptive Runtime
 
 **Deferred to Next Batch**
-- Adaptive Runtime
+- Runtime Monitoring
 
 **Deferred to Later Sprint**
 - Runtime Optimization
-- Runtime Monitoring
+- Runtime Learning
 - Runtime Metrics
 - Benchmarking
 

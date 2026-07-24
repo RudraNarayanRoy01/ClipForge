@@ -16,6 +16,7 @@ from .resource_allocator import LogicalResourceProfile, AllocationValidationStat
 from .execution_context import ContextValidationStatus, StageExecutionContext, ExecutionContext, RuntimeExecutionContextFactory
 from .orchestrator import StageOrchestrationStatus, SessionValidationStatus, StageExecutionState, ExecutionSession, RuntimeOrchestrator
 from .execution_engine import ExecutionStatus, StageExecutionResult, ExecutionResult, RuntimeExecutionEngine
+from .adaptive_runtime import AdaptationStatus, StageAdaptationDecision, AdaptationDecision, AdaptiveRuntime
 
 __all__ = [
     "RuntimeBootstrap",
@@ -77,4 +78,8 @@ __all__ = [
     "StageExecutionResult",
     "ExecutionResult",
     "RuntimeExecutionEngine",
+    "AdaptationStatus",
+    "StageAdaptationDecision",
+    "AdaptationDecision",
+    "AdaptiveRuntime",
 ]

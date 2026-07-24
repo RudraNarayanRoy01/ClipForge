@@ -65,10 +65,18 @@
 - **Certification Impact**: Was blocking execution of coordinated workflows.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.7)
+### 1.9 Adaptive Runtime Foundation
+- **Description**: The Runtime lacked a canonical subsystem to evaluate execution and recommend future adaptations without executing or optimizing.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.2.8)
+- **Certification Impact**: Was blocking adaptive runtime capabilities.
+- **Blocking Status**: Resolved (No longer blocking)
 
-### 2.1 Adaptive Runtime Foundation
-- **Description**: Dynamic observation and modification of execution flow based on metrics and learning.
+## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.8)
+
+### 2.1 Runtime Monitoring Foundation
+- **Description**: The Runtime lacks a canonical subsystem to monitor execution metrics.
 - **Severity**: High
 - **Owner**: Architecture Team
 - **Recommended Milestone**: Milestone 6 (Next Batch)
