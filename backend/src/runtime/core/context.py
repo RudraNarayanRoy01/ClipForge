@@ -14,6 +14,7 @@ from .scheduler import RuntimeScheduler
 from .planner import RuntimeExecutionPlanner
 from .execution_graph import RuntimeExecutionGraphBuilder
 from .resource_allocator import RuntimeResourceAllocator
+from .execution_context import RuntimeExecutionContextFactory
 
 class RuntimeContext:
     """
@@ -43,6 +44,7 @@ class RuntimeContext:
         self._execution_planner = RuntimeExecutionPlanner()
         self._execution_graph_builder = RuntimeExecutionGraphBuilder()
         self._resource_allocator = RuntimeResourceAllocator()
+        self._execution_context_factory = RuntimeExecutionContextFactory()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -151,6 +153,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeResourceAllocator instances.
         """
         return self._resource_allocator
+
+    @property
+    def execution_context_factory(self) -> RuntimeExecutionContextFactory:
+        """
+        Expose the canonical Execution Context Factory subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for execution preparation.
+        Future Runtime components must obtain context creation services through RuntimeContext 
+        rather than constructing independent RuntimeExecutionContextFactory instances.
+        """
+        return self._execution_context_factory
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

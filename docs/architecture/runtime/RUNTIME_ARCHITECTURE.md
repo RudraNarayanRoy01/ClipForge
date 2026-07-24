@@ -50,7 +50,7 @@ Runtime Execution Graph Builder
 ↓
 Runtime Resource Allocator
 ↓
-Future Execution Context
+Runtime Execution Context Factory
 ↓
 Future Runtime Orchestrator
 ↓
@@ -105,6 +105,7 @@ flowchart TD
     ExecutionPlanner[Runtime Execution Planner]
     ExecutionGraphBuilder[Runtime Execution Graph Builder]
     ResourceAllocator[Runtime Resource Allocator]
+    ExecutionContextFactory[Runtime Execution Context Factory]
     
     Context --> ProviderRegistry
     Context --> HardwareDiscovery
@@ -112,6 +113,7 @@ flowchart TD
     Context --> ExecutionPlanner
     Context --> ExecutionGraphBuilder
     Context --> ResourceAllocator
+    Context --> ExecutionContextFactory
     
     Results -.-> ProviderRegistry
 ```
@@ -171,8 +173,8 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Execution Planner** → How should execution be structured? (Execution Planning)
 - **Runtime Execution Graph Builder** → Which work depends on which? (Execution Coordination)
 - **Runtime Resource Allocator** → What logical computational resources are required? (Resource Coordination)
-- **Future Runtime Execution Context** → What execution environment is required? (Execution Context)
-- **Future Runtime Orchestrator** → How should execution be coordinated? (Orchestration)
+- **Runtime Execution Context Factory** → What prepared execution environment exists? (Execution Preparation)
+- **Future Runtime Orchestrator** → When should execution begin? (Orchestration)
 - **Future Runtime Execution Engine** → Execute the workload. (Execution)
 - **Future Runtime Optimization** → Improve future runtime behavior. (Optimization)
 
@@ -195,15 +197,13 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Provider Selection
 - Runtime Scheduler
 - Runtime Execution Planner
-- Runtime Execution Graph Foundation
 - Runtime Resource Allocation
+- Runtime Execution Context
 
 **Deferred to Next Batch**
-- Runtime Execution Context
+- Runtime Orchestrator
 
 **Deferred to Later Sprint**
-- Runtime Execution Context
-- Runtime Orchestrator
 - Runtime Execution Engine
 - Runtime Optimization
 - Runtime Monitoring
