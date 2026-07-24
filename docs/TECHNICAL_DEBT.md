@@ -185,9 +185,16 @@
 - **Certification Impact**: Was blocking runtime governance and pipeline ownership.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.24 Runtime Planning Governance
+- **Description**: The Runtime Decision Pipeline lacked formal architectural governance, invariants, ownership rules, and dependency contracts.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.8)
+- **Certification Impact**: Was blocking structural verification of the planning pipeline.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.4
 
-- Planning Governance (Sprint 6.4.8)
 - Planning & Policy Certification (Sprint 6.4.9)
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones

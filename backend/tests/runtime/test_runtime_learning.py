@@ -2,9 +2,9 @@ from dataclasses import FrozenInstanceError
 import pytest
 import time
 
-from runtime.core.runtime_optimization import OptimizationDecision, StageOptimizationDecision, OptimizationPriority
-from runtime.core.runtime_learning import RuntimeLearning, RuntimeKnowledge, StageRuntimeKnowledge, KnowledgeClassification
-from runtime.core.context import RuntimeContext
+from src.runtime.core.runtime_optimization import OptimizationDecision, StageOptimizationDecision, OptimizationPriority
+from src.runtime.core.runtime_learning import RuntimeLearning, RuntimeKnowledge, StageRuntimeKnowledge, KnowledgeClassification
+from src.runtime.core.context import RuntimeContext
 
 
 def test_runtime_knowledge_immutability():

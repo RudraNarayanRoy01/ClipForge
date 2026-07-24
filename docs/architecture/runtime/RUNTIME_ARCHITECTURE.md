@@ -19,98 +19,86 @@ The Adaptive AI Runtime is a first-class subsystem designed to orchestrate AI co
 - **Upper Boundary (Application Layer)**: Exposes abstract AI interfaces. The Application layer requests "Reasoning" or "Transcription" without knowing how it runs.
 - **Lower Boundary (Infrastructure/Hardware)**: Integrates with specific Provider SDKs (Ollama, Gemini) and discovers hardware constraints (CUDA, VRAM).
 
-## Runtime Decision Pipeline (Planning)
+## Runtime Planning Governance
 
-The initial phase of Runtime decision making follows a strict pipeline to transform accumulated knowledge into future execution intent:
+This section forms the canonical architectural contract governing the Runtime Decision Pipeline. It defines declarative rules that must be structurally certified by architecture tests. 
 
-```text
-RuntimeKnowledge
-↓
-RuntimePlanningStrategy
-↓
-PlanningStrategy
-↓
-RuntimePlanning
-↓
-PlanningDecision
-↓
-RuntimePolicy
-↓
-PolicyDecision
-↓
-RuntimeConstraintEngine
-↓
-ConstraintDecision
-↓
-RuntimeBudgetPlanner
-↓
-BudgetDecision
-↓
-RuntimeRouting
-↓
-RoutingDecision
-```
+### Runtime Invariants
 
-This pipeline is strictly certified to guarantee:
-- **Immutable strategy definition**: The planning philosophy is immutable.
-- **Deterministic strategy generation**: The generator produces a deterministic strategy.
-- **Immutable policy definition**: The policy architecture provides strict, unchanging governance.
-- **Deterministic policy evaluation**: Policy constraints evaluate predictably based solely on the PlanningDecision.
-- **Immutable budget definition**: The runtime budget is strictly defined as an immutable artifact.
-- **Deterministic budget evaluation**: The budget architecture evaluates predictably based solely on the ConstraintDecision.
-- **Immutable routing definition**: The runtime routing is strictly defined as an immutable artifact.
-- **Deterministic routing evaluation**: The routing architecture evaluates predictably based solely on the BudgetDecision.
-- **Append-only evolution**: Decisions do not overwrite past states.
-- **No RuntimeKnowledge mutation**: The input knowledge is consumed, never modified or embedded.
-- **No PlanningStrategy mutation**: Strategy is consumed, never modified.
-- **No PlanningDecision mutation**: The output of planning is strictly consumed, never altered.
-- **No PolicyDecision mutation**: The governance approval is immutable and final.
-- **No ConstraintDecision mutation**: The architectural constraints are immutable and strictly consumed.
-- **No BudgetDecision mutation**: The architectural budget is immutable and strictly consumed.
-- **No RoutingDecision mutation**: The architectural routing is immutable and strictly consumed.
-- **No skipped layers**: `RuntimeKnowledge` must pass through the full pipeline to become actionable governance, budget, and routing.
-- **No reverse dependencies**: Planning strictly follows Learning and Strategy, Policy strictly follows Planning, Constraint strictly follows Policy, Budget strictly follows Constraint, Routing strictly follows Budget.
+Runtime Invariants are absolute architectural truths that govern the pipeline:
+- **Planning Precedence**: Planning always precedes Policy.
+- **Policy Precedence**: Policy always precedes Constraint.
+- **Constraint Precedence**: Constraint always precedes Budget.
+- **Budget Precedence**: Budget always precedes Routing.
+- **Dependency Flow**: Dependency direction never reverses.
+- **Decision Ownership**: Decision ownership never changes.
+- **Passive Context**: `RuntimeContext` acts strictly as a passive Composition Root and Runtime Decision Environment. It never executes workloads, coordinates, orchestrates, schedules, optimizes, or routes.
 
-### Planning Strategy Layer
-The `RuntimePlanningStrategy` subsystem provides exactly one architectural answer: "Which planning philosophy should guide RuntimePlanning?"
-It produces a reusable, immutable `PlanningStrategy` artifact containing assumptions and preferences.
+### Pipeline Contracts
 
-### Runtime Policy Layer
-The `RuntimePolicy` subsystem evaluates the output of `RuntimePlanning`.
-It provides exactly one architectural answer: "Is this PlanningDecision permitted?"
-It produces an immutable `PolicyDecision` artifact representing the architectural governance approval. It explicitly rejects responsibility leakage into Constraint Engine, Budget Planning, Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+Pipeline Contracts define the specific inputs, outputs, and forbidden behaviors of each decision subsystem:
 
-**PolicyDecision Reusability:**
-`PolicyDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeConstraintEngine`, `RuntimeBudgetPlanner`, `RuntimeRouting`, and `RuntimeScheduler`—may freely consume a `PolicyDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+- **RuntimePlanning**
+  - Consumes: `RuntimeKnowledge`
+  - Produces: `PlanningDecision`
+  - Must never: Execute, Schedule, or Retry.
 
-### Runtime Constraint Layer
-The `RuntimeConstraintEngine` subsystem evaluates the output of `RuntimePolicy`.
-It provides exactly one architectural answer: "What architectural constraints apply?"
-It produces an immutable `ConstraintDecision` artifact representing the architectural execution boundaries. It explicitly rejects responsibility leakage into Budget Planning, Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+- **RuntimePolicy**
+  - Consumes: `PlanningDecision`
+  - Produces: `PolicyDecision`
+  - Must never: Modify `PlanningDecision`.
 
-**ConstraintDecision Reusability:**
-`ConstraintDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeBudgetPlanner`, `RuntimeRouting`, and `RuntimeScheduler`—may freely consume a `ConstraintDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+- **RuntimeConstraintEngine**
+  - Consumes: `PolicyDecision`
+  - Produces: `ConstraintDecision`
+  - Must never: Modify `PolicyDecision`.
 
-### Runtime Budget Layer
-The `RuntimeBudgetPlanner` subsystem evaluates the output of `RuntimeConstraintEngine`.
-It provides exactly one architectural answer: "What execution budget is available?"
-It produces an immutable `BudgetDecision` artifact representing the architectural execution budget. It explicitly rejects responsibility leakage into Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+- **RuntimeBudgetPlanner**
+  - Consumes: `ConstraintDecision`
+  - Produces: `BudgetDecision`
+  - Must never: Modify `ConstraintDecision`.
 
-**BudgetDecision Reusability:**
-`BudgetDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeRouting` and `RuntimeScheduler`—may freely consume a `BudgetDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+- **RuntimeRouting**
+  - Consumes: `BudgetDecision`
+  - Produces: `RoutingDecision`
+  - Must never: Modify `BudgetDecision`.
 
-### Runtime Routing Layer
-The `RuntimeRouting` subsystem evaluates the output of `RuntimeBudgetPlanner`.
-It provides exactly one architectural answer: "Where should this workload execute?"
-It produces an immutable `RoutingDecision` artifact representing the architectural execution route, including primary and fallback route identifiers. It explicitly rejects responsibility leakage into RuntimeScheduler, RuntimeExecution, Provider Selection, Hardware Selection, Retry Execution, or Optimization.
+### Ownership Rules
 
-**RoutingDecision Reusability:**
-`RoutingDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeScheduler` and `RuntimeExecution`—may freely consume a `RoutingDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+Decision ownership is strictly delineated:
+- `PlanningDecision` is exclusively owned by `RuntimePlanning`.
+- `PolicyDecision` is exclusively owned by `RuntimePolicy`.
+- `ConstraintDecision` is exclusively owned by `RuntimeConstraintEngine`.
+- `BudgetDecision` is exclusively owned by `RuntimeBudgetPlanner`.
+- `RoutingDecision` is exclusively owned by `RuntimeRouting`.
+- `RuntimeContext` owns the Runtime Decision Environment, Composition, Pipeline, Lifecycle, and Governance, but **does NOT** own Runtime Decisions.
 
-**Fallback Contract:**
-`RoutingDecision` establishes only the architectural fallback contract.
-Allowed elements are strictly limited to `primary_route_identifier` and `fallback_route_identifier`.
-It explicitly rejects the implementation of retry execution, failover implementation, recovery logic, or scheduling fallback. Actual fallback behavior belongs entirely to future RuntimeExecution.
+### Mutation Rules (Immutability)
+
+- **PlanningDecision**: Immutable after creation.
+- **PolicyDecision**: Immutable after creation.
+- **ConstraintDecision**: Immutable after creation.
+- **BudgetDecision**: Immutable after creation.
+- **RoutingDecision**: Immutable after creation.
+- **No Shared State**: Runtime subsystems must never mutate another subsystem's decision artifacts.
+
+### Dependency Rules
+
+**Allowed Dependencies:**
+`RuntimeKnowledge` -> `PlanningStrategy` -> `RuntimePlanning` -> `RuntimePolicy` -> `RuntimeConstraintEngine` -> `RuntimeBudgetPlanner` -> `RuntimeRouting`
+
+**Forbidden Dependencies:**
+- Routing -> Planning
+- Budget -> Planning
+- Constraint -> RuntimeContext
+- Policy -> RuntimeContext
+- RuntimeContext -> Decision Ownership
+- Circular dependencies or reverse dependency flows are strictly forbidden.
+
+### Extension Rules
+
+Future Runtime components must plug into `RuntimeContext` through composition without redesigning the core decision pipeline (`Planning`, `Policy`, `Constraint`, `Budget`, `Routing`). 
+Examples of future components include `RuntimeScheduler`, `RuntimeExecution`, `RuntimeObservation`, `RuntimeLearning`, `RuntimeOptimization`, and `RuntimeGovernance`.
 
 ## Runtime Dependency Direction
 
@@ -411,10 +399,9 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.7 establishes **only** the Runtime Context Expansion. The objective is to formally expand `RuntimeContext` into the canonical Runtime Decision Environment.
+Batch 6.4.8 establishes **Runtime Planning Governance**. The objective is to formally declare Runtime Invariants, Pipeline Contracts, Ownership Rules, and Dependency Rules, structurally certifying them without altering execution behavior.
 
-The following remain explicitly out of scope for Batch 6.4.7:
-- **Sprint 6.4.8**: Planning Governance
+The following remain explicitly out of scope for Batch 6.4.8:
 - **Sprint 6.4.9**: Planning & Policy Certification
 
 RuntimeContext will remain architecturally complete as a passive composition root without executing workloads or scheduling execution.

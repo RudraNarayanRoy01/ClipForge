@@ -63,3 +63,11 @@ Runtime -> Provider Ecosystem -> Hardware
 - **Application Core**: Owned by Domain Logic.
 - **Adaptive AI Runtime**: Owned by Platform Engineering / Architecture.
 - **Data Persistence**: Owned by Infrastructure layer.
+
+**Decision Ownership (Runtime Pipeline):**
+- `PlanningDecision`: Owned exclusively by `RuntimePlanning`.
+- `PolicyDecision`: Owned exclusively by `RuntimePolicy`.
+- `ConstraintDecision`: Owned exclusively by `RuntimeConstraintEngine`.
+- `BudgetDecision`: Owned exclusively by `RuntimeBudgetPlanner`.
+- `RoutingDecision`: Owned exclusively by `RuntimeRouting`.
+- `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
