@@ -10,6 +10,7 @@ from .providers import ProviderCategory, ProviderIdentity, ProviderDescriptor, P
 from .hardware import HardwareCategory, HardwareIdentity, HardwareDescriptor, HardwareRegistration, RuntimeHardwareDiscovery
 from .selection import ProviderSelectionStatus, ProviderSelectionRequest, ProviderSelectionResult, RuntimeProviderSelection
 from .scheduler import SchedulingStatus, SchedulerRequest, SchedulerResult, RuntimeScheduler
+from .planner import PlanningStatus, PlanningRequest, ExecutionPlan, RuntimeExecutionPlanner
 
 __all__ = [
     "RuntimeBootstrap",
@@ -44,4 +45,8 @@ __all__ = [
     "SchedulerRequest",
     "SchedulerResult",
     "RuntimeScheduler",
+    "PlanningStatus",
+    "PlanningRequest",
+    "ExecutionPlan",
+    "RuntimeExecutionPlanner",
 ]

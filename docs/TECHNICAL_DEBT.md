@@ -1,7 +1,7 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.1 | Batch: 6.1.7**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.2 | Batch: 6.2.2**
 
-## 1. Resolved During Sprint 6.1 (Batch 6.1.7)
+## 1. Resolved During Sprint 6.2 (Batch 6.2.2)
 
 ### 1.1 Runtime Hardware Discovery
 - **Description**: The Runtime lacked a canonical registry to discover and manage hardware (CUDA, CPU) definitions.
@@ -19,17 +19,25 @@
 - **Certification Impact**: Was blocking provider abstraction.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.1 (Batch 6.1.7)
-
-### 2.1 Provider Selection
-- **Description**: Intelligent matching of abstract Capabilities to registered Providers.
+### 1.3 Runtime Execution Planner
+- **Description**: The Runtime lacked a canonical subsystem for defining execution intent via immutable blueprints (logical execution stages).
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Next Batch)
+- **Recommended Milestone**: N/A (Resolved)
+- **Certification Impact**: Was blocking execution planning and structuring.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.2)
+
+### 2.1 Execution Graph Foundation
+- **Description**: Transformation of logical execution stages into a concrete dependency graph (nodes, edges, topology).
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Batch 6.2.3)
 - **Blocking Status**: Deferred
 
-### 2.2 Scheduler and Execution Engine
-- **Description**: Intelligent scheduling, execution logic, and planning engines.
+### 2.2 Execution Engine and Orchestrator
+- **Description**: Resource allocation, orchestration, and actual execution of the graph.
 - **Severity**: High
 - **Owner**: Architecture Team
 - **Recommended Milestone**: Milestone 6 (Later Sprint)

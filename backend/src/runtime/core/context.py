@@ -11,6 +11,7 @@ from .providers import RuntimeProviderRegistry
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
+from .planner import RuntimeExecutionPlanner
 
 class RuntimeContext:
     """
@@ -37,6 +38,8 @@ class RuntimeContext:
             self._hardware_discovery
         )
         self._scheduler = RuntimeScheduler()
+        self._execution_planner = RuntimeExecutionPlanner()
+
     @property
     def metadata(self) -> RuntimeMetadata:
         """Expose descriptive metadata about this Runtime instance."""
@@ -111,6 +114,17 @@ class RuntimeContext:
         rather than constructing independent Scheduler instances.
         """
         return self._scheduler
+
+    @property
+    def execution_planner(self) -> RuntimeExecutionPlanner:
+        """
+        Expose the canonical Execution Planner subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for execution planning.
+        Future Runtime components must obtain planning services through RuntimeContext 
+        rather than constructing independent RuntimeExecutionPlanner instances.
+        """
+        return self._execution_planner
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

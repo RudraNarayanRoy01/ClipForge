@@ -44,7 +44,7 @@ Runtime Provider Selection
 ↓
 Runtime Scheduler
 ↓
-Future Execution Planning
+Runtime Execution Planner
 ↓
 Future Execution Graph
 ↓
@@ -102,10 +102,12 @@ flowchart TD
     ProviderRegistry[Runtime Provider Registry]
     HardwareDiscovery[Runtime Hardware Discovery]
     ProviderSelection[Runtime Provider Selection]
+    ExecutionPlanner[Runtime Execution Planner]
     
     Context --> ProviderRegistry
     Context --> HardwareDiscovery
     Context --> ProviderSelection
+    Context --> ExecutionPlanner
     
     Results -.-> ProviderRegistry
 ```
@@ -162,7 +164,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Hardware Discovery** → What hardware exists? (Knowledge)
 - **Runtime Provider Selection** → Which provider is eligible? (Architectural Decision)
 - **Runtime Scheduler** → Where and when should work execute? (Operational Decision)
-- **Future Execution Planning** → How should execution be structured? (Execution Planning)
+- **Runtime Execution Planner** → How should execution be structured? (Execution Planning)
 - **Future Execution Graph** → What are the execution dependencies? (Execution Planning)
 - **Future Execution Engine** → Execute the workload. (Execution)
 - **Future Runtime Optimization** → Improve future runtime behavior. (Optimization)
@@ -185,11 +187,9 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Hardware Discovery
 - Provider Selection
 - Runtime Scheduler
+- Runtime Execution Planner
 
 **Deferred to Next Batch**
-- Execution Planning
-
-**Deferred to Later Sprint**
 - Execution Graph
 - Resource Allocation
 - Execution Context
