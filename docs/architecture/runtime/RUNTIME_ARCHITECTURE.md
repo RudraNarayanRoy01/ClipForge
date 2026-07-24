@@ -250,7 +250,7 @@ Capability Registry
 ↓
 **Sprint 6.3**
 ↓
-Resource Discovery
+Runtime Observation & Reasoning (Certified)
 ↓
 **Sprint 6.4**
 ↓
@@ -258,16 +258,16 @@ Planning & Policy
 ↓
 **Sprint 6.5**
 ↓
-Scheduling & Execution
+Advanced Scheduler & Execution
 ↓
 **Sprint 6.6**
 ↓
-Provider Ecosystem
+Provider & Model Ecosystem
 ↓
 **Sprint 6.7**
 ↓
-Adaptive Optimization
+Adaptive Runtime Intelligence
 ↓
 **Sprint 6.8**
 ↓
-Certification
+Runtime Certification

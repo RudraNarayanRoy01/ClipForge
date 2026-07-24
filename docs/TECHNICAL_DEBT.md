@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.7**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.8**
 
 ## 1. Resolved During Sprint 6.3
 
@@ -129,9 +129,9 @@
 - **Certification Impact**: Was blocking runtime knowledge persistence.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.7)
+## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.8)
 
-(No remaining reasoning capabilities deferred in Milestone 6)
+(No remaining observation or reasoning capabilities deferred in Milestone 6)
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones
 
