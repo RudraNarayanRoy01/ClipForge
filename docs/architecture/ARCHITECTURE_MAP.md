@@ -71,3 +71,6 @@ Runtime -> Provider Ecosystem -> Hardware
 - `BudgetDecision`: Owned exclusively by `RuntimeBudgetPlanner`.
 - `RoutingDecision`: Owned exclusively by `RuntimeRouting`.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
+
+**Certification Status:**
+- Sprint 6.4 (Planning & Policy) is formally certified and architecturally complete. Future components integrate via composition on the RuntimeContext.

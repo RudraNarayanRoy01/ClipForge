@@ -193,9 +193,16 @@
 - **Certification Impact**: Was blocking structural verification of the planning pipeline.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.4
+### 1.25 Planning & Policy Certification
+- **Description**: The Runtime Planning & Policy Engine lacked formal architectural certification and holistic validation.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.9)
+- **Certification Impact**: Was blocking formal Sprint 6.4 completion.
+- **Blocking Status**: Resolved (No longer blocking)
 
-- Planning & Policy Certification (Sprint 6.4.9)
+## 2. Deferred Beyond Sprint 6.4
+- Advanced Scheduler & Execution (Sprint 6.5)
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones
 

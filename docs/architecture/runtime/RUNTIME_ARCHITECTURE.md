@@ -399,9 +399,8 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.8 establishes **Runtime Planning Governance**. The objective is to formally declare Runtime Invariants, Pipeline Contracts, Ownership Rules, and Dependency Rules, structurally certifying them without altering execution behavior.
+Batch 6.4.9 concludes Sprint 6.4 by formally certifying the **Runtime Planning & Policy Engine**, including the Runtime Decision Pipeline, Decision Ownership, Runtime Governance, RuntimeContext passivity, Dependency Integrity, and Future Extensibility.
 
-The following remain explicitly out of scope for Batch 6.4.8:
-- **Sprint 6.4.9**: Planning & Policy Certification
+Sprint 6.4 is now declared **architecturally complete** and formally **certified**.
 
-RuntimeContext will remain architecturally complete as a passive composition root without executing workloads or scheduling execution.
+RuntimeContext remains architecturally complete as a passive composition root. It owns the pipeline but never executes workloads or schedules execution. Extensibility certification guarantees that future Sprint components (Scheduler, Execution, Observation, Learning, Optimization) can plug into RuntimeContext via composition without requiring redesign of the certified Planning, Policy, Constraint, Budget, or Routing architecture.
