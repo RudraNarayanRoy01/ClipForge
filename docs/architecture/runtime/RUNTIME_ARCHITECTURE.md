@@ -37,6 +37,10 @@ PlanningDecision
 RuntimePolicy
 ↓
 PolicyDecision
+↓
+RuntimeConstraintEngine
+↓
+ConstraintDecision
 ```
 
 This pipeline is strictly certified to guarantee:
@@ -63,6 +67,14 @@ It produces an immutable `PolicyDecision` artifact representing the architectura
 
 **PolicyDecision Reusability:**
 `PolicyDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeConstraintEngine`, `RuntimeBudgetPlanner`, `RuntimeRouting`, and `RuntimeScheduler`—may freely consume a `PolicyDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
+
+### Runtime Constraint Layer
+The `RuntimeConstraintEngine` subsystem evaluates the output of `RuntimePolicy`.
+It provides exactly one architectural answer: "What architectural constraints apply?"
+It produces an immutable `ConstraintDecision` artifact representing the architectural execution boundaries. It explicitly rejects responsibility leakage into Budget Planning, Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
+
+**ConstraintDecision Reusability:**
+`ConstraintDecision` is explicitly certified as a reusable architectural artifact. Future Runtime subsystems—including `RuntimeBudgetPlanner`, `RuntimeRouting`, and `RuntimeScheduler`—may freely consume a `ConstraintDecision` without modifying it. The artifact remains strictly immutable across all downstream consumption.
 
 ## Runtime Dependency Direction
 
@@ -117,11 +129,13 @@ Runtime Optimization
 ↓
 Runtime Learning
 ↓
-Runtime Planning Strategy
+RuntimePlanning Strategy
 ↓
 Runtime Planning
 ↓
 Runtime Policy
+↓
+Runtime Constraint Engine
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -189,6 +203,7 @@ flowchart TD
     Context --> RuntimePlanningStrategy
     Context --> RuntimePlanning
     Context --> RuntimePolicy
+    Context --> RuntimeConstraintEngine
     
     Results -.-> ProviderRegistry
 ```
@@ -262,6 +277,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Planning Strategy** → Which planning philosophy should guide RuntimePlanning? (Strategy Layer)
 - **Runtime Planning** → What should happen next? (Planning Layer)
 - **Runtime Policy** → Is this PlanningDecision permitted? (Policy Layer)
+- **Runtime Constraint Engine** → What architectural constraints apply? (Constraint Layer)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -338,15 +354,13 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.2 establishes **only** the Runtime Planning Strategy architecture. The objective is to permanently freeze RuntimePlanningStrategy as the architectural Strategy Layer.
+Batch 6.4.4 establishes **only** the Runtime Constraint architecture. The objective is to permanently freeze RuntimeConstraintEngine as the architectural Constraint Layer.
 
-The following remain explicitly out of scope for Batch 6.4.2:
-- **Sprint 6.4.3**: Policy Engine
-- **Sprint 6.4.4**: Constraint Engine
+The following remain explicitly out of scope for Batch 6.4.4:
 - **Sprint 6.4.5**: Budget Planning
 - **Sprint 6.4.6**: Routing & Fallback Planning
 - **Sprint 6.4.7**: Runtime Context Expansion
 - **Sprint 6.4.8**: Planning Governance
 - **Sprint 6.4.9**: Planning & Policy Certification
 
-Planning Strategies will remain architecturally complete while intentionally minimal until these future sprints.
+Runtime Constraints will remain architecturally complete while intentionally minimal until these future sprints.

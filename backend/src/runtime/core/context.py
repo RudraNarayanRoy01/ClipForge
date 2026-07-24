@@ -27,6 +27,8 @@ from .runtime_optimization import RuntimeOptimization
 from .runtime_learning import RuntimeLearning
 from .runtime_planning import RuntimePlanning, RuntimePlanningStrategy
 from .runtime_policy import RuntimePolicy
+from .runtime_constraint_engine import RuntimeConstraintEngine
+
 class RuntimeContext:
     """
     The canonical representation of a Runtime instance.
@@ -69,6 +71,7 @@ class RuntimeContext:
         self._runtime_planning_strategy = RuntimePlanningStrategy()
         self._runtime_planning = RuntimePlanning()
         self._runtime_policy = RuntimePolicy()
+        self._runtime_constraint_engine = RuntimeConstraintEngine()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -331,6 +334,17 @@ class RuntimeContext:
         rather than constructing independent RuntimePolicy instances.
         """
         return self._runtime_policy
+
+    @property
+    def runtime_constraint_engine(self) -> RuntimeConstraintEngine:
+        """
+        Expose the canonical Runtime Constraint Engine subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for runtime constraint boundaries.
+        Future Runtime components must obtain constraint services through RuntimeContext
+        rather than constructing independent RuntimeConstraintEngine instances.
+        """
+        return self._runtime_constraint_engine
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

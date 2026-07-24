@@ -26,6 +26,7 @@ from .runtime_optimization import OptimizationPriority, StageOptimizationDecisio
 from .runtime_learning import KnowledgeClassification, StageRuntimeKnowledge, RuntimeKnowledge, RuntimeLearning
 from .runtime_planning import PlanningDecision, RuntimePlanning
 from .runtime_policy import PolicyDecision, RuntimePolicy
+from .runtime_constraint_engine import ConstraintDecision, RuntimeConstraintEngine
 
 __all__ = [
     "RuntimeBootstrap",
@@ -123,4 +124,6 @@ __all__ = [
     "RuntimePlanning",
     "PolicyDecision",
     "RuntimePolicy",
+    "ConstraintDecision",
+    "RuntimeConstraintEngine",
 ]

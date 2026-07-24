@@ -153,9 +153,16 @@
 - **Certification Impact**: Was blocking runtime architectural governance and policy evaluation.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.20 Runtime Constraint Engine
+- **Description**: The Runtime lacked a canonical subsystem for answering "What architectural constraints apply?" based on a PolicyDecision.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.4)
+- **Certification Impact**: Was blocking runtime execution boundaries definition.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.4
 
-- Constraint Engine (Sprint 6.4.4)
 - Budget Planning (Sprint 6.4.5)
 - Routing & Fallback Planning (Sprint 6.4.6)
 - Runtime Context Expansion (Sprint 6.4.7)
