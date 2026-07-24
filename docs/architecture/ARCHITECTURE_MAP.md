@@ -31,6 +31,7 @@ flowchart TD
     Runtime → Monitor[Runtime Monitoring]
     Runtime → Telemetry[Runtime Telemetry]
     Runtime → Metrics[Runtime Metrics]
+    Runtime → Health[Runtime Health]
     
     Sched --> Providers[Provider Ecosystem]
     
@@ -42,7 +43,7 @@ flowchart TD
 
 **Dependency Direction (Inversion Principle):**
 Application → Runtime Contracts
-Application → Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Runtime Scheduler → Runtime Execution Planner → Runtime Execution Graph Builder → Runtime Resource Allocator → Runtime Execution Context Factory → Runtime Orchestrator → Runtime Execution Engine → Adaptive Runtime → Runtime Monitoring → Runtime Telemetry → Runtime Metrics → Future Runtime Health → Future Runtime Diagnostics → Future Optimization
+Application → Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Runtime Scheduler → Runtime Execution Planner → Runtime Execution Graph Builder → Runtime Resource Allocator → Runtime Execution Context Factory → Runtime Orchestrator → Runtime Execution Engine → Adaptive Runtime → Runtime Monitoring → Runtime Telemetry → Runtime Metrics → Runtime Health → Future Runtime Diagnostics → Future Optimization
 Runtime → Provider Ecosystem → Hardware
 
 **Ownership:**

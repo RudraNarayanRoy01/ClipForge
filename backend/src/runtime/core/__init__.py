@@ -20,6 +20,7 @@ from .adaptive_runtime import AdaptationStatus, StageAdaptationDecision, Adaptat
 from .runtime_monitoring import MonitoringStatus, StageMonitoringResult, MonitoringResult, RuntimeMonitoring
 from .runtime_telemetry import TelemetryStatus, StageTelemetrySnapshot, TelemetrySnapshot, RuntimeTelemetry
 from .runtime_metrics import RuntimeMetricStatus, StageRuntimeMetrics, RuntimeMetricsSnapshot, RuntimeMetrics
+from .runtime_health import RuntimeHealthStatus, StageRuntimeHealth, RuntimeHealthReport, RuntimeHealth
 
 __all__ = [
     "RuntimeBootstrap",
@@ -97,4 +98,8 @@ __all__ = [
     "StageRuntimeMetrics",
     "RuntimeMetricsSnapshot",
     "RuntimeMetrics",
+    "RuntimeHealthStatus",
+    "StageRuntimeHealth",
+    "RuntimeHealthReport",
+    "RuntimeHealth",
 ]

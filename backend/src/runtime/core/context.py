@@ -21,6 +21,7 @@ from .adaptive_runtime import AdaptiveRuntime
 from .runtime_monitoring import RuntimeMonitoring
 from .runtime_telemetry import RuntimeTelemetry
 from .runtime_metrics import RuntimeMetrics
+from .runtime_health import RuntimeHealth
 
 class RuntimeContext:
     """
@@ -57,6 +58,7 @@ class RuntimeContext:
         self._runtime_monitoring = RuntimeMonitoring()
         self._runtime_telemetry = RuntimeTelemetry()
         self._runtime_metrics = RuntimeMetrics()
+        self._runtime_health = RuntimeHealth()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -242,6 +244,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeMetrics instances.
         """
         return self._runtime_metrics
+
+    @property
+    def runtime_health(self) -> RuntimeHealth:
+        """
+        Expose the canonical Runtime Health subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for operational evaluation.
+        Future Runtime components must obtain health services through RuntimeContext 
+        rather than constructing independent RuntimeHealth instances.
+        """
+        return self._runtime_health
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

@@ -1,5 +1,5 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.1**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.4**
 
 ## 1. Resolved During Sprint 6.3 (Batch 6.3.1)
 
@@ -97,13 +97,21 @@
 - **Certification Impact**: Was blocking quantitative measurement.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.3)
-
-### 2.1 Runtime Health Foundation
-- **Description**: The Runtime lacks a canonical subsystem to evaluate health based on captured metrics.
+### 1.13 Runtime Health Foundation
+- **Description**: The Runtime lacked a canonical subsystem to evaluate health based on captured metrics.
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.4)
+- **Recommended Milestone**: N/A (Resolved in Batch 6.3.4)
+- **Certification Impact**: Was blocking operational evaluation.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.4)
+
+### 2.1 Runtime Diagnostics Foundation
+- **Description**: The Runtime lacks a canonical subsystem to diagnose why the Runtime is in a specific operational condition.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.5)
 - **Blocking Status**: Deferred
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones
