@@ -6,6 +6,9 @@ from .extension import IRuntimeExtensionPoint
 from .capabilities import RuntimeCapabilityRegistry
 
 
+from .discovery import RuntimeResourceDiscovery
+
+
 class RuntimeContext:
     """
     The canonical representation of a Runtime instance.
@@ -22,6 +25,7 @@ class RuntimeContext:
         self._lifecycle_coordinator = RuntimeLifecycleCoordinator()
         self._extension_points: Dict[str, IRuntimeExtensionPoint] = {}
         self._capability_registry = RuntimeCapabilityRegistry()
+        self._resource_discovery = RuntimeResourceDiscovery()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -42,6 +46,16 @@ class RuntimeContext:
         understood by this Runtime.
         """
         return self._capability_registry
+
+    @property
+    def resource_discovery(self) -> RuntimeResourceDiscovery:
+        """
+        Expose the canonical resource discovery subsystem for this Runtime instance.
+        
+        Future Runtime systems should access discovery through this context
+        rather than constructing independent discovery services.
+        """
+        return self._resource_discovery
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

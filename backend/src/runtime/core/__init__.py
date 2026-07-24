@@ -5,7 +5,7 @@ from .extension import IRuntimeExtension, IRuntimeExtensionPoint
 from .context import RuntimeContext
 from .metadata import RuntimeMetadata
 from .capabilities import CapabilityCategory, CapabilityDescriptor, RuntimeCapabilityRegistry
-
+from .discovery import ResourceCategory, ResourceDescriptor, DiscoveryResult, RuntimeResourceDiscovery
 __all__ = [
     "RuntimeBootstrap",
     "RuntimeLifecycleState",
@@ -17,4 +17,8 @@ __all__ = [
     "CapabilityCategory",
     "CapabilityDescriptor",
     "RuntimeCapabilityRegistry",
+    "ResourceCategory",
+    "ResourceDescriptor",
+    "DiscoveryResult",
+    "RuntimeResourceDiscovery",
 ]

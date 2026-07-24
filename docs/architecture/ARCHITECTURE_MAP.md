@@ -37,7 +37,7 @@ flowchart TD
 
 **Dependency Direction (Inversion Principle):**
 Application → Runtime Contracts
-Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Capability Descriptors → Future Discovery → Future Providers
+Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Discovery Results → Future Provider Registry → Future Execution
 Runtime → Provider Ecosystem → Hardware
 
 **Ownership:**

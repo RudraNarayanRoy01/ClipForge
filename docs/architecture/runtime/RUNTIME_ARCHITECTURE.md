@@ -32,11 +32,13 @@ Runtime Context
 ↓
 Runtime Capability Registry
 ↓
-Capability Descriptors
+Runtime Resource Discovery
 ↓
-Future Discovery
+Discovery Results
 ↓
-Future Providers
+Future Provider Registry
+↓
+Future Execution
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -74,12 +76,14 @@ flowchart TD
     Context --> Lifecycle
     Context --> Extensions
     Context --> Registry
+    Context --> Discovery
     
-    Descriptors[Capability Descriptors]
-    Registry --> Descriptors
+    Discovery[Runtime Resource Discovery]
+    Results[Discovery Results]
+    Discovery --> Results
     
-    Runtime[Future Providers / Discovery]
-    Descriptors -.-> Runtime
+    Runtime[Future Provider Registry]
+    Results -.-> Runtime
 ```
 
 ### Runtime Context Stability
@@ -128,18 +132,16 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Framework
 - Runtime Composition
 - Capability Registry
-
-**Deferred to Batch 6.1.5**
 - Resource Discovery
 
 **Deferred to Batch 6.1.6**
 - Provider Registry
 
 **Deferred to later Sprint**
+- Hardware Discovery
 - Scheduler
 - Planning Engine
 - Execution Engine
-- Hardware Discovery
 - Provider Selection
 - Runtime Optimization
 

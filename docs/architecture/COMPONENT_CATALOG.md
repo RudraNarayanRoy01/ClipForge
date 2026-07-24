@@ -25,9 +25,9 @@ This document serves as the architectural inventory of ClipForge, cataloging maj
 - **Future Extension Points**: Distributed rendering, GPU acceleration.
 
 ## Subsystem: Adaptive AI Runtime
-- **Responsibility**: Orchestrating AI computation independently of specific providers and hardware.
+- **Responsibility**: Orchestrating AI computation independently of specific providers and hardware, discovering available resources, and managing runtime architecture.
 - **Public Interfaces**: (Deferred to subsequent batches)
 - **Dependencies**: Depends ONLY on Application-defined abstract contracts. No outward dependencies to providers yet.
 - **Lifecycle**: Global / Platform-wide execution engine, managed by `RuntimeLifecycleCoordinator` (owned by `RuntimeContext`).
-- **Current Implementation Status**: Foundation phase (Architecture boundary, canonical Runtime Context, bootstrap, lifecycle, and Capability Registry established).
-- **Future Extension Points**: Execution Planning, Resource Discovery, Provider Ecosystem.
+- **Current Implementation Status**: Foundation phase (Architecture boundary, canonical Runtime Context, bootstrap, lifecycle, Capability Registry, and Resource Discovery established).
+- **Future Extension Points**: Execution Planning, Provider Registry, Provider Ecosystem.
