@@ -1,7 +1,7 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.2 | Batch: 6.2.6**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.1**
 
-## 1. Resolved During Sprint 6.2 (Batch 6.2.2)
+## 1. Resolved During Sprint 6.3 (Batch 6.3.1)
 
 ### 1.1 Runtime Hardware Discovery
 - **Description**: The Runtime lacked a canonical registry to discover and manage hardware (CUDA, CPU) definitions.
@@ -73,10 +73,18 @@
 - **Certification Impact**: Was blocking adaptive runtime capabilities.
 - **Blocking Status**: Resolved (No longer blocking)
 
+### 1.10 Runtime Monitoring Foundation
+- **Description**: The Runtime lacks a canonical subsystem to monitor execution and adaptation.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.3.1)
+- **Certification Impact**: Was blocking execution observation.
+- **Blocking Status**: Resolved (No longer blocking)
+
 ## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.8)
 
-### 2.1 Runtime Monitoring Foundation
-- **Description**: The Runtime lacks a canonical subsystem to monitor execution metrics.
+### 2.1 Runtime Telemetry Foundation
+- **Description**: The Runtime lacks a canonical subsystem to capture continuous execution signals.
 - **Severity**: High
 - **Owner**: Architecture Team
 - **Recommended Milestone**: Milestone 6 (Next Batch)

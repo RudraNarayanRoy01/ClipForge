@@ -18,6 +18,7 @@ from .execution_context import RuntimeExecutionContextFactory
 from .orchestrator import RuntimeOrchestrator
 from .execution_engine import RuntimeExecutionEngine
 from .adaptive_runtime import AdaptiveRuntime
+from .runtime_monitoring import RuntimeMonitoring
 
 class RuntimeContext:
     """
@@ -51,6 +52,7 @@ class RuntimeContext:
         self._orchestrator = RuntimeOrchestrator()
         self._execution_engine = RuntimeExecutionEngine()
         self._adaptive_runtime = AdaptiveRuntime()
+        self._runtime_monitoring = RuntimeMonitoring()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -203,6 +205,17 @@ class RuntimeContext:
         rather than constructing independent AdaptiveRuntime instances.
         """
         return self._adaptive_runtime
+
+    @property
+    def runtime_monitoring(self) -> RuntimeMonitoring:
+        """
+        Expose the canonical Runtime Monitoring subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for observation of execution and adaptation.
+        Future Runtime components must obtain monitoring services through RuntimeContext 
+        rather than constructing independent RuntimeMonitoring instances.
+        """
+        return self._runtime_monitoring
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """
