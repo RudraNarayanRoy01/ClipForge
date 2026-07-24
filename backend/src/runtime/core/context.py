@@ -22,6 +22,7 @@ from .runtime_monitoring import RuntimeMonitoring
 from .runtime_telemetry import RuntimeTelemetry
 from .runtime_metrics import RuntimeMetrics
 from .runtime_health import RuntimeHealth
+from .runtime_diagnostics import RuntimeDiagnostics
 
 class RuntimeContext:
     """
@@ -59,6 +60,7 @@ class RuntimeContext:
         self._runtime_telemetry = RuntimeTelemetry()
         self._runtime_metrics = RuntimeMetrics()
         self._runtime_health = RuntimeHealth()
+        self._runtime_diagnostics = RuntimeDiagnostics()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -255,6 +257,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeHealth instances.
         """
         return self._runtime_health
+
+    @property
+    def runtime_diagnostics(self) -> RuntimeDiagnostics:
+        """
+        Expose the canonical Runtime Diagnostics subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for diagnostic reasoning.
+        Future Runtime components must obtain diagnostic services through RuntimeContext
+        rather than constructing independent RuntimeDiagnostics instances.
+        """
+        return self._runtime_diagnostics
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

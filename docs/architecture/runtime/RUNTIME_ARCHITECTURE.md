@@ -66,7 +66,7 @@ Runtime Metrics
 ↓
 Runtime Health
 ↓
-Future Runtime Diagnostics
+Runtime Diagnostics
 ↓
 Future Optimization
 ↓
@@ -197,7 +197,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Telemetry** → Capture Runtime signals. (Signal Capture)
 - **Runtime Metrics** → What quantitative measurements should be calculated? (Quantitative Measurement)
 - **Runtime Health** → What is the Runtime's operational condition? (Operational Evaluation)
-- **Future Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostics)
+- **Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostic Reasoning)
 - **Future Optimization** → Improve future runtime behavior. (Optimization)
 - **Future Learning** → Retain permanent runtime intelligence. (Learning)
 
@@ -229,12 +229,12 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Telemetry
 - Runtime Metrics
 - Runtime Health
-
-**Deferred to Next Batch**
 - Runtime Diagnostics
 
-**Deferred to Later Sprint**
+**Deferred to Next Batch**
 - Runtime Optimization
+
+**Deferred to Later Sprint**
 - Runtime Learning
 - Benchmarking
 
