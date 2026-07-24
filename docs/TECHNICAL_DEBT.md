@@ -1,7 +1,7 @@
 # Technical Debt Register
-**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.3 | Batch: 6.3.8**
+**Roadmap: AI Clipping Platform | Milestone: 6 | Sprint: 6.4 | Batch: 6.4.2**
 
-## 1. Resolved During Sprint 6.3
+## 1. Resolved During Sprint 6.4
 
 ### 1.1 Runtime Hardware Discovery
 - **Description**: The Runtime lacked a canonical registry to discover and manage hardware (CUDA, CPU) definitions.
@@ -129,9 +129,31 @@
 - **Certification Impact**: Was blocking runtime knowledge persistence.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.8)
+### 1.17 Runtime Planning Foundation
+- **Description**: The Runtime lacked a canonical subsystem for answering "What should happen next?" based on RuntimeKnowledge.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.1)
+- **Certification Impact**: Was blocking execution intention generation.
+- **Blocking Status**: Resolved (No longer blocking)
 
-(No remaining observation or reasoning capabilities deferred in Milestone 6)
+### 1.18 Runtime Planning Strategy
+- **Description**: The Runtime lacked a canonical subsystem for providing a planning philosophy to guide RuntimePlanning.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: N/A (Resolved in Batch 6.4.2)
+- **Certification Impact**: Was blocking strategy-driven planning.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.4
+
+- Policy Engine (Sprint 6.4.3)
+- Constraint Engine (Sprint 6.4.4)
+- Budget Planning (Sprint 6.4.5)
+- Routing & Fallback Planning (Sprint 6.4.6)
+- Runtime Context Expansion (Sprint 6.4.7)
+- Planning Governance (Sprint 6.4.8)
+- Planning & Policy Certification (Sprint 6.4.9)
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones
 

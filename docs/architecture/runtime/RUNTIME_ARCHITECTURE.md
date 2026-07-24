@@ -26,18 +26,27 @@ The initial phase of Runtime decision making follows a strict pipeline to transf
 ```text
 RuntimeKnowledge
 ↓
+RuntimePlanningStrategy
+↓
+PlanningStrategy
+↓
 RuntimePlanning
 ↓
 PlanningDecision
 ```
 
 This pipeline is strictly certified to guarantee:
-- **Immutable transformation**: Inputs and outputs are strictly immutable.
-- **Deterministic planning**: Given identical `RuntimeKnowledge`, `RuntimePlanning` produces an identical `PlanningDecision`.
+- **Immutable strategy definition**: The planning philosophy is immutable.
+- **Deterministic strategy generation**: The generator produces a deterministic strategy.
 - **Append-only evolution**: Decisions do not overwrite past states.
 - **No RuntimeKnowledge mutation**: The input knowledge is consumed, never modified or embedded.
-- **No skipped layers**: `RuntimeKnowledge` must pass through `RuntimePlanning` to become actionable.
-- **No reverse dependencies**: Planning strictly follows Learning; it never influences Learning or Optimization directly.
+- **No PlanningStrategy mutation**: Strategy is consumed, never modified.
+- **No skipped layers**: `RuntimeKnowledge` must pass through the pipeline to become actionable.
+- **No reverse dependencies**: Planning strictly follows Learning and Strategy.
+
+### Planning Strategy Layer
+The `RuntimePlanningStrategy` subsystem provides exactly one architectural answer: "Which planning philosophy should guide RuntimePlanning?"
+It produces a reusable, immutable `PlanningStrategy` artifact containing assumptions and preferences. It explicitly rejects responsibility leakage into Policy, Constraint Engine, Budget Planning, Routing, Scheduler, Execution, Provider Selection, or Hardware Selection.
 
 ## Runtime Dependency Direction
 
@@ -91,6 +100,8 @@ Runtime Diagnostics
 Runtime Optimization
 ↓
 Runtime Learning
+↓
+Runtime Planning Strategy
 ↓
 Runtime Planning
 ```
@@ -157,6 +168,7 @@ flowchart TD
     Context --> RuntimeDiagnostics
     Context --> RuntimeOptimization
     Context --> RuntimeLearning
+    Context --> RuntimePlanningStrategy
     Context --> RuntimePlanning
     
     Results -.-> ProviderRegistry
@@ -228,6 +240,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostic Reasoning)
 - **Runtime Optimization** → What improvements should Runtime pursue? (Optimization Decision)
 - **Runtime Learning** → What Runtime knowledge should persist? (Knowledge Persistence Layer)
+- **Runtime Planning Strategy** → Which planning philosophy should guide RuntimePlanning? (Strategy Layer)
 - **Runtime Planning** → What should happen next? (Planning Layer)
 
 ### Runtime Lifecycle
@@ -261,6 +274,7 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Diagnostics
 - Runtime Optimization
 - Runtime Learning
+- Runtime Planning Strategy
 - Runtime Planning
 
 **Deferred to Next Milestone**
@@ -304,10 +318,9 @@ Runtime Certification
 
 ### Sprint 6.4 Boundary Validation
 
-Batch 6.4.1 establishes **only** the Planning Foundation. The objective is to secure the architectural boundaries before introducing complex decision logic.
+Batch 6.4.2 establishes **only** the Runtime Planning Strategy architecture. The objective is to permanently freeze RuntimePlanningStrategy as the architectural Strategy Layer.
 
-The following remain explicitly out of scope for Batch 6.4.1:
-- **Sprint 6.4.2**: Planning Strategies
+The following remain explicitly out of scope for Batch 6.4.2:
 - **Sprint 6.4.3**: Policy Engine
 - **Sprint 6.4.4**: Constraint Engine
 - **Sprint 6.4.5**: Budget Planning
@@ -316,4 +329,4 @@ The following remain explicitly out of scope for Batch 6.4.1:
 - **Sprint 6.4.8**: Planning Governance
 - **Sprint 6.4.9**: Planning & Policy Certification
 
-The Planning Foundation will remain architecturally complete while intentionally minimal until these future sprints.
+Planning Strategies will remain architecturally complete while intentionally minimal until these future sprints.

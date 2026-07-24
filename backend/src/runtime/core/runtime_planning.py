@@ -5,6 +5,62 @@ from .runtime_learning import RuntimeKnowledge
 
 
 @dataclass(frozen=True)
+class PlanningStrategy:
+    """
+    Immutable canonical Planning Strategy artifact.
+    
+    Represents the architectural planning philosophy used by RuntimePlanning.
+    It MUST NEVER contain:
+    - Executed commands
+    - Scheduling information
+    - Routing decisions
+    - Provider selection
+    - Policy decisions
+    - Hardware preferences
+    - Resource allocation
+    """
+    strategy_identifier: str
+    strategy_name: str
+    planning_philosophy: str
+    planning_assumptions: List[str] = field(default_factory=list)
+    planning_preferences: Dict[str, Any] = field(default_factory=dict)
+    planning_metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+class RuntimePlanningStrategy:
+    """
+    The canonical Runtime Planning Strategy subsystem.
+    
+    Responsibilities:
+    - Produce immutable PlanningStrategy
+    - Answer exactly one architectural question: 'Which planning philosophy should guide RuntimePlanning?'
+    
+    Must NEVER:
+    - Execute work
+    - Answer 'Can it happen?' (Policy)
+    - Answer 'When should it happen?' (Scheduler)
+    - Answer 'Where should it happen?' (Routing)
+    - Answer 'Execute it.' (Execution Engine)
+    - Mutate RuntimeKnowledge
+    - Perform provider or hardware selection
+    """
+    
+    def __init__(self) -> None:
+        pass
+        
+    def get_strategy(self) -> PlanningStrategy:
+        """
+        Generate and return the canonical immutable PlanningStrategy.
+        """
+        return PlanningStrategy(
+            strategy_identifier="default-planning-strategy",
+            strategy_name="Baseline Adaptive Planning",
+            planning_philosophy="Maintain execution stability while monitoring variance.",
+            planning_assumptions=["Assume baseline operation unless knowledge indicates otherwise."],
+            planning_preferences={"prioritize_stability": True},
+            planning_metadata={"version": "1.0", "generator": "RuntimePlanningStrategy"}
+        )
+@dataclass(frozen=True)
 class PlanningDecision:
     """
     Immutable canonical Planning Decision artifact.
@@ -57,7 +113,7 @@ class RuntimePlanning:
     def __init__(self) -> None:
         pass
 
-    def plan(self, runtime_knowledge: RuntimeKnowledge, current_time: float) -> PlanningDecision:
+    def plan(self, runtime_knowledge: RuntimeKnowledge, planning_strategy: PlanningStrategy, current_time: float) -> PlanningDecision:
         """
         Consume immutable RuntimeKnowledge and produce immutable PlanningDecision.
         Preserves architectural boundaries by only defining 'What should happen next?'.
@@ -75,7 +131,10 @@ class RuntimePlanning:
         objective = "Continue standard execution"
         rationale = "Runtime knowledge indicates baseline operation."
         confidence = runtime_knowledge.learning_confidence
-        assumptions = []
+        assumptions = list(planning_strategy.planning_assumptions)
+
+        if "prioritize_stability" in planning_strategy.planning_preferences:
+            assumptions.append("Stability prioritized by strategy.")
 
         if runtime_knowledge.knowledge_classifications:
             if "STABLE" in runtime_knowledge.knowledge_classifications:

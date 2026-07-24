@@ -3,7 +3,7 @@ import time
 from dataclasses import FrozenInstanceError
 
 from src.runtime.core.runtime_learning import RuntimeKnowledge, StageRuntimeKnowledge, KnowledgeClassification
-from src.runtime.core.runtime_planning import RuntimePlanning, PlanningDecision
+from src.runtime.core.runtime_planning import RuntimePlanning, PlanningDecision, PlanningStrategy, RuntimePlanningStrategy
 
 
 def test_planning_decision_immutability():
@@ -20,6 +20,21 @@ def test_planning_decision_immutability():
         
     with pytest.raises(FrozenInstanceError):
         decision.planning_confidence = 1.0  # type: ignore
+
+
+def test_planning_strategy_immutability():
+    """Verify PlanningStrategy immutability."""
+    strategy = PlanningStrategy(
+        strategy_identifier="test-strategy",
+        strategy_name="Test Strategy",
+        planning_philosophy="Test Philosophy"
+    )
+    
+    with pytest.raises(FrozenInstanceError):
+        strategy.strategy_name = "New Strategy"  # type: ignore
+        
+    with pytest.raises(FrozenInstanceError):
+        strategy.planning_philosophy = "New Philosophy"  # type: ignore
 
 
 def test_runtime_planning_ownership_and_direction():
@@ -44,7 +59,13 @@ def test_runtime_planning_ownership_and_direction():
         knowledge_timestamp=time.time()
     )
     
-    decision = planning.plan(knowledge, time.time())
+    strategy = PlanningStrategy(
+        strategy_identifier="test-strategy",
+        strategy_name="Test Strategy",
+        planning_philosophy="Test Philosophy"
+    )
+    
+    decision = planning.plan(knowledge, strategy, time.time())
     
     # Verify outputs
     assert isinstance(decision, PlanningDecision)
@@ -88,7 +109,13 @@ def test_invalid_knowledge_handling():
         knowledge_timestamp=time.time()
     )
     
-    decision = planning.plan(invalid_knowledge, time.time())
+    strategy = PlanningStrategy(
+        strategy_identifier="test-strategy",
+        strategy_name="Test Strategy",
+        planning_philosophy="Test Philosophy"
+    )
+    
+    decision = planning.plan(invalid_knowledge, strategy, time.time())
     
     assert decision.session_id == "invalid"
     assert "Invalid" in decision.planning_assumptions[0]
@@ -143,3 +170,64 @@ def test_runtime_context_ownership():
     
     for dep in forbidden_dependencies:
         assert not hasattr(planning, dep), f"RuntimePlanning must not construct {dep}"
+
+    # Verify RuntimeContext owns RuntimePlanningStrategy
+    assert hasattr(context, "runtime_planning_strategy")
+    assert isinstance(context.runtime_planning_strategy, RuntimePlanningStrategy)
+
+    strategy_generator = context.runtime_planning_strategy
+    
+    for dep in forbidden_dependencies:
+        assert not hasattr(strategy_generator, dep), f"RuntimePlanningStrategy must not construct {dep}"
+    
+    assert not hasattr(strategy_generator, "runtime_planning"), "RuntimePlanningStrategy must not construct RuntimePlanning"
+
+
+def test_planning_strategy_purity():
+    """Verify PlanningStrategy purity by ensuring it contains only strategy information."""
+    strategy = PlanningStrategy(
+        strategy_identifier="test-strategy",
+        strategy_name="Test Strategy",
+        planning_philosophy="Test Philosophy"
+    )
+    
+    # Allowed attributes
+    allowed_attributes = {
+        "strategy_identifier", "strategy_name", "planning_philosophy",
+        "planning_assumptions", "planning_preferences", "planning_metadata"
+    }
+    
+    # Check that there are no additional attributes (purity)
+    actual_attributes = {k for k in strategy.__dict__.keys() if not k.startswith('_')}
+    assert actual_attributes.issubset(allowed_attributes), f"Found unexpected attributes: {actual_attributes - allowed_attributes}"
+
+    # Explicitly verify rejection of specific forbidden domains
+    forbidden_domains = [
+        "schedule", "scheduling_data", "provider_selection", "routing_decision",
+        "routing", "hardware_decision", "execution_command", "policy_evaluation",
+        "resource_allocation", "budget_values", "constraint_results"
+    ]
+    for domain in forbidden_domains:
+        assert not hasattr(strategy, domain)
+
+
+def test_planning_strategy_reusability():
+    """Verify that PlanningStrategy can be theoretically reused without mutation."""
+    strategy = PlanningStrategy(
+        strategy_identifier="test-strategy",
+        strategy_name="Test Strategy",
+        planning_philosophy="Test Philosophy",
+        planning_assumptions=["Test Assumption"]
+    )
+    
+    # Simulate consumption by multiple theoretical systems
+    consumer_a_assumptions = list(strategy.planning_assumptions)
+    consumer_b_assumptions = list(strategy.planning_assumptions)
+    
+    consumer_a_assumptions.append("A")
+    consumer_b_assumptions.append("B")
+    
+    # Ensure the original strategy remains unchanged (reusable)
+    assert strategy.planning_assumptions == ["Test Assumption"]
+    assert len(strategy.planning_assumptions) == 1
+

@@ -25,7 +25,7 @@ from .runtime_health import RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnostics
 from .runtime_optimization import RuntimeOptimization
 from .runtime_learning import RuntimeLearning
-from .runtime_planning import RuntimePlanning
+from .runtime_planning import RuntimePlanning, RuntimePlanningStrategy
 
 class RuntimeContext:
     """
@@ -66,6 +66,7 @@ class RuntimeContext:
         self._runtime_diagnostics = RuntimeDiagnostics()
         self._runtime_optimization = RuntimeOptimization()
         self._runtime_learning = RuntimeLearning()
+        self._runtime_planning_strategy = RuntimePlanningStrategy()
         self._runtime_planning = RuntimePlanning()
 
     @property
@@ -296,6 +297,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeLearning instances.
         """
         return self._runtime_learning
+
+    @property
+    def runtime_planning_strategy(self) -> RuntimePlanningStrategy:
+        """
+        Expose the canonical Runtime Planning Strategy subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for providing the planning philosophy.
+        Future Runtime components must obtain planning strategy services through RuntimeContext
+        rather than constructing independent RuntimePlanningStrategy instances.
+        """
+        return self._runtime_planning_strategy
 
     @property
     def runtime_planning(self) -> RuntimePlanning:
