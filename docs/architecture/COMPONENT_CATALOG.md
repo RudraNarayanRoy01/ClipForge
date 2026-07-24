@@ -29,5 +29,5 @@ This document serves as the architectural inventory of ClipForge, cataloging maj
 - **Public Interfaces**: (Deferred to subsequent batches)
 - **Dependencies**: Depends ONLY on Application-defined abstract contracts. No outward dependencies to providers yet.
 - **Lifecycle**: Global / Platform-wide execution engine, managed by `RuntimeLifecycleCoordinator` (owned by `RuntimeContext`).
-- **Current Implementation Status**: Foundation phase complete. Runtime Observation & Reasoning subsystems (Monitoring, Telemetry, Metrics, Health, Diagnostics, Optimization, and Learning) are structurally complete and formally certified (Sprint 6.3).
+- **Current Implementation Status**: Foundation phase complete. Runtime Observation & Reasoning subsystems (Monitoring, Telemetry, Metrics, Health, Diagnostics, Optimization, and Learning) are structurally complete and formally certified (Sprint 6.3). Runtime Planning Foundation is established (Sprint 6.4).
 - **Future Extension Points**: Provider Ecosystem.

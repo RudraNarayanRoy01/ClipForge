@@ -35,6 +35,7 @@ flowchart TD
     Runtime → Diagnostics[Runtime Diagnostics]
     Runtime → Optimization[Runtime Optimization]
     Runtime → Learning[Runtime Learning]
+    Runtime → Planning[Runtime Planning]
     
     Sched --> Providers[Provider Ecosystem]
     
@@ -46,11 +47,10 @@ flowchart TD
 
 **Dependency Direction (Inversion Principle):**
 Application → Runtime Contracts
-Application → Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Runtime Scheduler → Runtime Execution Planner → Runtime Execution Graph Builder → Runtime Resource Allocator → Runtime Execution Context Factory → Runtime Orchestrator → Runtime Execution Engine → Adaptive Runtime → Runtime Monitoring → Runtime Telemetry → Runtime Metrics → Runtime Health → Runtime Diagnostics → Runtime Optimization → Runtime Learning
+Application → Runtime Bootstrap → Runtime Context → Runtime Capability Registry → Runtime Resource Discovery → Runtime Provider Registry → Runtime Hardware Discovery → Hardware Registrations → Runtime Provider Selection → Runtime Scheduler → Runtime Execution Planner → Runtime Execution Graph Builder → Runtime Resource Allocator → Runtime Execution Context Factory → Runtime Orchestrator → Runtime Execution Engine → Adaptive Runtime → Runtime Monitoring → Runtime Telemetry → Runtime Metrics → Runtime Health → Runtime Diagnostics → Runtime Optimization → Runtime Learning → Runtime Planning
 Runtime → Provider Ecosystem → Hardware
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.
 - **Adaptive AI Runtime**: Owned by Platform Engineering / Architecture.
 - **Data Persistence**: Owned by Infrastructure layer.
-

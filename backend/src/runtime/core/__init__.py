@@ -24,6 +24,7 @@ from .runtime_health import RuntimeHealthStatus, StageRuntimeHealth, RuntimeHeal
 from .runtime_diagnostics import RuntimeDiagnosticStatus, StageRuntimeDiagnostic, RuntimeDiagnosticsReport, RuntimeDiagnostics
 from .runtime_optimization import OptimizationPriority, StageOptimizationDecision, OptimizationDecision, RuntimeOptimization
 from .runtime_learning import KnowledgeClassification, StageRuntimeKnowledge, RuntimeKnowledge, RuntimeLearning
+from .runtime_planning import PlanningDecision, RuntimePlanning
 
 __all__ = [
     "RuntimeBootstrap",
@@ -117,4 +118,6 @@ __all__ = [
     "StageRuntimeKnowledge",
     "RuntimeKnowledge",
     "RuntimeLearning",
+    "PlanningDecision",
+    "RuntimePlanning",
 ]

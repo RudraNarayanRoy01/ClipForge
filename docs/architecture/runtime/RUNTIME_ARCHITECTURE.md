@@ -19,6 +19,26 @@ The Adaptive AI Runtime is a first-class subsystem designed to orchestrate AI co
 - **Upper Boundary (Application Layer)**: Exposes abstract AI interfaces. The Application layer requests "Reasoning" or "Transcription" without knowing how it runs.
 - **Lower Boundary (Infrastructure/Hardware)**: Integrates with specific Provider SDKs (Ollama, Gemini) and discovers hardware constraints (CUDA, VRAM).
 
+## Runtime Decision Pipeline (Planning)
+
+The initial phase of Runtime decision making follows a strict pipeline to transform accumulated knowledge into future execution intent:
+
+```text
+RuntimeKnowledge
+↓
+RuntimePlanning
+↓
+PlanningDecision
+```
+
+This pipeline is strictly certified to guarantee:
+- **Immutable transformation**: Inputs and outputs are strictly immutable.
+- **Deterministic planning**: Given identical `RuntimeKnowledge`, `RuntimePlanning` produces an identical `PlanningDecision`.
+- **Append-only evolution**: Decisions do not overwrite past states.
+- **No RuntimeKnowledge mutation**: The input knowledge is consumed, never modified or embedded.
+- **No skipped layers**: `RuntimeKnowledge` must pass through `RuntimePlanning` to become actionable.
+- **No reverse dependencies**: Planning strictly follows Learning; it never influences Learning or Optimization directly.
+
 ## Runtime Dependency Direction
 
 The explicit dependency direction introduced by Runtime Context and Capability Registry:
@@ -71,6 +91,8 @@ Runtime Diagnostics
 Runtime Optimization
 ↓
 Runtime Learning
+↓
+Runtime Planning
 ```
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
@@ -130,6 +152,12 @@ flowchart TD
     Context --> ExecutionGraphBuilder
     Context --> ResourceAllocator
     Context --> ExecutionContextFactory
+    Context --> RuntimeMetrics
+    Context --> RuntimeHealth
+    Context --> RuntimeDiagnostics
+    Context --> RuntimeOptimization
+    Context --> RuntimeLearning
+    Context --> RuntimePlanning
     
     Results -.-> ProviderRegistry
 ```
@@ -200,6 +228,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Diagnostics** → Why did Runtime behavior occur? (Diagnostic Reasoning)
 - **Runtime Optimization** → What improvements should Runtime pursue? (Optimization Decision)
 - **Runtime Learning** → What Runtime knowledge should persist? (Knowledge Persistence Layer)
+- **Runtime Planning** → What should happen next? (Planning Layer)
 
 ### Runtime Lifecycle
 The Runtime coordinates operations through explicit lifecycle states:
@@ -232,6 +261,7 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Diagnostics
 - Runtime Optimization
 - Runtime Learning
+- Runtime Planning
 
 **Deferred to Next Milestone**
 - Benchmarking
@@ -271,3 +301,19 @@ Adaptive Runtime Intelligence
 **Sprint 6.8**
 ↓
 Runtime Certification
+
+### Sprint 6.4 Boundary Validation
+
+Batch 6.4.1 establishes **only** the Planning Foundation. The objective is to secure the architectural boundaries before introducing complex decision logic.
+
+The following remain explicitly out of scope for Batch 6.4.1:
+- **Sprint 6.4.2**: Planning Strategies
+- **Sprint 6.4.3**: Policy Engine
+- **Sprint 6.4.4**: Constraint Engine
+- **Sprint 6.4.5**: Budget Planning
+- **Sprint 6.4.6**: Routing & Fallback Planning
+- **Sprint 6.4.7**: Runtime Context Expansion
+- **Sprint 6.4.8**: Planning Governance
+- **Sprint 6.4.9**: Planning & Policy Certification
+
+The Planning Foundation will remain architecturally complete while intentionally minimal until these future sprints.

@@ -25,6 +25,7 @@ from .runtime_health import RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnostics
 from .runtime_optimization import RuntimeOptimization
 from .runtime_learning import RuntimeLearning
+from .runtime_planning import RuntimePlanning
 
 class RuntimeContext:
     """
@@ -65,6 +66,7 @@ class RuntimeContext:
         self._runtime_diagnostics = RuntimeDiagnostics()
         self._runtime_optimization = RuntimeOptimization()
         self._runtime_learning = RuntimeLearning()
+        self._runtime_planning = RuntimePlanning()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -294,6 +296,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeLearning instances.
         """
         return self._runtime_learning
+
+    @property
+    def runtime_planning(self) -> RuntimePlanning:
+        """
+        Expose the canonical Runtime Planning subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for runtime planning decisions.
+        Future Runtime components must obtain planning services through RuntimeContext
+        rather than constructing independent RuntimePlanning instances.
+        """
+        return self._runtime_planning
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """
