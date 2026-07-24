@@ -8,6 +8,7 @@ from .capabilities import CapabilityCategory, CapabilityDescriptor, RuntimeCapab
 from .discovery import ResourceCategory, ResourceDescriptor, DiscoveryResult, RuntimeResourceDiscovery
 from .providers import ProviderCategory, ProviderIdentity, ProviderDescriptor, ProviderRegistration, RuntimeProviderRegistry
 from .hardware import HardwareCategory, HardwareIdentity, HardwareDescriptor, HardwareRegistration, RuntimeHardwareDiscovery
+from .selection import ProviderSelectionStatus, ProviderSelectionRequest, ProviderSelectionResult, RuntimeProviderSelection
 
 __all__ = [
     "RuntimeBootstrap",
@@ -34,4 +35,8 @@ __all__ = [
     "HardwareDescriptor",
     "HardwareRegistration",
     "RuntimeHardwareDiscovery",
+    "ProviderSelectionStatus",
+    "ProviderSelectionRequest",
+    "ProviderSelectionResult",
+    "RuntimeProviderSelection",
 ]

@@ -29,5 +29,5 @@ This document serves as the architectural inventory of ClipForge, cataloging maj
 - **Public Interfaces**: (Deferred to subsequent batches)
 - **Dependencies**: Depends ONLY on Application-defined abstract contracts. No outward dependencies to providers yet.
 - **Lifecycle**: Global / Platform-wide execution engine, managed by `RuntimeLifecycleCoordinator` (owned by `RuntimeContext`).
-- **Current Implementation Status**: Foundation phase (Architecture boundary, canonical Runtime Context, bootstrap, lifecycle, Capability Registry, Resource Discovery, Provider Registry, and Hardware Discovery established).
-- **Future Extension Points**: Provider Selection, Execution Planning, Provider Ecosystem.
+- **Current Implementation Status**: Foundation phase (Architecture boundary, canonical Runtime Context, bootstrap, lifecycle, Capability Registry, Resource Discovery, Provider Registry, Hardware Discovery, and Provider Selection established).
+- **Future Extension Points**: Execution Planning, Scheduler, Provider Ecosystem.

@@ -9,6 +9,7 @@ from .capabilities import RuntimeCapabilityRegistry
 from .discovery import RuntimeResourceDiscovery
 from .providers import RuntimeProviderRegistry
 from .hardware import RuntimeHardwareDiscovery
+from .selection import RuntimeProviderSelection
 
 class RuntimeContext:
     """
@@ -29,6 +30,11 @@ class RuntimeContext:
         self._resource_discovery = RuntimeResourceDiscovery()
         self._provider_registry = RuntimeProviderRegistry()
         self._hardware_discovery = RuntimeHardwareDiscovery()
+        self._provider_selection = RuntimeProviderSelection(
+            self._capability_registry,
+            self._provider_registry,
+            self._hardware_discovery
+        )
     @property
     def metadata(self) -> RuntimeMetadata:
         """Expose descriptive metadata about this Runtime instance."""
@@ -81,6 +87,17 @@ class RuntimeContext:
         rather than constructing independent hardware discovery services.
         """
         return self._hardware_discovery
+
+    @property
+    def provider_selection(self) -> RuntimeProviderSelection:
+        """
+        Expose the canonical Provider Selection subsystem for this Runtime instance.
+        
+        This serves as the single source of truth for architectural provider eligibility.
+        Future Runtime systems should access Provider Selection through this context
+        rather than constructing independent matching engines.
+        """
+        return self._provider_selection
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

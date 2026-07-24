@@ -40,7 +40,7 @@ Runtime Hardware Discovery
 ↓
 Hardware Registrations
 ↓
-Future Provider Selection
+Runtime Provider Selection
 ↓
 Future Scheduler
 ↓
@@ -95,6 +95,11 @@ flowchart TD
     
     ProviderRegistry[Runtime Provider Registry]
     HardwareDiscovery[Runtime Hardware Discovery]
+    ProviderSelection[Runtime Provider Selection]
+    
+    Context --> ProviderRegistry
+    Context --> HardwareDiscovery
+    Context --> ProviderSelection
     
     Results -.-> ProviderRegistry
 ```
@@ -149,9 +154,9 @@ It MUST NOT match providers to hardware, evaluate provider compatibility, alloca
 The boundary between **Runtime Knowledge** and **Runtime Decision Making** is strictly enforced. Decision-making begins only in Provider Selection.
 
 - **Runtime Hardware Discovery** → What hardware exists? (Knowledge)
-- **Future Provider Selection** → Which provider should be used? (Decision Making)
-- **Future Scheduler** → Where and when should work execute? (Decision Making)
-- **Future Planning Engine** → How should execution be orchestrated? (Decision Making)
+- **Runtime Provider Selection** → Which provider is eligible? (Architectural Decision)
+- **Future Scheduler** → Where and when should work execute? (Execution Decision)
+- **Future Planning Engine** → How should execution be orchestrated? (Execution Decision)
 - **Future Execution Engine** → Execute the workload. (Execution)
 - **Future Runtime Optimization** → Improve future execution decisions. (Optimization)
 
@@ -171,12 +176,12 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Resource Discovery
 - Provider Registry
 - Hardware Discovery
-
-**Deferred to Next Batch**
 - Provider Selection
 
-**Deferred to Later Sprint**
+**Deferred to Next Batch**
 - Scheduler
+
+**Deferred to Later Sprint**
 - Planning Engine
 - Execution Engine
 - Runtime Optimization
