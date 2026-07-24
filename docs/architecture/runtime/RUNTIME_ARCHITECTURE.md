@@ -46,9 +46,9 @@ Runtime Scheduler
 ↓
 Runtime Execution Planner
 ↓
-Future Execution Graph
+Runtime Execution Graph Builder
 ↓
-Future Resource Allocation
+Future Runtime Resource Allocator
 ↓
 Future Execution Context
 ↓
@@ -103,11 +103,13 @@ flowchart TD
     HardwareDiscovery[Runtime Hardware Discovery]
     ProviderSelection[Runtime Provider Selection]
     ExecutionPlanner[Runtime Execution Planner]
+    ExecutionGraphBuilder[Runtime Execution Graph Builder]
     
     Context --> ProviderRegistry
     Context --> HardwareDiscovery
     Context --> ProviderSelection
     Context --> ExecutionPlanner
+    Context --> ExecutionGraphBuilder
     
     Results -.-> ProviderRegistry
 ```
@@ -165,8 +167,11 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Provider Selection** → Which provider is eligible? (Architectural Decision)
 - **Runtime Scheduler** → Where and when should work execute? (Operational Decision)
 - **Runtime Execution Planner** → How should execution be structured? (Execution Planning)
-- **Future Execution Graph** → What are the execution dependencies? (Execution Planning)
-- **Future Execution Engine** → Execute the workload. (Execution)
+- **Runtime Execution Graph Builder** → Which work depends on which? (Execution Coordination)
+- **Future Runtime Resource Allocator** → Which resources are reserved? (Resource Allocation)
+- **Future Runtime Execution Context** → What execution environment is required? (Execution Context)
+- **Future Runtime Orchestrator** → How should execution be coordinated? (Orchestration)
+- **Future Runtime Execution Engine** → Execute the workload. (Execution)
 - **Future Runtime Optimization** → Improve future runtime behavior. (Optimization)
 
 ### Runtime Lifecycle
@@ -188,12 +193,15 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Provider Selection
 - Runtime Scheduler
 - Runtime Execution Planner
+- Runtime Execution Graph Foundation
 
 **Deferred to Next Batch**
-- Execution Graph
-- Resource Allocation
-- Execution Context
+- Runtime Resource Allocation
+
+**Deferred to Later Sprint**
+- Runtime Execution Context
 - Runtime Orchestrator
+- Runtime Execution Engine
 - Runtime Optimization
 - Runtime Monitoring
 - Runtime Metrics

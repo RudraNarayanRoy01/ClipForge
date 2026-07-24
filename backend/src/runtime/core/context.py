@@ -12,6 +12,7 @@ from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
 from .planner import RuntimeExecutionPlanner
+from .execution_graph import RuntimeExecutionGraphBuilder
 
 class RuntimeContext:
     """
@@ -39,6 +40,7 @@ class RuntimeContext:
         )
         self._scheduler = RuntimeScheduler()
         self._execution_planner = RuntimeExecutionPlanner()
+        self._execution_graph_builder = RuntimeExecutionGraphBuilder()
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -125,6 +127,17 @@ class RuntimeContext:
         rather than constructing independent RuntimeExecutionPlanner instances.
         """
         return self._execution_planner
+
+    @property
+    def execution_graph_builder(self) -> RuntimeExecutionGraphBuilder:
+        """
+        Expose the canonical Execution Graph Builder subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for dependency modeling.
+        Future Runtime components must obtain graph-building services through RuntimeContext 
+        rather than constructing independent RuntimeExecutionGraphBuilder instances.
+        """
+        return self._execution_graph_builder
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

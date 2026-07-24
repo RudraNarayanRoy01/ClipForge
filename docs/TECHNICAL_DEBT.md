@@ -27,17 +27,25 @@
 - **Certification Impact**: Was blocking execution planning and structuring.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.2)
-
-### 2.1 Execution Graph Foundation
+### 1.4 Runtime Execution Graph Foundation
 - **Description**: Transformation of logical execution stages into a concrete dependency graph (nodes, edges, topology).
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Batch 6.2.3)
+- **Recommended Milestone**: N/A (Resolved in Batch 6.2.3)
+- **Certification Impact**: Was blocking execution dependency modeling.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.3)
+
+### 2.1 Runtime Resource Allocation
+- **Description**: Resource allocation before orchestrating the graph.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Batch 6.2.4)
 - **Blocking Status**: Deferred
 
-### 2.2 Execution Engine and Orchestrator
-- **Description**: Resource allocation, orchestration, and actual execution of the graph.
+### 2.2 Execution Context, Engine and Orchestrator
+- **Description**: Setup of execution context, orchestration, and actual execution of the graph.
 - **Severity**: High
 - **Owner**: Architecture Team
 - **Recommended Milestone**: Milestone 6 (Later Sprint)
