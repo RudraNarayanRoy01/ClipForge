@@ -89,13 +89,21 @@
 - **Certification Impact**: Was blocking execution signal capture.
 - **Blocking Status**: Resolved (No longer blocking)
 
-## 2. Deferred Beyond Sprint 6.2 (Batch 6.2.8)
-
-### 2.1 Runtime Metrics Foundation
-- **Description**: The Runtime lacks a canonical subsystem to calculate and aggregate metrics from captured telemetry signals.
+### 1.12 Runtime Metrics Foundation
+- **Description**: The Runtime lacked a canonical subsystem to calculate and aggregate quantitative metrics from captured telemetry signals.
 - **Severity**: High
 - **Owner**: Architecture Team
-- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.3)
+- **Recommended Milestone**: N/A (Resolved in Batch 6.3.3)
+- **Certification Impact**: Was blocking quantitative measurement.
+- **Blocking Status**: Resolved (No longer blocking)
+
+## 2. Deferred Beyond Sprint 6.3 (Batch 6.3.3)
+
+### 2.1 Runtime Health Foundation
+- **Description**: The Runtime lacks a canonical subsystem to evaluate health based on captured metrics.
+- **Severity**: High
+- **Owner**: Architecture Team
+- **Recommended Milestone**: Milestone 6 (Next Batch 6.3.4)
 - **Blocking Status**: Deferred
 
 ## 3. Deferred Beyond Milestone 6 / To Future Milestones

@@ -19,6 +19,7 @@ from .execution_engine import ExecutionStatus, StageExecutionResult, ExecutionRe
 from .adaptive_runtime import AdaptationStatus, StageAdaptationDecision, AdaptationDecision, AdaptiveRuntime
 from .runtime_monitoring import MonitoringStatus, StageMonitoringResult, MonitoringResult, RuntimeMonitoring
 from .runtime_telemetry import TelemetryStatus, StageTelemetrySnapshot, TelemetrySnapshot, RuntimeTelemetry
+from .runtime_metrics import RuntimeMetricStatus, StageRuntimeMetrics, RuntimeMetricsSnapshot, RuntimeMetrics
 
 __all__ = [
     "RuntimeBootstrap",
@@ -92,4 +93,8 @@ __all__ = [
     "StageTelemetrySnapshot",
     "TelemetrySnapshot",
     "RuntimeTelemetry",
+    "RuntimeMetricStatus",
+    "StageRuntimeMetrics",
+    "RuntimeMetricsSnapshot",
+    "RuntimeMetrics",
 ]
