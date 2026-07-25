@@ -102,16 +102,36 @@ Examples of future components include `RuntimeScheduler`, `RuntimeExecution`, `R
 
 ## Runtime Execution Domain Model
 
-This section documents the canonical architectural language used by all future Runtime execution capabilities (established in Batch 6.5.1).
+This section documents the canonical architectural language used by all future Runtime execution capabilities (established in Batch 6.5.1 and refined in Batch 6.5.3).
 
-### Execution Artifacts
+### Execution Request Domain
 
-Execution artifacts are purely declarative, immutable data objects representing work at various stages of execution. They do NOT contain logic for lifecycle transitions, scheduling behavior, progress calculation, or execution coordination.
-
-- **ExecutionIdentity**: A pure value object representing the permanent identity of an execution (`execution_id`, `created_at`). It does NOT contain distributed tracing correlation IDs or execution state.
+- **ExecutionIdentity**: A pure value object representing the permanent identity of an execution (`execution_id`, `created_at`).
 - **ExecutionRequest**: Represents approved work waiting for execution. Strictly declarative. Must NEVER contain execution metrics, scheduling decisions, or retry info.
-- **ExecutionStatus**: A snapshot of execution state metadata. Does NOT own lifecycle, perform transitions, or calculate progress.
-- **ExecutionResult**: Represents "What happened". Consumed by future components (Retry, Observation). Must NEVER contain retry decisions, scheduling hints, or drive architecture directly.
+
+### Execution Result Domain
+
+Defines "What execution produced."
+- **ExecutionResult**: The immutable outcome of Runtime execution. Consumed by future components (Lifecycle, Retry, Observation, Learning, Optimization). Must NEVER contain retry history, lifecycle state, resource allocation, monitoring, telemetry, metrics, or future optimization data.
+- **ExecutionOutcome**: Represents the business outcome (e.g. `SUCCESS`, `FAILURE`, `PARTIAL`, `CANCELLED`).
+- **ExecutionStatus**: Represents Runtime execution state (e.g. `PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`).
+- **ExecutionSummary**: A mandatory immutable component of ExecutionResult detailing execution steps, reason, and summary.
+
+### RuntimeExecutor Service
+
+The `RuntimeExecutor` is the canonical Runtime execution engine.
+It performs exactly **one responsibility**: `SchedulingDecision` -> `ExecutionResult`.
+It defines "How execution is performed" and owns `ExecutionResult`, `ExecutionStatus`, `ExecutionOutcome`, and `ExecutionSummary`.
+
+It is explicitly **NOT**:
+- A Workflow Engine
+- A Scheduler
+- A Lifecycle Manager
+- A Retry Coordinator
+- An Observation Service
+- An Optimization Engine
+- A Resource Manager
+- An Orchestrator
 
 ### Execution Ownership & Contracts
 
@@ -119,13 +139,12 @@ Execution artifacts are purely declarative, immutable data objects representing 
 | :--- | :--- | :--- |
 | **ExecutionIdentity** | Owned by Runtime Execution Model | Consumed by all execution artifacts |
 | **ExecutionRequest** | Produced by Runtime Execution Model | Consumed by RuntimeScheduler |
-| **ExecutionStatus** | Produced by RuntimeExecutor | Consumed by Observation |
+| **ExecutionStatus** | Produced by RuntimeExecutor | Consumed by Observation, Lifecycle |
 | **ExecutionResult** | Produced by RuntimeExecutor | Consumed by Retry, Observation, Learning, Optimization |
 
 ### Execution Dependency Rules
 
-- The dependency direction strictly flows: `ExecutionRequest` -> `Scheduler` -> `Executor` -> `ExecutionResult`.
-- Execution artifacts may depend upon Runtime Decisions (e.g., `PlanningDecision`, `PolicyDecision`).
+- The dependency direction strictly flows: `Execution Request Domain` -> `Runtime Scheduler` -> `Scheduling Domain` -> `Runtime Executor` -> `Execution Result Domain` -> `Runtime Lifecycle` (Future).
 - Runtime Decisions must NEVER depend upon Execution artifacts. Dependency direction must never reverse.
 
 ## Runtime Scheduling Domain Model
@@ -194,7 +213,7 @@ Runtime Execution Context Factory
 ↓
 Runtime Orchestrator
 ↓
-Runtime Execution Engine
+Runtime Executor
 ↓
 Adaptive Runtime
 ↓
@@ -364,7 +383,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Resource Allocator** → What logical computational resources are required? (Resource Coordination)
 - **Runtime Execution Context Factory** → What prepared execution environment exists? (Execution Preparation)
 - **Runtime Orchestrator** → Which prepared stages are ready to coordinate? (Execution Coordination)
-- **Runtime Execution Engine** → Execute exactly those prepared stages deterministically. (Execution)
+- **Runtime Executor** → Execute exactly the approved SchedulingDecision to produce an immutable ExecutionResult. (Execution)
 - **Adaptive Runtime** → Dynamically evaluate execution and recommend future adaptations. (Adaptive)
 - **Runtime Monitoring** → Produce immutable observations of completed execution and adaptation. (Observation)
 - **Runtime Telemetry** → Capture Runtime signals. (Signal Capture)
@@ -405,7 +424,7 @@ To prevent architectural overlap and provide a clear roadmap, execution and prov
 - Runtime Resource Allocation
 - Runtime Execution Context
 - Runtime Orchestrator
-- Runtime Execution Engine
+- Runtime Executor
 - Adaptive Runtime
 - Runtime Monitoring
 - Runtime Telemetry

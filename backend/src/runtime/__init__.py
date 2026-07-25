@@ -13,10 +13,12 @@ from .core import RuntimeBootstrap, RuntimeLifecycleState, RuntimeContext, Runti
 from .core.execution_model import (
     ExecutionIdentity,
     ExecutionRequest,
-    ExecutionState,
+    ExecutionPriority
+)
+from .core.execution_result_model import (
     ExecutionStatus,
-    ExecutionPriority,
     ExecutionOutcome,
+    ExecutionSummary,
     ExecutionResult
 )
 from .contracts import ILifecycleAware
@@ -25,10 +27,10 @@ __all__ = [
     "RuntimeBootstrap",
     "ExecutionIdentity",
     "ExecutionRequest",
-    "ExecutionState",
-    "ExecutionStatus",
     "ExecutionPriority",
+    "ExecutionStatus",
     "ExecutionOutcome",
+    "ExecutionSummary",
     "ExecutionResult",
     "RuntimeLifecycleState",
     "RuntimeContext",

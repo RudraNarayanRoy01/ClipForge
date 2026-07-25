@@ -3,12 +3,15 @@ from .bootstrap import RuntimeBootstrap
 from .execution_model import (
     ExecutionIdentity,
     ExecutionRequest,
-    ExecutionState,
-    ExecutionStatus as ModelExecutionStatus,
-    ExecutionPriority,
-    ExecutionOutcome,
-    ExecutionResult as ModelExecutionResult
+    ExecutionPriority
 )
+from .execution_result_model import (
+    ExecutionStatus,
+    ExecutionOutcome,
+    ExecutionSummary,
+    ExecutionResult
+)
+from .executor import RuntimeExecutor
 from .lifecycle import RuntimeLifecycleState, RuntimeLifecycleCoordinator
 from .extension import IRuntimeExtension, IRuntimeExtensionPoint
 from .context import RuntimeContext
@@ -33,7 +36,6 @@ from .execution_graph import GraphValidationStatus, ExecutionGraphNode, Executio
 from .resource_allocator import LogicalResourceProfile, AllocationValidationStatus, StageAllocation, AllocationResult, RuntimeResourceAllocator
 from .execution_context import ContextValidationStatus, StageExecutionContext, ExecutionContext, RuntimeExecutionContextFactory
 from .orchestrator import StageOrchestrationStatus, SessionValidationStatus, StageExecutionState, ExecutionSession, RuntimeOrchestrator
-from .execution_engine import ExecutionStatus, StageExecutionResult, ExecutionResult, RuntimeExecutionEngine
 from .adaptive_runtime import AdaptationStatus, StageAdaptationDecision, AdaptationDecision, AdaptiveRuntime
 from .runtime_monitoring import MonitoringStatus, StageMonitoringResult, MonitoringResult, RuntimeMonitoring
 from .runtime_telemetry import TelemetryStatus, StageTelemetrySnapshot, TelemetrySnapshot, RuntimeTelemetry
@@ -51,11 +53,12 @@ __all__ = [
     "RuntimeBootstrap",
     "ExecutionIdentity",
     "ExecutionRequest",
-    "ExecutionState",
-    "ModelExecutionStatus",
     "ExecutionPriority",
+    "ExecutionStatus",
     "ExecutionOutcome",
-    "ModelExecutionResult",
+    "ExecutionSummary",
+    "ExecutionResult",
+    "RuntimeExecutor",
     "RuntimeLifecycleState",
     "RuntimeLifecycleCoordinator",
     "IRuntimeExtension",
@@ -114,10 +117,6 @@ __all__ = [
     "StageExecutionState",
     "ExecutionSession",
     "RuntimeOrchestrator",
-    "ExecutionStatus",
-    "StageExecutionResult",
-    "ExecutionResult",
-    "RuntimeExecutionEngine",
     "AdaptationStatus",
     "StageAdaptationDecision",
     "AdaptationDecision",

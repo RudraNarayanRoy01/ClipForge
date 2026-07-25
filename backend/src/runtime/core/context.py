@@ -1,6 +1,7 @@
 from typing import Dict, Optional
 
-from .execution_model import ExecutionRequest, ExecutionStatus
+from .execution_model import ExecutionRequest
+from .execution_result_model import ExecutionStatus
 from .scheduling_model import SchedulingDecision
 from .metadata import RuntimeMetadata
 from .lifecycle import RuntimeLifecycleCoordinator
@@ -18,7 +19,6 @@ from .execution_graph import RuntimeExecutionGraphBuilder
 from .resource_allocator import RuntimeResourceAllocator
 from .execution_context import RuntimeExecutionContextFactory
 from .orchestrator import RuntimeOrchestrator
-from .execution_engine import RuntimeExecutionEngine
 from .adaptive_runtime import AdaptiveRuntime
 from .runtime_monitoring import RuntimeMonitoring
 from .runtime_telemetry import RuntimeTelemetry
@@ -74,7 +74,6 @@ class RuntimeContext:
         self._resource_allocator = RuntimeResourceAllocator()
         self._execution_context_factory = RuntimeExecutionContextFactory()
         self._orchestrator = RuntimeOrchestrator()
-        self._execution_engine = RuntimeExecutionEngine()
         self._adaptive_runtime = AdaptiveRuntime()
         self._runtime_monitoring = RuntimeMonitoring()
         self._runtime_telemetry = RuntimeTelemetry()
@@ -224,17 +223,6 @@ class RuntimeContext:
         rather than constructing independent RuntimeOrchestrator instances.
         """
         return self._orchestrator
-
-    @property
-    def execution_engine(self) -> RuntimeExecutionEngine:
-        """
-        Expose the canonical Runtime Execution Engine subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for deterministic execution.
-        Future Runtime components must obtain execution services through RuntimeContext 
-        rather than constructing independent RuntimeExecutionEngine instances.
-        """
-        return self._execution_engine
 
     @property
     def adaptive_runtime(self) -> AdaptiveRuntime:
