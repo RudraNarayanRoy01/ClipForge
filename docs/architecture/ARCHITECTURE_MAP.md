@@ -50,6 +50,7 @@ flowchart TD
     Runtime --> DecisionEngine[Runtime Decision Engine]
     Runtime --> Reasoning[Runtime Reasoning]
     Runtime --> Confidence[Runtime Confidence]
+    Runtime --> Recommendation[Runtime Recommendation]
     Runtime --> Optimization[Runtime Optimization]
     Runtime --> Learning[Runtime Learning]
     
@@ -108,6 +109,7 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `RuntimeDecisionState`, `RuntimeDecisionType`, `RuntimeDecisionReason`, `RuntimeDecision`, `RuntimeDecisionInfo`, `RuntimeDecisionResult`: Owned by the Runtime Decision Engine.
 - `RuntimeReasoningState`, `RuntimeReasoningType`, `RuntimeReasoningReason`, `RuntimeReasoning`, `RuntimeReasoningInfo`, `RuntimeReasoningResult`: Owned by the Runtime Reasoning Domain.
 - `RuntimeConfidenceState`, `RuntimeConfidenceLevel`, `RuntimeConfidenceFactor`, `RuntimeConfidenceEvidence`, `RuntimeConfidence`, `RuntimeConfidenceInfo`, `RuntimeConfidenceResult`: Owned by the Runtime Confidence Domain.
+- `RuntimeRecommendationState`, `RuntimeRecommendationCategory`, `RuntimeRecommendationPriority`, `RuntimeRecommendationAlternative`, `RuntimeRecommendationRationale`, `RuntimeRecommendation`, `RuntimeRecommendationInfo`, `RuntimeRecommendationResult`: Owned by the Runtime Recommendation Domain.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -134,3 +136,4 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.7.3 (Runtime Decision Engine) is complete, defining the canonical immutable decision artifact decoupled from its production.
 - Batch 6.7.4 (Runtime Reasoning) is complete, establishing the passive immutable domain answering 'Why' a decision exists.
 - Batch 6.7.5 (Runtime Confidence) is complete, establishing the immutable representation of structural confidence in a reasoning artifact.
+- Batch 6.7.6 (Runtime Recommendation) is complete, defining the immutable advisory recommendations of possible future actions based on the Intelligence Pipeline.

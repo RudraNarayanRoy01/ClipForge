@@ -16,6 +16,17 @@ from .runtime_confidence_model import (
     RuntimeConfidenceResult
 )
 
+from .runtime_recommendation_model import (
+    RuntimeRecommendationState,
+    RuntimeRecommendationCategory,
+    RuntimeRecommendationPriority,
+    RuntimeRecommendationAlternative,
+    RuntimeRecommendationRationale,
+    RuntimeRecommendation,
+    RuntimeRecommendationInfo,
+    RuntimeRecommendationResult
+)
+
 __all__ = [
     "ProviderType",
     "ProviderStatus",
@@ -27,5 +38,13 @@ __all__ = [
     "RuntimeConfidenceEvidence",
     "RuntimeConfidence",
     "RuntimeConfidenceInfo",
-    "RuntimeConfidenceResult"
+    "RuntimeConfidenceResult",
+    "RuntimeRecommendationState",
+    "RuntimeRecommendationCategory",
+    "RuntimeRecommendationPriority",
+    "RuntimeRecommendationAlternative",
+    "RuntimeRecommendationRationale",
+    "RuntimeRecommendation",
+    "RuntimeRecommendationInfo",
+    "RuntimeRecommendationResult"
 ]

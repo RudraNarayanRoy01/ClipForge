@@ -828,6 +828,14 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 - **Constraint**: Must NEVER own calculation, scoring algorithms, machine learning confidence, inference, prediction, recommendation, optimization, orchestration, workflow, provider routing, or execution planning. It remains permanently passive. `RuntimeConfidenceEvidence` permanently owns only evidence identifiers, references, metadata, and classification, NEVER evidence scoring, weighting, ranking, evaluation, or prioritization.
 - **Boundary**: Acts as the architectural boundary between reasoning and recommendation. Consumes ONLY `RuntimeReasoning` via `reasoning_id` and immutable references. Must NEVER embed `RuntimeReasoning`, `RuntimeDecision`, or `RuntimeObservation`. Must NEVER consume `RuntimeRecommendation` (which owns action/provider proposals, ranking, alternatives), `RuntimeDecisionCoordinator`, or `RuntimeIntelligenceContext`.
 
+### Runtime Recommendation (Batch 6.7.6)
+- **Responsibility**: Defines the canonical immutable representation of a Runtime Recommendation. It answers "What should the Runtime recommend?" based upon the completed Runtime Intelligence pipeline. It owns Recommendation Identity, Metadata, Vocabulary, Lifecycle, Category, Priority, Rationale, Alternatives, and Artifact.
+- **Constraint**: A recommendation is purely advisory. It represents only the Runtime's advisory assessment of possible future actions. It does NOT represent execution, execution intent, execution plan, workflow, orchestration, provider routing, policy enforcement, scheduling, retry strategy, optimization, or command generation. Recommendations may be accepted, rejected, ignored, or replaced by future bounded contexts.
+- **Provider Agnostic**: Must NEVER recommend specific providers, models, hardware, or implementations (e.g., Gemini, OpenAI, Ollama, llama.cpp, CUDA, CPU, GPU). It may reference only required capabilities, execution characteristics, or resource characteristics. Provider and model selection remain permanently owned by future Runtime components.
+- **Rationale Ownership**: `RuntimeRecommendationRationale` owns only rationale identifiers, summaries, immutable references, and metadata. It NEVER performs reasoning, confidence calculation, evidence evaluation, recommendation ranking, or recommendation generation algorithms. It explains a recommendation; it never creates one.
+- **Alternatives Ownership**: `RuntimeRecommendationAlternative` permanently owns only alternative identifiers, metadata, descriptions, categories, priorities, and immutable references. It NEVER owns execution plans, routing logic, provider selection, scheduling, retry plans, optimization strategies, or orchestration logic.
+- **Boundary**: Consumes only `observation_id`, `decision_id`, `reasoning_id`, `confidence_id`, immutable metadata, and immutable references. Must NEVER embed downstream artifacts. It is the final advisory bounded context before `RuntimeDecisionCoordinator` becomes the first orchestration bounded context. Must NEVER implement orchestration, workflow composition, cross-domain intelligence aggregation, or global state.
+
 ### Future Batch Evolution
 - **Batch 6.7.1**: Runtime Intelligence Vocabulary
 - **Batch 6.7.2**: Runtime Observation
@@ -840,7 +848,8 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 
 ## Runtime Intelligence Pipeline
 
-The Runtime Intelligence Pipeline flows sequentially with strict forward-only dependencies:
+The Runtime Intelligence Pipeline flows sequentially with strict forward-only dependencies. Runtime Recommendation acts as the architectural boundary where advisory contexts end and orchestration begins.
+
 `Runtime Intelligence Vocabulary` → `Runtime Observation` → `Runtime Decision` → `Runtime Reasoning` → `Runtime Confidence` → `Runtime Recommendation` → `Runtime Decision Coordinator` → `Runtime Intelligence Context`.
 
 ## Runtime Technical Debt Register
