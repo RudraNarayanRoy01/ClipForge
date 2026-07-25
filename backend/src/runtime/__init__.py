@@ -9,7 +9,15 @@ It ensures that the application only requests Capabilities (e.g. "Reasoning"),
 leaving the Runtime to determine the optimal Provider and Schedule for execution.
 """
 
-from .core import RuntimeBootstrap, RuntimeLifecycleState, RuntimeContext, RuntimeMetadata
+from .core import RuntimeBootstrap, RuntimeLifecycleState, RuntimeContext, RuntimeMetadata, RuntimeLifecycle
+from .core.lifecycle_model import (
+    LifecycleResult,
+    LifecycleState,
+    LifecycleStage,
+    LifecycleSummary,
+    LifecycleIdentity,
+    LifecycleTransition
+)
 from .core.execution_model import (
     ExecutionIdentity,
     ExecutionRequest,
@@ -32,7 +40,14 @@ __all__ = [
     "ExecutionOutcome",
     "ExecutionSummary",
     "ExecutionResult",
+    "LifecycleResult",
+    "LifecycleState",
+    "LifecycleStage",
+    "LifecycleSummary",
+    "LifecycleIdentity",
+    "LifecycleTransition",
     "RuntimeLifecycleState",
+    "RuntimeLifecycle",
     "RuntimeContext",
     "RuntimeMetadata",
     "ILifecycleAware",

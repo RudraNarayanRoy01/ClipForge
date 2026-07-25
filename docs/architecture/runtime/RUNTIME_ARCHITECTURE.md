@@ -144,8 +144,58 @@ It is explicitly **NOT**:
 
 ### Execution Dependency Rules
 
-- The dependency direction strictly flows: `Execution Request Domain` -> `Runtime Scheduler` -> `Scheduling Domain` -> `Runtime Executor` -> `Execution Result Domain` -> `Runtime Lifecycle` (Future).
+- The dependency direction strictly flows: `Execution Request Domain` -> `Runtime Scheduler` -> `Scheduling Domain` -> `Runtime Executor` -> `Execution Result Domain` -> `Runtime Lifecycle` -> `Lifecycle Domain` -> `Retry` -> `Observation` -> `Learning` -> `Optimization`.
 - Runtime Decisions must NEVER depend upon Execution artifacts. Dependency direction must never reverse.
+
+## Runtime Lifecycle Domain Model
+
+This section establishes the canonical architectural contract for the Runtime Lifecycle (established in Batch 6.5.4). 
+It explicitly differentiates between the Application Lifecycle and the Execution Lifecycle.
+
+### Application Lifecycle vs. Execution Lifecycle
+
+- **Application Lifecycle**: Managed by `RuntimeLifecycleCoordinator`. Governs the startup, bootstrapping, initialization, and shutdown of the Runtime subsystem itself.
+- **Execution Lifecycle**: Managed by `RuntimeLifecycle`. Governs the lifecycle progression of an individual completed execution (`ExecutionResult`).
+
+The two concepts are architecturally distinct and must never be conceptually coupled.
+
+### Lifecycle Artifacts (Immutable Domain)
+
+Lifecycle artifacts define "What lifecycle produced." They are purely declarative, immutable data objects. They contain NO business logic, scheduling decisions, execution state, retry info, observation data, or resource allocation.
+
+- **LifecycleIdentity**: A pure value object representing the permanent identity of a lifecycle progression (`lifecycle_id`, `created_at`).
+- **LifecycleState**: Represents the state of the execution lifecycle (`CREATED`, `INITIALIZED`, `ACTIVE`, `COMPLETED`, `FAILED`, `TERMINATED`).
+- **LifecycleStage**: Represents the major phase of the runtime lifecycle (`EXECUTION`, `POST_EXECUTION`, `FINALIZED`).
+- **LifecycleSummary**: Immutable summary information (`summary`, `reason`, `transition_count`, `warnings`).
+- **LifecycleTransition**: The canonical immutable representation of Runtime state transitions (`previous_state`, `current_state`, `transition_reason`, `timestamp`). Future components (Retry, Observation) consume this directly.
+- **LifecycleResult**: The immutable outcome of Runtime lifecycle progression. Contains identity, state, stage, summary, and transition history.
+
+### RuntimeLifecycle Service
+
+The `RuntimeLifecycle` service defines "How execution lifecycle progression is evaluated."
+It performs exactly **one responsibility**: `ExecutionResult` -> `LifecycleResult`.
+
+It is explicitly **NOT**:
+- An Executor
+- A Scheduler
+- A Retry Engine
+- An Observation Service
+- A Learning Engine
+- An Optimization Engine
+- A Workflow Engine
+- A Queue Manager
+- A Resource Manager
+
+### Lifecycle Ownership & Dependency Rules
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **LifecycleResult** | Produced and owned by `RuntimeLifecycle` | Consumed by Retry, Observation, Learning, Optimization |
+| **LifecycleTransition** | Produced and owned by `RuntimeLifecycle` | Consumed by Retry, Observation, Learning, Optimization |
+
+**Future Retry & Observation Responsibilities:**
+Future capabilities like Retry and Observation will consume `LifecycleResult` and `LifecycleTransition` directly. `RuntimeLifecycle` will NOT expand into a workflow engine to coordinate these capabilities.
+
 
 ## Runtime Scheduling Domain Model
 
@@ -384,6 +434,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Execution Context Factory** → What prepared execution environment exists? (Execution Preparation)
 - **Runtime Orchestrator** → Which prepared stages are ready to coordinate? (Execution Coordination)
 - **Runtime Executor** → Execute exactly the approved SchedulingDecision to produce an immutable ExecutionResult. (Execution)
+- **Runtime Lifecycle** → What is the lifecycle progression of the execution? (Execution Lifecycle)
 - **Adaptive Runtime** → Dynamically evaluate execution and recommend future adaptations. (Adaptive)
 - **Runtime Monitoring** → Produce immutable observations of completed execution and adaptation. (Observation)
 - **Runtime Telemetry** → Capture Runtime signals. (Signal Capture)
@@ -402,8 +453,8 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 ### Runtime Decision Environment
 The Decision Pipeline (`RuntimePlanningStrategy` → `RuntimePlanning` → `RuntimePolicy` → `RuntimeConstraintEngine` → `RuntimeBudgetPlanner` → `RuntimeRouting`) is formally owned by the `RuntimeContext`. `RuntimeKnowledge` acts as the initial artifact consumed by this pipeline but remains an independent subsystem artifact not permanently owned by `RuntimeContext` state.
 
-### Runtime Lifecycle
-The Runtime coordinates operations through explicit lifecycle states:
+### Application Lifecycle (Runtime Subsystem)
+The Runtime Application coordinates operations through explicit lifecycle states managed by `RuntimeLifecycleCoordinator`:
 `UNINITIALIZED -> BOOTSTRAPPING -> INITIALIZED -> SHUTTING_DOWN -> SHUTDOWN`
 
 ## Runtime Technical Debt Register

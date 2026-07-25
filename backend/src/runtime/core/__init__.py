@@ -12,7 +12,15 @@ from .execution_result_model import (
     ExecutionResult
 )
 from .executor import RuntimeExecutor
-from .lifecycle import RuntimeLifecycleState, RuntimeLifecycleCoordinator
+from .lifecycle_model import (
+    LifecycleResult,
+    LifecycleState,
+    LifecycleStage,
+    LifecycleSummary,
+    LifecycleIdentity,
+    LifecycleTransition
+)
+from .lifecycle import RuntimeLifecycleState, RuntimeLifecycleCoordinator, RuntimeLifecycle
 from .extension import IRuntimeExtension, IRuntimeExtensionPoint
 from .context import RuntimeContext
 from .metadata import RuntimeMetadata
@@ -59,8 +67,15 @@ __all__ = [
     "ExecutionSummary",
     "ExecutionResult",
     "RuntimeExecutor",
+    "LifecycleResult",
+    "LifecycleState",
+    "LifecycleStage",
+    "LifecycleSummary",
+    "LifecycleIdentity",
+    "LifecycleTransition",
     "RuntimeLifecycleState",
     "RuntimeLifecycleCoordinator",
+    "RuntimeLifecycle",
     "IRuntimeExtension",
     "IRuntimeExtensionPoint",
     "RuntimeContext",

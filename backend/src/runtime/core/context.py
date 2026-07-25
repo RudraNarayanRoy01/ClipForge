@@ -4,7 +4,8 @@ from .execution_model import ExecutionRequest
 from .execution_result_model import ExecutionStatus
 from .scheduling_model import SchedulingDecision
 from .metadata import RuntimeMetadata
-from .lifecycle import RuntimeLifecycleCoordinator
+from .lifecycle_model import LifecycleResult
+from .lifecycle import RuntimeLifecycleCoordinator, RuntimeLifecycle
 from .extension import IRuntimeExtensionPoint
 from .capabilities import RuntimeCapabilityRegistry
 
@@ -58,6 +59,7 @@ class RuntimeContext:
     def __init__(self) -> None:
         self._metadata = RuntimeMetadata()
         self._lifecycle_coordinator = RuntimeLifecycleCoordinator()
+        self._runtime_lifecycle = RuntimeLifecycle()
         self._extension_points: Dict[str, IRuntimeExtensionPoint] = {}
         self._capability_registry = RuntimeCapabilityRegistry()
         self._resource_discovery = RuntimeResourceDiscovery()
@@ -93,6 +95,7 @@ class RuntimeContext:
         self.active_execution_request: Optional[ExecutionRequest] = None
         self.active_execution_status: Optional[ExecutionStatus] = None
         self.active_scheduling_decision: Optional[SchedulingDecision] = None
+        self.active_lifecycle_result: Optional[LifecycleResult] = None
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -103,6 +106,16 @@ class RuntimeContext:
     def lifecycle(self) -> RuntimeLifecycleCoordinator:
         """Expose the canonical lifecycle coordinator for this Runtime instance."""
         return self._lifecycle_coordinator
+
+    @property
+    def runtime_lifecycle(self) -> RuntimeLifecycle:
+        """
+        Expose the canonical Runtime Lifecycle Engine for this Runtime instance.
+        
+        This handles execution lifecycle progression (ExecutionResult -> LifecycleResult).
+        It does NOT handle application startup/shutdown.
+        """
+        return self._runtime_lifecycle
 
     @property
     def capability_registry(self) -> RuntimeCapabilityRegistry:

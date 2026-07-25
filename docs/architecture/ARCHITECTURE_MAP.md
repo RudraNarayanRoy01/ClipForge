@@ -37,6 +37,8 @@ flowchart TD
     Runtime --> Planner[Execution Planning]
     Runtime --> Graph[Execution Graph Builder]
     Runtime --> Sched[Scheduler]
+    Runtime --> Executor[Runtime Executor]
+    Runtime --> Lifecycle[Runtime Lifecycle]
     Runtime --> Adapt[Adaptive Runtime]
     Runtime --> Monitor[Runtime Monitoring]
     Runtime --> Telemetry[Runtime Telemetry]
@@ -56,7 +58,7 @@ flowchart TD
 
 **Dependency Direction (Inversion Principle):**
 Application -> Runtime Contracts
-Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Executor -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
+Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Executor -> Runtime Lifecycle -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
 Runtime -> Provider Ecosystem -> Hardware
 
 **Ownership:**
@@ -71,6 +73,7 @@ Runtime -> Provider Ecosystem -> Hardware
 - `BudgetDecision`: Owned exclusively by `RuntimeBudgetPlanner`.
 - `RoutingDecision`: Owned exclusively by `RuntimeRouting`.
 - `ExecutionIdentity`, `ExecutionRequest`, `ExecutionStatus`, `ExecutionResult`: Owned by the Runtime Execution Model.
+- `LifecycleIdentity`, `LifecycleResult`, `LifecycleTransition`, `LifecycleState`, `LifecycleStage`, `LifecycleSummary`: Owned by the Runtime Lifecycle Domain.
 - `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
@@ -79,3 +82,4 @@ Runtime -> Provider Ecosystem -> Hardware
 - Batch 6.5.1 (Runtime Execution Model) is complete, establishing pure declarative execution artifacts.
 - Batch 6.5.2 (Runtime Scheduler) is complete, establishing the immutable Scheduling Domain Model.
 - Batch 6.5.3 (Runtime Executor) is complete, establishing the Execution Result Domain and RuntimeExecutor service.
+- Batch 6.5.4 (Runtime Lifecycle) is complete, establishing the immutable Lifecycle Domain and RuntimeLifecycle engine.
