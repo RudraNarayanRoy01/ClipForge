@@ -48,6 +48,7 @@ flowchart TD
     Runtime --> Diagnostics[Runtime Diagnostics]
     Runtime --> Observation[Runtime Observation]
     Runtime --> DecisionEngine[Runtime Decision Engine]
+    Runtime --> Reasoning[Runtime Reasoning]
     Runtime --> Optimization[Runtime Optimization]
     Runtime --> Learning[Runtime Learning]
     
@@ -104,6 +105,7 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `RuntimeExecutionInfo`, `RuntimeExecutionState`, `RuntimeExecutionTrigger`, `RuntimeExecutionDecision`, `RuntimeExecutionResult`: Owned by the RuntimeExecutionManager.
 - `RuntimeIntelligenceState`, `RUNTIME_INTELLIGENCE_POLICY`, `RuntimeIntelligenceInfo`: Owned by the Runtime Intelligence Domain.
 - `RuntimeDecisionState`, `RuntimeDecisionType`, `RuntimeDecisionReason`, `RuntimeDecision`, `RuntimeDecisionInfo`, `RuntimeDecisionResult`: Owned by the Runtime Decision Engine.
+- `RuntimeReasoningState`, `RuntimeReasoningType`, `RuntimeReasoningReason`, `RuntimeReasoning`, `RuntimeReasoningInfo`, `RuntimeReasoningResult`: Owned by the Runtime Reasoning Domain.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -128,3 +130,4 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.7.1 (Runtime Intelligence Domain) is complete, establishing the immutable vocabulary and transport artifacts for future Runtime Intelligence components.
 - Batch 6.7.2 (Runtime Observation) is complete, establishing the observation domain.
 - Batch 6.7.3 (Runtime Decision Engine) is complete, defining the canonical immutable decision artifact decoupled from its production.
+- Batch 6.7.4 (Runtime Reasoning) is complete, establishing the passive immutable domain answering 'Why' a decision exists.

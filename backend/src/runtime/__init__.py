@@ -118,6 +118,14 @@ from .domain.runtime_observation_model import (
     RuntimeObservationInfo,
     RuntimeObservationResult
 )
+from .domain.runtime_reasoning_model import (
+    RuntimeReasoningState,
+    RuntimeReasoningType,
+    RuntimeReasoningReason,
+    RuntimeReasoning,
+    RuntimeReasoningInfo,
+    RuntimeReasoningResult
+)
 from .contracts import ILifecycleAware
 
 __all__ = [
@@ -205,4 +213,10 @@ __all__ = [
     "RuntimeSnapshot",
     "RuntimeObservationInfo",
     "RuntimeObservationResult",
+    "RuntimeReasoningState",
+    "RuntimeReasoningType",
+    "RuntimeReasoningReason",
+    "RuntimeReasoning",
+    "RuntimeReasoningInfo",
+    "RuntimeReasoningResult",
 ]

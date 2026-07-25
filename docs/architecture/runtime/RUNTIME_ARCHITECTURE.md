@@ -817,6 +817,12 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 - **Decision Artifact vs. Decision Producer**: `RuntimeDecision` is the immutable artifact. Future Runtime Intelligence bounded contexts produce, evaluate, reason about, validate, recommend, and coordinate that artifact. This follows the exact same architectural pattern as `ProviderRegistry` (defines canonical Provider model) and `ModelRegistry` (defines canonical Model metadata).
 - **Boundary**: Runtime Decision consumes Runtime Observation, but Observation never consumes Decision. Runtime Decision must never consume Runtime Reasoning, Runtime Confidence, Runtime Recommendation, or Runtime Decision Coordinator.
 
+### Runtime Reasoning (Batch 6.7.4)
+- **Responsibility**: Defines the canonical immutable representation of Runtime Reasoning. It answers "Why does this Runtime Decision exist?". It owns Reasoning Identity, Classification, Metadata, Lifecycle, Vocabulary, and Explanation Structure.
+- **Constraint**: Must NEVER define reasoning execution, engines, algorithms, planning, inference, or optimization. Must NEVER own confidence, recommendations, or orchestration. It is a permanently passive bounded context.
+- **Artifact vs. Producer**: `RuntimeReasoning` is the immutable artifact. Future components may produce, evaluate, or compose reasoning, but the Reasoning Domain itself does none of this.
+- **Boundary**: Consumes `RuntimeDecision` and `RuntimeObservation` identifiers. Must NEVER consume Runtime Confidence, Recommendation, or Context.
+
 ### Future Batch Evolution
 - **Batch 6.7.1**: Runtime Intelligence Vocabulary
 - **Batch 6.7.2**: Runtime Observation
