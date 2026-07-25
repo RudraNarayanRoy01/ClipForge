@@ -823,6 +823,11 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 - **Artifact vs. Producer**: `RuntimeReasoning` is the immutable artifact. Future components may produce, evaluate, or compose reasoning, but the Reasoning Domain itself does none of this.
 - **Boundary**: Consumes `RuntimeDecision` and `RuntimeObservation` identifiers. Must NEVER consume Runtime Confidence, Recommendation, or Context.
 
+### Runtime Confidence (Batch 6.7.5)
+- **Responsibility**: Defines the canonical immutable representation of Runtime Confidence. It answers "How trustworthy is this Runtime Reasoning artifact?". It represents structural confidence (e.g., completeness, consistency, structural integrity, availability of required evidence and upstream artifacts, internal coherence), NOT statistical probability, AI confidence, prediction confidence, likelihood, inference certainty, correctness, or truthfulness. It owns Confidence Identity, Metadata, Vocabulary, Lifecycle, Factors, Evidence, Level, and Artifact.
+- **Constraint**: Must NEVER own calculation, scoring algorithms, machine learning confidence, inference, prediction, recommendation, optimization, orchestration, workflow, provider routing, or execution planning. It remains permanently passive. `RuntimeConfidenceEvidence` permanently owns only evidence identifiers, references, metadata, and classification, NEVER evidence scoring, weighting, ranking, evaluation, or prioritization.
+- **Boundary**: Acts as the architectural boundary between reasoning and recommendation. Consumes ONLY `RuntimeReasoning` via `reasoning_id` and immutable references. Must NEVER embed `RuntimeReasoning`, `RuntimeDecision`, or `RuntimeObservation`. Must NEVER consume `RuntimeRecommendation` (which owns action/provider proposals, ranking, alternatives), `RuntimeDecisionCoordinator`, or `RuntimeIntelligenceContext`.
+
 ### Future Batch Evolution
 - **Batch 6.7.1**: Runtime Intelligence Vocabulary
 - **Batch 6.7.2**: Runtime Observation
@@ -832,6 +837,11 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 - **Batch 6.7.6**: Runtime Recommendation
 - **Batch 6.7.7**: Runtime Decision Coordinator
 - **Batch 6.7.8**: Runtime Intelligence Context
+
+## Runtime Intelligence Pipeline
+
+The Runtime Intelligence Pipeline flows sequentially with strict forward-only dependencies:
+`Runtime Intelligence Vocabulary` → `Runtime Observation` → `Runtime Decision` → `Runtime Reasoning` → `Runtime Confidence` → `Runtime Recommendation` → `Runtime Decision Coordinator` → `Runtime Intelligence Context`.
 
 ## Runtime Technical Debt Register
 
