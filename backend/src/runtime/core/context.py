@@ -21,6 +21,7 @@ from .provider_capability_registry import ProviderCapabilityRegistry
 from .model_registry import ModelRegistry
 from .model_lifecycle_manager import ModelLifecycleManager
 from .provider_health_manager import ProviderHealthManager
+from .provider_failover_manager import ProviderFailoverManager
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
@@ -80,6 +81,7 @@ class RuntimeContext:
         self._model_registry = ModelRegistry()
         self._model_lifecycle_manager = ModelLifecycleManager()
         self._provider_health_manager = ProviderHealthManager()
+        self._provider_failover_manager = ProviderFailoverManager(self._provider_health_manager)
         self._hardware_discovery = RuntimeHardwareDiscovery()
         self._provider_selection = RuntimeProviderSelection(
             self._capability_registry,
@@ -237,6 +239,16 @@ class RuntimeContext:
         RuntimeContext acts as a passive composition root and does not own health behavior.
         """
         return self._provider_health_manager
+
+    @property
+    def provider_failover_manager(self) -> ProviderFailoverManager:
+        """
+        Expose the canonical observational Provider Failover Manager for this Runtime instance.
+        
+        This serves as the single source of truth for structural provider failover definitions in Sprint 6.6.
+        RuntimeContext acts as a passive composition root and does not own failover behavior.
+        """
+        return self._provider_failover_manager
 
     @property
     def hardware_discovery(self) -> RuntimeHardwareDiscovery:

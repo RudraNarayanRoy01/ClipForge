@@ -23,6 +23,7 @@ from .core.provider_capability_registry import ProviderCapabilityRegistry
 from .core.model_registry import ModelRegistry
 from .core.model_lifecycle_manager import ModelLifecycleManager
 from .core.provider_health_manager import ProviderHealthManager
+from .core.provider_failover_manager import ProviderFailoverManager
 from .domain.provider_registry_model import (
     ProviderType,
     ProviderStatus,
@@ -52,6 +53,13 @@ from .domain.provider_health_model import (
     ProviderHealthTransition,
     ProviderHealthInfo,
     ProviderHealthResult
+)
+from .domain.provider_failover_model import (
+    ProviderFailoverState,
+    ProviderFailoverTrigger,
+    ProviderFailoverDecision,
+    ProviderFailoverInfo,
+    ProviderFailoverResult
 )
 from .core.execution_model import (
     ExecutionIdentity,
@@ -111,4 +119,10 @@ __all__ = [
     "ProviderHealthTransition",
     "ProviderHealthInfo",
     "ProviderHealthResult",
+    "ProviderFailoverManager",
+    "ProviderFailoverState",
+    "ProviderFailoverTrigger",
+    "ProviderFailoverDecision",
+    "ProviderFailoverInfo",
+    "ProviderFailoverResult",
 ]
