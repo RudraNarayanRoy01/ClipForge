@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
-from .runtime_learning import RuntimeKnowledge
-
 
 @dataclass(frozen=True)
 class PlanningStrategy:
@@ -88,7 +86,6 @@ class RuntimePlanning:
     The canonical Runtime Planning subsystem.
     
     Responsibilities:
-    - Consume immutable RuntimeKnowledge
     - Transform accumulated Runtime knowledge into a future execution intention
     - Produce immutable PlanningDecision
     - Answer exactly one architectural question: 'What should happen next?'
@@ -113,47 +110,35 @@ class RuntimePlanning:
     def __init__(self) -> None:
         pass
 
-    def plan(self, runtime_knowledge: RuntimeKnowledge, planning_strategy: PlanningStrategy, current_time: float) -> PlanningDecision:
+    def plan(self, session_id: str, planning_strategy: PlanningStrategy, current_time: float) -> PlanningDecision:
         """
-        Consume immutable RuntimeKnowledge and produce immutable PlanningDecision.
+        Produce immutable PlanningDecision.
         Preserves architectural boundaries by only defining 'What should happen next?'.
         """
-        if not runtime_knowledge or runtime_knowledge.session_id == "invalid":
+        if not session_id or session_id == "invalid":
             return PlanningDecision(
                 session_id="invalid",
                 planning_objective="No objective identified",
-                planning_rationale="No valid runtime knowledge provided.",
+                planning_rationale="No valid session provided.",
                 planning_confidence=0.0,
                 planning_assumptions=["Invalid input state"],
-                planning_metadata={"error": "No valid runtime knowledge provided.", "timestamp": current_time}
+                planning_metadata={"error": "No valid session.", "timestamp": current_time}
             )
 
         objective = "Continue standard execution"
-        rationale = "Runtime knowledge indicates baseline operation."
-        confidence = runtime_knowledge.learning_confidence
+        rationale = "Baseline operation planned."
+        confidence = 0.5
         assumptions = list(planning_strategy.planning_assumptions)
 
         if "prioritize_stability" in planning_strategy.planning_preferences:
             assumptions.append("Stability prioritized by strategy.")
 
-        if runtime_knowledge.knowledge_classifications:
-            if "STABLE" in runtime_knowledge.knowledge_classifications:
-                objective = "Apply stable optimization pattern"
-                rationale = "Critical failure pattern identified in knowledge."
-                assumptions.append("Failure conditions may reoccur.")
-            elif "EMERGING" in runtime_knowledge.knowledge_classifications:
-                objective = "Monitor for performance variance"
-                rationale = "Emerging patterns indicate performance fluctuation."
-                assumptions.append("Variance may persist.")
-
-        if runtime_knowledge.learned_patterns:
-            assumptions.extend([f"Observed: {p}" for p in runtime_knowledge.learned_patterns])
-
         return PlanningDecision(
-            session_id=runtime_knowledge.session_id,
+            session_id=session_id,
             planning_objective=objective,
             planning_rationale=rationale,
             planning_confidence=confidence,
             planning_assumptions=assumptions,
             planning_metadata={"planned_by": "RuntimePlanning", "timestamp": current_time}
         )
+

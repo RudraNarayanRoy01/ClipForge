@@ -60,7 +60,14 @@ from .runtime_metrics import RuntimeMetricStatus, StageRuntimeMetrics, RuntimeMe
 from .runtime_health import RuntimeHealthStatus, StageRuntimeHealth, RuntimeHealthReport, RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnosticStatus, StageRuntimeDiagnostic, RuntimeDiagnosticsReport, RuntimeDiagnostics
 from .runtime_optimization import OptimizationPriority, StageOptimizationDecision, OptimizationDecision, RuntimeOptimization
-from .runtime_learning import KnowledgeClassification, StageRuntimeKnowledge, RuntimeKnowledge, RuntimeLearning
+from .learning_model import (
+    LearningCategory,
+    LearningConfidence,
+    LearningPattern,
+    LearningSummary,
+    LearningResult
+)
+from .learning import RuntimeLearning
 from .runtime_planning import PlanningDecision, RuntimePlanning
 from .runtime_policy import PolicyDecision, RuntimePolicy
 from .runtime_constraint_engine import ConstraintDecision, RuntimeConstraintEngine
@@ -176,9 +183,11 @@ __all__ = [
     "StageOptimizationDecision",
     "OptimizationDecision",
     "RuntimeOptimization",
-    "KnowledgeClassification",
-    "StageRuntimeKnowledge",
-    "RuntimeKnowledge",
+    "LearningCategory",
+    "LearningConfidence",
+    "LearningPattern",
+    "LearningSummary",
+    "LearningResult",
     "RuntimeLearning",
     "PlanningDecision",
     "RuntimePlanning",

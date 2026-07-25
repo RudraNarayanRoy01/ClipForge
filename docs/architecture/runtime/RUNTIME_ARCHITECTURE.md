@@ -298,6 +298,56 @@ It owns no execution state and does not implement retry loops, backoffs, or queu
 **Future Learning & Optimization Responsibilities:**
 Future capabilities like Learning and Optimization will consume `ObservationResult`. `RuntimeObservation` must not gradually expand into an analytics, optimization, or learning engine.
 
+## Runtime Learning Domain Model
+
+This section establishes the canonical architectural contract for Runtime Learning (established in Batch 6.5.7).
+It explicitly differentiates between **Runtime Learning**, **Runtime Prediction**, and **Runtime Optimization**.
+
+### Learning vs. Prediction vs. Optimization
+
+- **Learning**: Represents immutable understanding of patterns extracted from observations. It answers "What Runtime learned" (e.g. repeated failure on specific hardware).
+- **Prediction**: Estimates future outcomes. Prediction belongs outside the Runtime Learning pipeline.
+- **Optimization**: Makes active decisions to improve future execution. Optimization consumes Learning but Learning never optimizes.
+- **Analytics**: Produces dashboards and reports, which remain outside the Runtime pipeline entirely.
+
+### Learning Artifacts (Immutable Domain)
+
+Learning artifacts define "What Runtime learned." They are purely declarative, immutable data objects. They contain NO optimization logic, execution behavior, or predictive models.
+
+- **LearningCategory**: The category of Runtime knowledge (e.g., `EXECUTION`, `RETRY`, `RESOURCE`, `PERFORMANCE`, `STABILITY`, `SYSTEM`, `UNKNOWN`).
+- **LearningConfidence**: Confidence in learned knowledge (e.g., `LOW`, `MEDIUM`, `HIGH`, `VERY_HIGH`). It remains classification only.
+- **LearningPattern**: One immutable Runtime learning pattern (`category`, `confidence`, `description`, `supporting_observations`, `context`).
+- **LearningSummary**: Immutable summary information (`summary`, `pattern_count`, `high_confidence_count`, `medium_confidence_count`, `low_confidence_count`).
+- **LearningResult**: The immutable outcome of Runtime learning. Produced by `RuntimeLearning`. Consumed by future `RuntimeOptimization`. Must NEVER contain execution, scheduling, or optimization logic.
+
+### RuntimeLearning Service
+
+The `RuntimeLearning` service defines "How Runtime learns."
+It performs exactly **one responsibility**: `ObservationResult` -> `LearningResult`.
+
+It is explicitly **NOT**:
+- A RuntimeExecutor
+- A RuntimeScheduler
+- A RuntimeLifecycle
+- A RuntimeRetry
+- A RuntimeObservation
+- An Optimization Engine
+- A Prediction Engine
+- A Recommendation Engine
+- An Analytics Engine
+- A Monitoring Engine
+
+### Learning Ownership & Dependency Rules
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **LearningResult** | Produced and owned by `RuntimeLearning` | Consumed by future `RuntimeOptimization` |
+| **LearningPattern** | Owned by `RuntimeLearning` | Consumed by future `RuntimeOptimization` |
+
+**Future Optimization Responsibilities:**
+Future capabilities like Optimization will consume `LearningResult`. `RuntimeLearning` must not gradually expand into an optimization or prediction engine.
+
+
 
 ## Runtime Scheduling Domain Model
 

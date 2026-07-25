@@ -78,6 +78,7 @@ Runtime -> Provider Ecosystem -> Hardware
 - `LifecycleIdentity`, `LifecycleResult`, `LifecycleTransition`, `LifecycleState`, `LifecycleStage`, `LifecycleSummary`: Owned by the Runtime Lifecycle Domain.
 - `RetryIdentity`, `RetryResult`, `RetryDecision`, `RetryReason`, `RetryPolicy`, `RetrySummary`: Owned by the Runtime Retry Domain.
 - `ObservationIdentity`, `ObservationResult`, `ObservationRecord`, `ObservationCategory`, `ObservationSeverity`, `ObservationSummary`: Owned by the Runtime Observation Domain.
+- `LearningResult`, `LearningPattern`, `LearningCategory`, `LearningConfidence`, `LearningSummary`: Owned by the Runtime Learning Domain.
 - `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
@@ -89,3 +90,4 @@ Runtime -> Provider Ecosystem -> Hardware
 - Batch 6.5.4 (Runtime Lifecycle) is complete, establishing the immutable Lifecycle Domain and RuntimeLifecycle engine.
 - Batch 6.5.5 (Runtime Retry) is complete, establishing the immutable Retry Domain and RuntimeRetry evaluation engine.
 - Batch 6.5.6 (Runtime Observation) is complete, establishing the immutable Observation Domain and RuntimeObservation extraction engine, explicitly distinguished from Monitoring.
+- Batch 6.5.7 (Runtime Learning) is complete, establishing the immutable Learning Domain and RuntimeLearning extraction engine, explicitly distinguished from Prediction and Optimization.
