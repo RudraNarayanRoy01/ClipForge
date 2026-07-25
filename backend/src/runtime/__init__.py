@@ -22,6 +22,7 @@ from .core.provider_registry import ProviderRegistry
 from .core.provider_capability_registry import ProviderCapabilityRegistry
 from .core.model_registry import ModelRegistry
 from .core.model_lifecycle_manager import ModelLifecycleManager
+from .core.provider_health_manager import ProviderHealthManager
 from .domain.provider_registry_model import (
     ProviderType,
     ProviderStatus,
@@ -45,6 +46,12 @@ from .domain.model_lifecycle_model import (
     ModelLifecycleTransition,
     ModelLifecycleInfo,
     ModelLifecycleResult
+)
+from .domain.provider_health_model import (
+    ProviderHealthState,
+    ProviderHealthTransition,
+    ProviderHealthInfo,
+    ProviderHealthResult
 )
 from .core.execution_model import (
     ExecutionIdentity,
@@ -99,4 +106,9 @@ __all__ = [
     "ModelLifecycleTransition",
     "ModelLifecycleInfo",
     "ModelLifecycleResult",
+    "ProviderHealthManager",
+    "ProviderHealthState",
+    "ProviderHealthTransition",
+    "ProviderHealthInfo",
+    "ProviderHealthResult",
 ]

@@ -756,10 +756,21 @@ The Provider Ecosystem introduces the canonical architecture for Provider Identi
 - **Artifacts**: `ModelInfo`, `ModelType`, `ModelStatus`, `ModelRegistryResult`.
 - **Constraint**: Must never own Provider Identity or Provider Capability. Must never become a Model Loader, Initializer, Resolver, Selector, Evaluator, or Execution Planner.
 
+### Model Lifecycle Manager (Lifecycle)
+- **Responsibility**: Owns Model Lifecycle. Answers "What is the state of this model?"
+- **Artifacts**: `ModelLifecycleInfo`, `ModelLifecycleState`, `ModelLifecycleTransition`, `ModelLifecycleResult`.
+- **Constraint**: Must never load or execute models. Relies entirely on the declarative policy.
+
+### Provider Health Manager (Health)
+- **Responsibility**: Owns Provider Health. Answers "What is the current structural health state of this provider?" purely observationally.
+- **Artifacts**: `ProviderHealthInfo`, `ProviderHealthState`, `ProviderHealthTransition`, `ProviderHealthResult`.
+- **Constraint**: Must never execute HTTP requests, measure latency, schedule work, or interpret health to make runtime decisions (e.g. failover, retry). It is an observational subsystem only. 
+- **Separation**: Distinct from `RuntimeHealth` which evaluates the operational condition of the Runtime itself.
+
 ### Registry Relationship & Integration
-- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability` -> `ModelRegistry` (Models) -> `ModelInfo`.
-- **Identity Decoupling**: `ModelInfo` and `ProviderCapability` reference only immutable provider identifiers (`provider_id`) and never own or embed `ProviderInfo`.
-- **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes `ProviderCapabilityRegistry`, `ProviderRegistry`, and `ModelRegistry`. `RuntimeContext` must NEVER register models, evaluate capabilities, compare capabilities, mutate metadata, perform provider reasoning, or perform orchestration.
+- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability` -> `ModelRegistry` (Models) -> `ModelInfo` -> `ModelLifecycleManager` (Lifecycle) -> `ProviderHealthManager` (Health).
+- **Identity Decoupling**: `ModelInfo`, `ProviderCapability`, and `ProviderHealthInfo` reference only immutable provider identifiers (`provider_id`) and never own or embed `ProviderInfo`.
+- **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes the registries and managers. `RuntimeContext` must NEVER register models, evaluate capabilities, evaluate health, mutate metadata, perform provider reasoning, or perform orchestration.
 
 ## Runtime Technical Debt Register
 

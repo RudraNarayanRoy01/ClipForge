@@ -20,6 +20,7 @@ from .provider_registry import ProviderRegistry
 from .provider_capability_registry import ProviderCapabilityRegistry
 from .model_registry import ModelRegistry
 from .model_lifecycle_manager import ModelLifecycleManager
+from .provider_health_manager import ProviderHealthManager
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
@@ -78,6 +79,7 @@ class RuntimeContext:
         self._provider_capability_registry = ProviderCapabilityRegistry()
         self._model_registry = ModelRegistry()
         self._model_lifecycle_manager = ModelLifecycleManager()
+        self._provider_health_manager = ProviderHealthManager()
         self._hardware_discovery = RuntimeHardwareDiscovery()
         self._provider_selection = RuntimeProviderSelection(
             self._capability_registry,
@@ -225,6 +227,16 @@ class RuntimeContext:
         RuntimeContext acts as a passive composition root and does not own lifecycle behavior.
         """
         return self._model_lifecycle_manager
+
+    @property
+    def provider_health_manager(self) -> ProviderHealthManager:
+        """
+        Expose the canonical observational Provider Health Manager for this Runtime instance.
+        
+        This serves as the single source of truth for external provider structural health states in Sprint 6.6.
+        RuntimeContext acts as a passive composition root and does not own health behavior.
+        """
+        return self._provider_health_manager
 
     @property
     def hardware_discovery(self) -> RuntimeHardwareDiscovery:

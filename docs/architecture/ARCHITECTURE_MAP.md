@@ -54,6 +54,9 @@ flowchart TD
     
     Providers --> ProviderRegistry[Provider Registry - Identity]
     Providers --> ProviderCapabilityRegistry[Provider Capability Registry - Features]
+    Providers --> ModelRegistry[Model Registry - Metadata]
+    Providers --> ModelLifecycleManager[Model Lifecycle Manager]
+    Providers --> ProviderHealthManager[Provider Health Manager]
     
     ProviderRegistry --> Local[Local Hardware (CUDA, CPU)]
     Providers --> Cloud[Cloud APIs (OpenAI, Gemini)]
@@ -65,7 +68,7 @@ flowchart TD
 Application -> Runtime Contracts
 Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Executor -> Runtime Lifecycle -> Runtime Retry -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
 Runtime -> Provider Ecosystem -> Hardware
-ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability
+ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability -> ModelRegistry -> ModelInfo -> ModelLifecycleManager -> ProviderHealthManager
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.
@@ -81,12 +84,15 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `ExecutionIdentity`, `ExecutionRequest`, `ExecutionStatus`, `ExecutionResult`: Owned by the Runtime Execution Model.
 - `LifecycleIdentity`, `LifecycleResult`, `LifecycleTransition`, `LifecycleState`, `LifecycleStage`, `LifecycleSummary`: Owned by the Runtime Lifecycle Domain.
 - `RetryIdentity`, `RetryResult`, `RetryDecision`, `RetryReason`, `RetryPolicy`, `RetrySummary`: Owned by the Runtime Retry Domain.
-- `ObservationIdentity`, `ObservationResult`, `ObservationRecord`, `ObservationCategory`, `ObservationSeverity`, `ObservationSummary`: Owned by the Runtime Observation Domain.
+- `ObservationResult`, `ObservationRecord`, `ObservationCategory`, `ObservationSeverity`, `ObservationSummary`: Owned by the Runtime Observation Domain.
 - `LearningResult`, `LearningPattern`, `LearningCategory`, `LearningConfidence`, `LearningSummary`: Owned by the Runtime Learning Domain.
 - `OptimizationResult`, `OptimizationDecision`, `OptimizationCategory`, `OptimizationPriority`, `OptimizationSummary`: Owned by the Runtime Optimization Domain.
 - `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
 - `ProviderInfo`, `ProviderStatus`, `ProviderType`: Owned by the ProviderRegistry.
 - `ProviderCapability`, `CapabilityLimits`, `CapabilityType`: Owned by the ProviderCapabilityRegistry.
+- `ModelInfo`, `ModelStatus`, `ModelType`: Owned by the ModelRegistry.
+- `ModelLifecycleInfo`, `ModelLifecycleState`, `ModelLifecycleTransition`, `ModelLifecycleResult`: Owned by the ModelLifecycleManager.
+- `ProviderHealthInfo`, `ProviderHealthState`, `ProviderHealthTransition`, `ProviderHealthResult`: Owned by the ProviderHealthManager.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -101,3 +107,6 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.5.8 (Runtime Optimization) is complete, establishing the immutable Optimization Domain and RuntimeOptimization engine, strictly concluding the Sprint 6.5 adaptive pipeline.
 - Batch 6.6.1 (Provider Registry) is complete, establishing the pure metadata registry for Provider Identity.
 - Batch 6.6.2 (Provider Capability) is complete, establishing the ProviderCapabilityRegistry and immutable capability artifacts, enforcing strict separation from Identity.
+- Batch 6.6.3 (Model Registry) is complete, establishing the pure metadata registry for Model Metadata.
+- Batch 6.6.4 (Model Lifecycle) is complete, establishing declarative structural transitions for model states.
+- Batch 6.6.5 (Provider Health) is complete, establishing the observational ProviderHealthManager independent of execution.
