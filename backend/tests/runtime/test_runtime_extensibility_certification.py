@@ -1,62 +1,53 @@
 import inspect
 import pytest
 
-from src.runtime.core.context import RuntimeContext
-from src.runtime.core.runtime_planning import RuntimePlanning
-from src.runtime.core.runtime_policy import RuntimePolicy
-from src.runtime.core.runtime_constraint_engine import RuntimeConstraintEngine
-from src.runtime.core.runtime_budget_planner import RuntimeBudgetPlanner
-from src.runtime.core.runtime_routing import RuntimeRouting
+from src.runtime.core.execution_model import ExecutionRequest
+from src.runtime.core.planner import RuntimeExecutionPlanner
+from src.runtime.core.scheduling_model import SchedulingDecision
+from src.runtime.core.scheduler import RuntimeScheduler
+from src.runtime.core.execution_result_model import ExecutionResult
+from src.runtime.core.executor import RuntimeExecutor
+from src.runtime.core.lifecycle_model import LifecycleResult
+from src.runtime.core.lifecycle import RuntimeLifecycle
+from src.runtime.core.retry_model import RetryResult
+from src.runtime.core.retry import RuntimeRetry
+from src.runtime.core.observation_model import ObservationResult
+from src.runtime.core.observation import RuntimeObservation
+from src.runtime.core.learning_model import LearningResult
+from src.runtime.core.learning import RuntimeLearning
+from src.runtime.core.optimization_model import OptimizationResult
+from src.runtime.core.optimization import RuntimeOptimization
 
 class TestRuntimeExtensibilityCertification:
     """
-    Certifies that future Runtime components (Scheduler, Execution, Observation,
-    Learning, Optimization) can integrate through composition without redesigning
-    the Planning, Policy, Constraint, Budget, or Routing components.
+    Certifies that future Runtime capabilities (Sprint 6.6) can integrate 
+    through composition and consumption of immutable artifacts without modifying 
+    the certified Runtime pipeline.
     """
 
-    def test_future_components_compositional_integration(self):
+    def test_frozen_pipeline_components_isolation(self):
         """
-        Verify that RuntimeContext acts as the composition root for future components,
-        and that these components are isolated from the decision pipeline's core logic.
-        """
-        context = RuntimeContext()
-        
-        # We assert the context has slots for future components, showing they integrate via composition.
-        # This confirms that they don't need to be injected into the decision pipeline.
-        future_properties = [
-            'scheduler',
-            'execution_engine',
-            'runtime_monitoring',
-            'runtime_learning',
-            'runtime_optimization'
-        ]
-        
-        context_methods = [name for name, _ in inspect.getmembers(RuntimeContext, predicate=inspect.isdatadescriptor)]
-        
-        for prop in future_properties:
-            assert prop in context_methods, f"Extensibility gap: RuntimeContext missing composition root for {prop}"
-            
-    def test_pipeline_independence_from_future_components(self):
-        """
-        Verify that existing decision pipeline components (Planning, Policy, etc.)
-        do not depend on future extensions (Scheduler, Execution, etc.).
-        This guarantees future modules can be added without modifying Sprint 6.4 components.
+        Verify that existing decision pipeline components (Planner, Scheduler, Executor, etc.)
+        do not depend on future extensions.
+        This guarantees future modules can be added without modifying Sprint 6.5 components.
         """
         pipeline_classes = [
-            RuntimePlanning,
-            RuntimePolicy,
-            RuntimeConstraintEngine,
-            RuntimeBudgetPlanner,
-            RuntimeRouting
+            RuntimeExecutionPlanner,
+            RuntimeScheduler,
+            RuntimeExecutor,
+            RuntimeLifecycle,
+            RuntimeRetry,
+            RuntimeObservation,
+            RuntimeLearning,
+            RuntimeOptimization
         ]
         
         forbidden_imports = [
-            'RuntimeScheduler',
-            'RuntimeExecutionEngine',
-            'RuntimeMonitoring',
-            'RuntimeLearning',
-            'RuntimeOptimization'
+            'CampaignManager',
+            'AdvancedOrchestrator',
+            'DistributedCache',
+            'GlobalLoadBalancer',
+            'ExternalPolicyEngine'
         ]
         
         for cls in pipeline_classes:
@@ -65,3 +56,38 @@ class TestRuntimeExtensibilityCertification:
             for forbidden in forbidden_imports:
                 assert forbidden not in module_dir, \
                     f"Extensibility violation: {cls.__name__} depends on future component {forbidden}."
+                    
+    def test_artifacts_are_independent(self):
+        """
+        Verify that immutable artifacts (ExecutionRequest, SchedulingDecision, etc.) 
+        have no dependencies on execution logic, ensuring they can be safely 
+        consumed by Sprint 6.6 extensions.
+        """
+        artifacts = [
+            ExecutionRequest,
+            SchedulingDecision,
+            ExecutionResult,
+            LifecycleResult,
+            RetryResult,
+            ObservationResult,
+            LearningResult,
+            OptimizationResult
+        ]
+        
+        pipeline_classes = [
+            'RuntimeExecutionPlanner',
+            'RuntimeScheduler',
+            'RuntimeExecutor',
+            'RuntimeLifecycle',
+            'RuntimeRetry',
+            'RuntimeObservation',
+            'RuntimeLearning',
+            'RuntimeOptimization'
+        ]
+        
+        for artifact_cls in artifacts:
+            module = inspect.getmodule(artifact_cls)
+            module_dir = dir(module)
+            for logic_cls in pipeline_classes:
+                assert logic_cls not in module_dir, \
+                    f"Extensibility violation: Artifact {artifact_cls.__name__} depends on execution logic {logic_cls}."

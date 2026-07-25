@@ -97,6 +97,9 @@ class RuntimeContext:
         self._runtime_budget_planner = RuntimeBudgetPlanner()
         self._runtime_routing = RuntimeRouting()
         
+        from .executor import RuntimeExecutor
+        self._executor = RuntimeExecutor()
+        
         # Execution State (Passive References)
         self.active_execution_request: Optional[ExecutionRequest] = None
         self.active_execution_status: Optional[ExecutionStatus] = None
@@ -209,6 +212,17 @@ class RuntimeContext:
         rather than constructing independent Scheduler instances.
         """
         return self._scheduler
+
+    @property
+    def executor(self) -> 'RuntimeExecutor':
+        """
+        Expose the canonical Executor subsystem for this Runtime instance.
+        
+        This serves as the single architectural authority for execution decisions.
+        Future Runtime components must obtain execution services through RuntimeContext
+        rather than constructing independent RuntimeExecutor instances.
+        """
+        return self._executor
 
     @property
     def execution_planner(self) -> RuntimeExecutionPlanner:

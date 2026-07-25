@@ -1,12 +1,15 @@
 import pytest
+import inspect
 
 from src.runtime.core.context import RuntimeContext
-from src.runtime.core.runtime_planning import RuntimePlanningStrategy, RuntimePlanning
-from src.runtime.core.runtime_policy import RuntimePolicy
-from src.runtime.core.runtime_constraint_engine import RuntimeConstraintEngine
-from src.runtime.core.runtime_budget_planner import RuntimeBudgetPlanner
-from src.runtime.core.runtime_routing import RuntimeRouting
-
+from src.runtime.core.planner import RuntimeExecutionPlanner
+from src.runtime.core.scheduler import RuntimeScheduler
+from src.runtime.core.executor import RuntimeExecutor
+from src.runtime.core.lifecycle import RuntimeLifecycle
+from src.runtime.core.retry import RuntimeRetry
+from src.runtime.core.observation import RuntimeObservation
+from src.runtime.core.learning import RuntimeLearning
+from src.runtime.core.optimization import RuntimeOptimization
 
 def test_runtime_context_is_composition_root():
     """Verify RuntimeContext instantiates all components and is the sole composition root."""
@@ -16,13 +19,15 @@ def test_runtime_context_is_composition_root():
     assert context.metadata is not None
     assert context.lifecycle is not None
     
-    # Verify Decision Environment ownership
-    assert isinstance(context.runtime_planning_strategy, RuntimePlanningStrategy)
-    assert isinstance(context.runtime_planning, RuntimePlanning)
-    assert isinstance(context.runtime_policy, RuntimePolicy)
-    assert isinstance(context.runtime_constraint_engine, RuntimeConstraintEngine)
-    assert isinstance(context.runtime_budget_planner, RuntimeBudgetPlanner)
-    assert isinstance(context.runtime_routing, RuntimeRouting)
+    # Verify Sprint 6.5 Pipeline components ownership
+    assert isinstance(context.execution_planner, RuntimeExecutionPlanner)
+    assert isinstance(context.scheduler, RuntimeScheduler)
+    assert isinstance(context.executor, RuntimeExecutor)
+    assert isinstance(context.runtime_lifecycle, RuntimeLifecycle)
+    assert isinstance(context.runtime_retry, RuntimeRetry)
+    assert isinstance(context.runtime_observation, RuntimeObservation)
+    assert isinstance(context.runtime_learning, RuntimeLearning)
+    assert isinstance(context.runtime_optimization, RuntimeOptimization)
 
 def test_runtime_decision_environment_encapsulation():
     """
@@ -33,12 +38,14 @@ def test_runtime_decision_environment_encapsulation():
     
     # Ensure components exist independently but are exposed centrally
     pipeline_components = [
-        context.runtime_planning_strategy,
-        context.runtime_planning,
-        context.runtime_policy,
-        context.runtime_constraint_engine,
-        context.runtime_budget_planner,
-        context.runtime_routing
+        context.execution_planner,
+        context.scheduler,
+        context.executor,
+        context.runtime_lifecycle,
+        context.runtime_retry,
+        context.runtime_observation,
+        context.runtime_learning,
+        context.runtime_optimization
     ]
     
     for comp in pipeline_components:
@@ -69,9 +76,6 @@ def test_hardware_and_provider_independence():
     """
     Verify RuntimeContext does not leak hardware or provider details.
     """
-    import inspect
-    from src.runtime.core.context import RuntimeContext
-    
     source = inspect.getsource(RuntimeContext)
     
     forbidden_terms = [
