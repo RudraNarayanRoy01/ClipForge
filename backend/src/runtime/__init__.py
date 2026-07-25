@@ -25,6 +25,7 @@ from .core.model_lifecycle_manager import ModelLifecycleManager
 from .core.provider_health_manager import ProviderHealthManager
 from .core.provider_failover_manager import ProviderFailoverManager
 from .core.runtime_retry_manager import RuntimeRetryManager
+from .core.runtime_scheduling_manager import RuntimeSchedulingManager
 from .domain.provider_registry_model import (
     ProviderType,
     ProviderStatus,
@@ -68,6 +69,13 @@ from .domain.runtime_retry_model import (
     RuntimeRetryDecision,
     RuntimeRetryInfo,
     RuntimeRetryResult
+)
+from .domain.runtime_schedule_model import (
+    RuntimeScheduleState,
+    RuntimeScheduleTrigger,
+    RuntimeScheduleDecision,
+    RuntimeScheduleInfo,
+    RuntimeScheduleResult
 )
 from .core.execution_model import (
     ExecutionIdentity,
@@ -139,4 +147,10 @@ __all__ = [
     "RuntimeRetryDecision",
     "RuntimeRetryInfo",
     "RuntimeRetryResult",
+    "RuntimeSchedulingManager",
+    "RuntimeScheduleState",
+    "RuntimeScheduleTrigger",
+    "RuntimeScheduleDecision",
+    "RuntimeScheduleInfo",
+    "RuntimeScheduleResult",
 ]

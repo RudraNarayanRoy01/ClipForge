@@ -23,6 +23,7 @@ from .model_lifecycle_manager import ModelLifecycleManager
 from .provider_health_manager import ProviderHealthManager
 from .provider_failover_manager import ProviderFailoverManager
 from .runtime_retry_manager import RuntimeRetryManager
+from .runtime_scheduling_manager import RuntimeSchedulingManager
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
@@ -84,6 +85,7 @@ class RuntimeContext:
         self._provider_health_manager = ProviderHealthManager()
         self._provider_failover_manager = ProviderFailoverManager(self._provider_health_manager)
         self._runtime_retry_manager = RuntimeRetryManager(self._provider_failover_manager)
+        self._runtime_scheduling_manager = RuntimeSchedulingManager(self._runtime_retry_manager)
         self._hardware_discovery = RuntimeHardwareDiscovery()
         self._provider_selection = RuntimeProviderSelection(
             self._capability_registry,
@@ -261,6 +263,16 @@ class RuntimeContext:
         RuntimeContext acts as a passive composition root and does not own retry behavior.
         """
         return self._runtime_retry_manager
+
+    @property
+    def runtime_scheduling_manager(self) -> RuntimeSchedulingManager:
+        """
+        Expose the canonical observational Runtime Scheduling Manager for this Runtime instance.
+        
+        This serves as the single source of truth for structural execution eligibility in Sprint 6.6.
+        RuntimeContext acts as a passive composition root and does not own scheduling behavior.
+        """
+        return self._runtime_scheduling_manager
 
     @property
     def hardware_discovery(self) -> RuntimeHardwareDiscovery:
