@@ -8,6 +8,8 @@ from .lifecycle_model import LifecycleResult
 from .lifecycle import RuntimeLifecycleCoordinator, RuntimeLifecycle
 from .retry_model import RetryResult
 from .retry import RuntimeRetry
+from .observation_model import ObservationResult
+from .observation import RuntimeObservation
 from .extension import IRuntimeExtensionPoint
 from .capabilities import RuntimeCapabilityRegistry
 
@@ -63,6 +65,7 @@ class RuntimeContext:
         self._lifecycle_coordinator = RuntimeLifecycleCoordinator()
         self._runtime_lifecycle = RuntimeLifecycle()
         self._runtime_retry = RuntimeRetry()
+        self._runtime_observation = RuntimeObservation()
         self._extension_points: Dict[str, IRuntimeExtensionPoint] = {}
         self._capability_registry = RuntimeCapabilityRegistry()
         self._resource_discovery = RuntimeResourceDiscovery()
@@ -100,6 +103,7 @@ class RuntimeContext:
         self.active_scheduling_decision: Optional[SchedulingDecision] = None
         self.active_lifecycle_result: Optional[LifecycleResult] = None
         self.active_retry_result: Optional[RetryResult] = None
+        self.active_observation_result: Optional[ObservationResult] = None
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -130,6 +134,16 @@ class RuntimeContext:
         It does NOT execute retries, recover state, or schedule work.
         """
         return self._runtime_retry
+
+    @property
+    def runtime_observation(self) -> RuntimeObservation:
+        """
+        Expose the canonical Runtime Observation Engine for this Runtime instance.
+        
+        This handles observation extraction (RetryResult -> ObservationResult).
+        It does NOT continuously monitor Runtime, collect telemetry, or stream events.
+        """
+        return self._runtime_observation
 
     @property
     def capability_registry(self) -> RuntimeCapabilityRegistry:

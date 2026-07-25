@@ -46,6 +46,7 @@ flowchart TD
     Runtime --> Metrics[Runtime Metrics]
     Runtime --> Health[Runtime Health]
     Runtime --> Diagnostics[Runtime Diagnostics]
+    Runtime --> Observation[Runtime Observation]
     Runtime --> Optimization[Runtime Optimization]
     Runtime --> Learning[Runtime Learning]
     
@@ -76,6 +77,7 @@ Runtime -> Provider Ecosystem -> Hardware
 - `ExecutionIdentity`, `ExecutionRequest`, `ExecutionStatus`, `ExecutionResult`: Owned by the Runtime Execution Model.
 - `LifecycleIdentity`, `LifecycleResult`, `LifecycleTransition`, `LifecycleState`, `LifecycleStage`, `LifecycleSummary`: Owned by the Runtime Lifecycle Domain.
 - `RetryIdentity`, `RetryResult`, `RetryDecision`, `RetryReason`, `RetryPolicy`, `RetrySummary`: Owned by the Runtime Retry Domain.
+- `ObservationIdentity`, `ObservationResult`, `ObservationRecord`, `ObservationCategory`, `ObservationSeverity`, `ObservationSummary`: Owned by the Runtime Observation Domain.
 - `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
@@ -86,3 +88,4 @@ Runtime -> Provider Ecosystem -> Hardware
 - Batch 6.5.3 (Runtime Executor) is complete, establishing the Execution Result Domain and RuntimeExecutor service.
 - Batch 6.5.4 (Runtime Lifecycle) is complete, establishing the immutable Lifecycle Domain and RuntimeLifecycle engine.
 - Batch 6.5.5 (Runtime Retry) is complete, establishing the immutable Retry Domain and RuntimeRetry evaluation engine.
+- Batch 6.5.6 (Runtime Observation) is complete, establishing the immutable Observation Domain and RuntimeObservation extraction engine, explicitly distinguished from Monitoring.

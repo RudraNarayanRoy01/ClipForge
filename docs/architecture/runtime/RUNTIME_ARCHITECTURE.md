@@ -247,6 +247,58 @@ It is explicitly **NOT**:
 Future components like Observation will consume `RetryResult`. `RuntimeRetry` must not gradually expand into an observation or recovery engine.
 
 
+## Runtime Observation Domain Model
+
+This section establishes the canonical architectural contract for Runtime Observation (established in Batch 6.5.6).
+It explicitly differentiates between **Runtime Observation** and **Runtime Monitoring**.
+
+### Observation vs. Monitoring
+
+- **Observation**: Represents immutable Runtime understanding. It answers "What Runtime observed" about a completed execution or evaluation.
+- **Monitoring**: Represents continuous active observation. It includes collecting telemetry, tracking metrics, streaming events, publishing logs, and integrating with external observability platforms (e.g., Datadog, Prometheus).
+
+`RuntimeObservation` strictly performs **Observation**. It does **NOT** perform **Monitoring**. Active monitoring is intentionally deferred outside the core Runtime Decision Pipeline.
+
+### Observation Artifacts (Immutable Domain)
+
+Observation artifacts define "What observation produced." They are purely declarative, immutable data objects representing the system's understanding of an event. They contain NO execution logic, scheduling information, retry loops, analytics, or telemetry implementation.
+
+- **ObservationIdentity**: A pure value object representing the permanent identity of an observation (`observation_id`, `created_at`).
+- **ObservationCategory**: A simple classification of the observation (e.g., `EXECUTION`, `LIFECYCLE`, `RETRY`, `RESOURCE`, `SYSTEM`). It does NOT imply severity or trigger behavior.
+- **ObservationSeverity**: A simple classification of impact (e.g., `INFO`, `WARNING`, `ERROR`, `CRITICAL`).
+- **ObservationRecord**: Represents one immutable Runtime observation. It is purely descriptive and does not interpret, recommend actions, or learn patterns.
+- **ObservationSummary**: Immutable summary information (`summary`, `observation_count`, `warning_count`, `error_count`, `critical_count`).
+- **ObservationResult**: The immutable outcome of Runtime observation. It contains the identity, related retry identity, summary, and a list of records.
+
+### RuntimeObservation Service
+
+The `RuntimeObservation` service defines "How Runtime observations are extracted."
+It performs exactly **one responsibility**: `RetryResult` -> `ObservationResult`.
+
+It is explicitly **NOT**:
+- A RuntimeExecutor
+- A RuntimeScheduler
+- A RuntimeLifecycle
+- A RuntimeRetry
+- A Monitoring Engine
+- An Analytics Engine
+- A Learning Engine
+- An Optimization Engine
+- A Recommendation Engine
+
+It owns no execution state and does not implement retry loops, backoffs, or queue management.
+
+### Observation Ownership & Dependency Rules
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **ObservationResult** | Produced and owned by `RuntimeObservation` | Consumed by future Learning components |
+| **ObservationRecord** | Owned by `RuntimeObservation` | Consumed by future Learning components |
+
+**Future Learning & Optimization Responsibilities:**
+Future capabilities like Learning and Optimization will consume `ObservationResult`. `RuntimeObservation` must not gradually expand into an analytics, optimization, or learning engine.
+
+
 ## Runtime Scheduling Domain Model
 
 This section documents the canonical architectural language for Runtime Scheduling (established in Batch 6.5.2).
@@ -327,11 +379,13 @@ Runtime Health
 ↓
 Runtime Diagnostics
 ↓
-Runtime Optimization
+Runtime Observation
 ↓
 Runtime Learning
 ↓
-RuntimePlanning Strategy
+Runtime Optimization
+↓
+Runtime Planning Strategy
 ↓
 Runtime Planning
 ↓
