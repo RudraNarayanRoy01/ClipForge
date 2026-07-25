@@ -47,6 +47,7 @@ flowchart TD
     Runtime --> Health[Runtime Health]
     Runtime --> Diagnostics[Runtime Diagnostics]
     Runtime --> Observation[Runtime Observation]
+    Runtime --> DecisionEngine[Runtime Decision Engine]
     Runtime --> Optimization[Runtime Optimization]
     Runtime --> Learning[Runtime Learning]
     
@@ -101,7 +102,8 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `RuntimeRetryInfo`, `RuntimeRetryState`, `RuntimeRetryTrigger`, `RuntimeRetryDecision`, `RuntimeRetryResult`: Owned by the RuntimeRetryManager.
 - `RuntimeScheduleInfo`, `RuntimeScheduleState`, `RuntimeScheduleTrigger`, `RuntimeScheduleDecision`, `RuntimeScheduleResult`: Owned by the RuntimeSchedulingManager.
 - `RuntimeExecutionInfo`, `RuntimeExecutionState`, `RuntimeExecutionTrigger`, `RuntimeExecutionDecision`, `RuntimeExecutionResult`: Owned by the RuntimeExecutionManager.
-- `RuntimeIntelligenceState`, `RuntimeDecisionType`, `RuntimeDecisionReason`, `RuntimeIntelligencePolicy`, `RuntimeIntelligenceInfo`, `RuntimeDecisionResult`: Owned by the Runtime Intelligence Domain.
+- `RuntimeIntelligenceState`, `RUNTIME_INTELLIGENCE_POLICY`, `RuntimeIntelligenceInfo`: Owned by the Runtime Intelligence Domain.
+- `RuntimeDecisionState`, `RuntimeDecisionType`, `RuntimeDecisionReason`, `RuntimeDecision`, `RuntimeDecisionInfo`, `RuntimeDecisionResult`: Owned by the Runtime Decision Engine.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -124,3 +126,5 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.6.8 (Runtime Scheduling) is complete, establishing the pure structural Execution Eligibility manager.
 - Batch 6.6.9 (Runtime Execution) is complete, establishing the pure structural Execution Preparation manager decoupled from Scheduling.
 - Batch 6.7.1 (Runtime Intelligence Domain) is complete, establishing the immutable vocabulary and transport artifacts for future Runtime Intelligence components.
+- Batch 6.7.2 (Runtime Observation) is complete, establishing the observation domain.
+- Batch 6.7.3 (Runtime Decision Engine) is complete, defining the canonical immutable decision artifact decoupled from its production.

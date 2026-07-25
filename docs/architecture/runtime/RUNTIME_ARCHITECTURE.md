@@ -807,9 +807,15 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 - **Transport Artifact**: `RuntimeDecisionResult` is a passive immutable transport object returned by future components. It is NOT the decision itself. It contains no execution, scheduling, retry, or hardware metadata, and no reasoning or confidence.
 - **Separation**: The Domain is purely declarative. Future components (Observation, Decision Engine, Reasoning, Confidence, Recommendation) consume this Domain, but the Domain never consumes them. The dependency direction must never invert.
 
-### Runtime Observation (Future)
+### Runtime Observation (Batch 6.7.2)
 - **Responsibility**: Permanently owns the Runtime Snapshot, Runtime Signals, Observation Metadata, Runtime Metrics References, and Runtime Observation Artifacts.
 - **Separation**: Observation consumes the Runtime Intelligence Vocabulary. The Intelligence Domain never consumes observations.
+
+### Runtime Decision Engine (Batch 6.7.3)
+- **Responsibility**: Defines the canonical immutable representation of a Runtime Decision. It owns Decision Identity, Decision Classification, Decision Metadata, Decision Lifecycle, and Decision Artifacts.
+- **Constraint**: Must NEVER own decision evaluation, decision reasoning, decision confidence, decision recommendation, optimization, or learning. It establishes the passive decision model, not the active process that produces it.
+- **Decision Artifact vs. Decision Producer**: `RuntimeDecision` is the immutable artifact. Future Runtime Intelligence bounded contexts produce, evaluate, reason about, validate, recommend, and coordinate that artifact. This follows the exact same architectural pattern as `ProviderRegistry` (defines canonical Provider model) and `ModelRegistry` (defines canonical Model metadata).
+- **Boundary**: Runtime Decision consumes Runtime Observation, but Observation never consumes Decision. Runtime Decision must never consume Runtime Reasoning, Runtime Confidence, Runtime Recommendation, or Runtime Decision Coordinator.
 
 ### Future Batch Evolution
 - **Batch 6.7.1**: Runtime Intelligence Vocabulary
