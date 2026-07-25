@@ -58,6 +58,7 @@ flowchart TD
     Providers --> ModelLifecycleManager[Model Lifecycle Manager]
     Providers --> ProviderHealthManager[Provider Health Manager]
     Providers --> ProviderFailoverManager[Provider Failover Manager]
+    Providers --> RuntimeRetryManager[Runtime Retry Manager]
     
     ProviderRegistry --> Local[Local Hardware (CUDA, CPU)]
     Providers --> Cloud[Cloud APIs (OpenAI, Gemini)]
@@ -69,7 +70,7 @@ flowchart TD
 Application -> Runtime Contracts
 Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Executor -> Runtime Lifecycle -> Runtime Retry -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
 Runtime -> Provider Ecosystem -> Hardware
-ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability -> ModelRegistry -> ModelInfo -> ModelLifecycleManager -> ProviderHealthManager -> ProviderFailoverManager
+ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability -> ModelRegistry -> ModelInfo -> ModelLifecycleManager -> ProviderHealthManager -> ProviderFailoverManager -> RuntimeRetryManager
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.
@@ -95,6 +96,7 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `ModelLifecycleInfo`, `ModelLifecycleState`, `ModelLifecycleTransition`, `ModelLifecycleResult`: Owned by the ModelLifecycleManager.
 - `ProviderHealthInfo`, `ProviderHealthState`, `ProviderHealthTransition`, `ProviderHealthResult`: Owned by the ProviderHealthManager.
 - `ProviderFailoverInfo`, `ProviderFailoverState`, `ProviderFailoverTrigger`, `ProviderFailoverDecision`, `ProviderFailoverResult`: Owned by the ProviderFailoverManager.
+- `RuntimeRetryInfo`, `RuntimeRetryState`, `RuntimeRetryTrigger`, `RuntimeRetryDecision`, `RuntimeRetryResult`: Owned by the RuntimeRetryManager.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -113,3 +115,4 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.6.4 (Model Lifecycle) is complete, establishing declarative structural transitions for model states.
 - Batch 6.6.5 (Provider Health) is complete, establishing the observational ProviderHealthManager independent of execution.
 - Batch 6.6.6 (Provider Failover) is complete, establishing the purely structural observational failover manager.
+- Batch 6.6.7 (Runtime Retry) is complete, establishing the purely structural ecosystem retry policy distinct from execution retries.
