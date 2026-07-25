@@ -19,11 +19,18 @@ from .core.lifecycle_model import (
     LifecycleTransition
 )
 from .core.provider_registry import ProviderRegistry
+from .core.provider_capability_registry import ProviderCapabilityRegistry
 from .domain.provider_registry_model import (
     ProviderType,
     ProviderStatus,
     ProviderInfo,
     ProviderRegistryResult
+)
+from .domain.provider_capability_model import (
+    CapabilityType,
+    CapabilityLimits,
+    ProviderCapability,
+    ProviderCapabilityResult
 )
 from .core.execution_model import (
     ExecutionIdentity,
@@ -59,8 +66,13 @@ __all__ = [
     "RuntimeMetadata",
     "ILifecycleAware",
     "ProviderRegistry",
+    "ProviderCapabilityRegistry",
     "ProviderType",
     "ProviderStatus",
     "ProviderInfo",
     "ProviderRegistryResult",
+    "CapabilityType",
+    "CapabilityLimits",
+    "ProviderCapability",
+    "ProviderCapabilityResult",
 ]

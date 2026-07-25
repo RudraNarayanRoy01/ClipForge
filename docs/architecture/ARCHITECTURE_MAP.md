@@ -52,7 +52,10 @@ flowchart TD
     
     Sched --> Providers[Provider Ecosystem]
     
-    Providers --> Local[Local Hardware (CUDA, CPU)]
+    Providers --> ProviderRegistry[Provider Registry - Identity]
+    Providers --> ProviderCapabilityRegistry[Provider Capability Registry - Features]
+    
+    ProviderRegistry --> Local[Local Hardware (CUDA, CPU)]
     Providers --> Cloud[Cloud APIs (OpenAI, Gemini)]
 ```
 
@@ -62,6 +65,7 @@ flowchart TD
 Application -> Runtime Contracts
 Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Executor -> Runtime Lifecycle -> Runtime Retry -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
 Runtime -> Provider Ecosystem -> Hardware
+ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.
@@ -81,6 +85,8 @@ Runtime -> Provider Ecosystem -> Hardware
 - `LearningResult`, `LearningPattern`, `LearningCategory`, `LearningConfidence`, `LearningSummary`: Owned by the Runtime Learning Domain.
 - `OptimizationResult`, `OptimizationDecision`, `OptimizationCategory`, `OptimizationPriority`, `OptimizationSummary`: Owned by the Runtime Optimization Domain.
 - `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
+- `ProviderInfo`, `ProviderStatus`, `ProviderType`: Owned by the ProviderRegistry.
+- `ProviderCapability`, `CapabilityLimits`, `CapabilityType`: Owned by the ProviderCapabilityRegistry.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -93,3 +99,5 @@ Runtime -> Provider Ecosystem -> Hardware
 - Batch 6.5.6 (Runtime Observation) is complete, establishing the immutable Observation Domain and RuntimeObservation extraction engine, explicitly distinguished from Monitoring.
 - Batch 6.5.7 (Runtime Learning) is complete, establishing the immutable Learning Domain and RuntimeLearning extraction engine, explicitly distinguished from Prediction and Optimization.
 - Batch 6.5.8 (Runtime Optimization) is complete, establishing the immutable Optimization Domain and RuntimeOptimization engine, strictly concluding the Sprint 6.5 adaptive pipeline.
+- Batch 6.6.1 (Provider Registry) is complete, establishing the pure metadata registry for Provider Identity.
+- Batch 6.6.2 (Provider Capability) is complete, establishing the ProviderCapabilityRegistry and immutable capability artifacts, enforcing strict separation from Identity.

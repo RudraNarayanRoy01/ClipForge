@@ -737,6 +737,25 @@ The Decision Pipeline (`RuntimePlanningStrategy` → `RuntimePlanning` → `Runt
 The Runtime Application coordinates operations through explicit lifecycle states managed by `RuntimeLifecycleCoordinator`:
 `UNINITIALIZED -> BOOTSTRAPPING -> INITIALIZED -> SHUTTING_DOWN -> SHUTDOWN`
 
+## Provider Ecosystem (Sprint 6.6)
+
+The Provider Ecosystem introduces the canonical architecture for Provider Identity and Provider Capability, explicitly separating these concerns.
+
+### Provider Registry (Identity)
+- **Responsibility**: Owns Provider Identity. Answers "What providers exist?"
+- **Artifacts**: `ProviderInfo`, `ProviderStatus`, `ProviderType`, `ProviderRegistryResult`.
+- **Constraint**: Must never own Provider Capability.
+
+### Provider Capability Registry (Features)
+- **Responsibility**: Owns Provider Capability. Answers "What capabilities does this provider support?"
+- **Artifacts**: `ProviderCapability`, `CapabilityLimits`, `CapabilityType`, `ProviderCapabilityResult`.
+- **Constraint**: Must never own Provider Identity. Must never contain execution behavior, ranking logic, or scheduling configurations.
+
+### Registry Relationship & Integration
+- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability`.
+- **Identity Decoupling**: `ProviderCapability` references only immutable provider identifiers (`provider_id`) and never owns or embeds `ProviderInfo`.
+- **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes `ProviderCapabilityRegistry` and `ProviderRegistry`. `RuntimeContext` must NEVER register capabilities, update capabilities, evaluate capabilities, compare capabilities, mutate capability metadata, perform provider reasoning, or perform orchestration.
+
 ## Runtime Technical Debt Register
 
 To prevent architectural overlap and provide a clear roadmap, execution and provider features are intentionally deferred:
