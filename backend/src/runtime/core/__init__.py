@@ -21,6 +21,15 @@ from .lifecycle_model import (
     LifecycleTransition
 )
 from .lifecycle import RuntimeLifecycleState, RuntimeLifecycleCoordinator, RuntimeLifecycle
+from .retry_model import (
+    RetryResult,
+    RetryDecision,
+    RetryReason,
+    RetryPolicy,
+    RetrySummary,
+    RetryIdentity
+)
+from .retry import RuntimeRetry
 from .extension import IRuntimeExtension, IRuntimeExtensionPoint
 from .context import RuntimeContext
 from .metadata import RuntimeMetadata
@@ -76,6 +85,13 @@ __all__ = [
     "RuntimeLifecycleState",
     "RuntimeLifecycleCoordinator",
     "RuntimeLifecycle",
+    "RetryResult",
+    "RetryDecision",
+    "RetryReason",
+    "RetryPolicy",
+    "RetrySummary",
+    "RetryIdentity",
+    "RuntimeRetry",
     "IRuntimeExtension",
     "IRuntimeExtensionPoint",
     "RuntimeContext",

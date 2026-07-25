@@ -196,6 +196,56 @@ It is explicitly **NOT**:
 **Future Retry & Observation Responsibilities:**
 Future capabilities like Retry and Observation will consume `LifecycleResult` and `LifecycleTransition` directly. `RuntimeLifecycle` will NOT expand into a workflow engine to coordinate these capabilities.
 
+## Runtime Retry Domain Model
+
+This section establishes the canonical architectural contract for Runtime Retry Evaluation (established in Batch 6.5.5).
+It explicitly differentiates between **Retry Evaluation** and **Retry Recovery**.
+
+### Retry Evaluation vs. Retry Recovery
+
+- **Retry Evaluation**: Evaluates *whether* an execution should be attempted again. This is purely a declarative decision.
+- **Retry Recovery**: The active process of executing a retry, reconstructing execution context, or performing a rollback.
+
+`RuntimeRetry` strictly performs **Evaluation**. It does **NOT** perform **Recovery**. Recovery is intentionally deferred to future Runtime capabilities.
+
+### Retry Artifacts (Immutable Domain)
+
+Retry artifacts define "What retry evaluation produced." They are purely declarative, immutable data objects representing evaluation decisions. They contain NO execution behavior, recovery logic, telemetry, or metrics.
+
+- **RetryIdentity**: A pure value object representing the permanent identity of a retry evaluation (`retry_id`, `created_at`).
+- **RetryDecision**: Represents the outcome of retry evaluation (e.g., `RETRY`, `DO_NOT_RETRY`, `MANUAL_REVIEW`, `ABORT`). Answers only "What should happen?" and does not execute the decision.
+- **RetryReason**: Represents why the decision was made (e.g., `TRANSIENT_FAILURE`, `POLICY_LIMIT`).
+- **RetryPolicy**: Purely descriptive policy (`maximum_attempts`, `current_attempt`, `retry_strategy`, `retry_window`). Evaluated by RuntimeRetry, but implemented by future Recovery components.
+- **RetrySummary**: Immutable summary information (`summary`, `reason`, `remaining_attempts`, `warnings`).
+- **RetryResult**: The immutable outcome of Runtime retry evaluation. Consumed by future Recovery and Observation components.
+
+### RuntimeRetry Service
+
+The `RuntimeRetry` service defines "How retry decisions are evaluated."
+It performs exactly **one responsibility**: `LifecycleResult` -> `RetryResult`.
+
+It is explicitly **NOT**:
+- A RuntimeExecutor
+- A RuntimeScheduler
+- A RuntimeLifecycle
+- A Recovery Engine
+- An Observation Service
+- A Learning Engine
+- An Optimization Engine
+- A Workflow Engine
+- A Queue Manager
+- A Resource Manager
+
+### Retry Ownership & Dependency Rules
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **RetryResult** | Produced and owned by `RuntimeRetry` | Consumed by future Recovery, Observation |
+| **RetryDecision** | Owned by `RuntimeRetry` | Consumed by future Recovery |
+
+**Future Observation Responsibilities:**
+Future components like Observation will consume `RetryResult`. `RuntimeRetry` must not gradually expand into an observation or recovery engine.
+
 
 ## Runtime Scheduling Domain Model
 
@@ -435,6 +485,7 @@ The boundary between **Runtime Knowledge** and **Runtime Decision Making** is st
 - **Runtime Orchestrator** → Which prepared stages are ready to coordinate? (Execution Coordination)
 - **Runtime Executor** → Execute exactly the approved SchedulingDecision to produce an immutable ExecutionResult. (Execution)
 - **Runtime Lifecycle** → What is the lifecycle progression of the execution? (Execution Lifecycle)
+- **Runtime Retry** → Should this execution be attempted again? (Retry Evaluation)
 - **Adaptive Runtime** → Dynamically evaluate execution and recommend future adaptations. (Adaptive)
 - **Runtime Monitoring** → Produce immutable observations of completed execution and adaptation. (Observation)
 - **Runtime Telemetry** → Capture Runtime signals. (Signal Capture)

@@ -6,6 +6,8 @@ from .scheduling_model import SchedulingDecision
 from .metadata import RuntimeMetadata
 from .lifecycle_model import LifecycleResult
 from .lifecycle import RuntimeLifecycleCoordinator, RuntimeLifecycle
+from .retry_model import RetryResult
+from .retry import RuntimeRetry
 from .extension import IRuntimeExtensionPoint
 from .capabilities import RuntimeCapabilityRegistry
 
@@ -60,6 +62,7 @@ class RuntimeContext:
         self._metadata = RuntimeMetadata()
         self._lifecycle_coordinator = RuntimeLifecycleCoordinator()
         self._runtime_lifecycle = RuntimeLifecycle()
+        self._runtime_retry = RuntimeRetry()
         self._extension_points: Dict[str, IRuntimeExtensionPoint] = {}
         self._capability_registry = RuntimeCapabilityRegistry()
         self._resource_discovery = RuntimeResourceDiscovery()
@@ -96,6 +99,7 @@ class RuntimeContext:
         self.active_execution_status: Optional[ExecutionStatus] = None
         self.active_scheduling_decision: Optional[SchedulingDecision] = None
         self.active_lifecycle_result: Optional[LifecycleResult] = None
+        self.active_retry_result: Optional[RetryResult] = None
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -116,6 +120,16 @@ class RuntimeContext:
         It does NOT handle application startup/shutdown.
         """
         return self._runtime_lifecycle
+
+    @property
+    def runtime_retry(self) -> RuntimeRetry:
+        """
+        Expose the canonical Runtime Retry Evaluation Engine for this Runtime instance.
+        
+        This handles retry evaluation (LifecycleResult -> RetryResult).
+        It does NOT execute retries, recover state, or schedule work.
+        """
+        return self._runtime_retry
 
     @property
     def capability_registry(self) -> RuntimeCapabilityRegistry:
