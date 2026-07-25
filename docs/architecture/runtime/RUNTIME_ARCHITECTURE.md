@@ -348,6 +348,73 @@ It is explicitly **NOT**:
 Future capabilities like Optimization will consume `LearningResult`. `RuntimeLearning` must not gradually expand into an optimization or prediction engine.
 
 
+## Runtime Optimization Domain Model
+
+This section establishes the canonical architectural contract for Runtime Optimization (established in Batch 6.5.8).
+It explicitly differentiates between **Optimization**, **Execution Application**, and **Resource Management**.
+
+### Optimization vs Application vs Resource Management
+
+- **Optimization**: Derives declarative optimization intents based on learned patterns (e.g., "Reduce GPU memory pressure"). Answers "What optimization is needed?"
+- **Application**: The actual execution of an optimization (e.g., changing parameters, moving workloads). `RuntimeOptimization` NEVER applies optimizations.
+- **Resource Management**: The act of allocating or changing physical/logical resources. `RuntimeOptimization` NEVER performs resource management.
+
+### Optimization Artifacts (Immutable Domain)
+
+Optimization artifacts define "What Runtime Optimization derived." They are purely declarative, immutable data objects. They contain NO executable actions, commands, callbacks, or state transitions.
+
+- **OptimizationCategory**: A simple classification of the optimization (e.g., `EXECUTION`, `RETRY`, `RESOURCE`, `PERFORMANCE`).
+- **OptimizationPriority**: Classification of importance (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
+- **OptimizationDecision**: Represents one immutable optimization intent (`category`, `priority`, `description`, `supporting_patterns`). Must not contain execution commands.
+- **OptimizationSummary**: Immutable summary information (`summary`, `decision_count`, etc.).
+- **OptimizationResult**: The immutable canonical outcome of Runtime optimization. Consumed by future Runtime execution capabilities.
+
+### RuntimeOptimization Service
+
+The `RuntimeOptimization` service defines "How Runtime derives optimization decisions."
+It performs exactly **one responsibility**: `LearningResult` -> `OptimizationResult`.
+
+It is explicitly **NOT**:
+- A RuntimeExecutor
+- A RuntimeScheduler
+- A RuntimeLearning Engine
+- A Resource Manager
+- A Workflow Coordinator
+- A Prediction or Analytics Engine
+
+### Optimization Ownership & Dependency Rules
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **OptimizationResult** | Produced and owned by `RuntimeOptimization` | Consumed by future Runtime capabilities |
+| **OptimizationDecision** | Owned by `RuntimeOptimization` | Consumed by future Runtime capabilities |
+
+**Pipeline Termination:**
+`RuntimeOptimization` is the final stage of the Sprint 6.5 adaptive pipeline. Its responsibility ends immediately after producing `OptimizationResult`.
+
+## Sprint 6.5 Pipeline Certification
+
+Batch 6.5.8 formally certifies that **Sprint 6.5 establishes a complete adaptive Runtime pipeline**.
+
+The completed adaptive pipeline consists of:
+1. **Execution Domain**
+2. **Scheduling Domain**
+3. **Lifecycle Domain**
+4. **Retry Domain**
+5. **Observation Domain**
+6. **Learning Domain**
+7. **Optimization Domain**
+
+**Architectural Invariant for Future Development:**
+Every Runtime stage in this pipeline:
+- Owns exactly one responsibility.
+- Consumes exactly one immutable artifact.
+- Produces exactly one immutable artifact.
+- Hands ownership cleanly to the next Runtime stage.
+
+No dependency may reverse. No ownership may reverse. This sequential, decoupled flow (Execution -> Scheduling -> Lifecycle -> Retry -> Observation -> Learning -> Optimization) serves as the permanent architectural invariant for the Adaptive AI Runtime.
+
+
 
 ## Runtime Scheduling Domain Model
 

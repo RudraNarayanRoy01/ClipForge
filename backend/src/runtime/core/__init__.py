@@ -59,7 +59,14 @@ from .runtime_telemetry import TelemetryStatus, StageTelemetrySnapshot, Telemetr
 from .runtime_metrics import RuntimeMetricStatus, StageRuntimeMetrics, RuntimeMetricsSnapshot, RuntimeMetrics
 from .runtime_health import RuntimeHealthStatus, StageRuntimeHealth, RuntimeHealthReport, RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnosticStatus, StageRuntimeDiagnostic, RuntimeDiagnosticsReport, RuntimeDiagnostics
-from .runtime_optimization import OptimizationPriority, StageOptimizationDecision, OptimizationDecision, RuntimeOptimization
+from .optimization_model import (
+    OptimizationCategory,
+    OptimizationPriority,
+    OptimizationDecision,
+    OptimizationSummary,
+    OptimizationResult
+)
+from .optimization import RuntimeOptimization
 from .learning_model import (
     LearningCategory,
     LearningConfidence,
@@ -179,9 +186,11 @@ __all__ = [
     "StageRuntimeDiagnostic",
     "RuntimeDiagnosticsReport",
     "RuntimeDiagnostics",
+    "OptimizationCategory",
     "OptimizationPriority",
-    "StageOptimizationDecision",
     "OptimizationDecision",
+    "OptimizationSummary",
+    "OptimizationResult",
     "RuntimeOptimization",
     "LearningCategory",
     "LearningConfidence",

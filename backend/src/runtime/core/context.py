@@ -30,7 +30,7 @@ from .runtime_telemetry import RuntimeTelemetry
 from .runtime_metrics import RuntimeMetrics
 from .runtime_health import RuntimeHealth
 from .runtime_diagnostics import RuntimeDiagnostics
-from .runtime_optimization import RuntimeOptimization
+from .optimization import RuntimeOptimization
 from .learning import RuntimeLearning
 from .runtime_planning import RuntimePlanning, RuntimePlanningStrategy
 from .runtime_policy import RuntimePolicy

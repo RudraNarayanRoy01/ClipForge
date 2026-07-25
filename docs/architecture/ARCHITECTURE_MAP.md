@@ -79,6 +79,7 @@ Runtime -> Provider Ecosystem -> Hardware
 - `RetryIdentity`, `RetryResult`, `RetryDecision`, `RetryReason`, `RetryPolicy`, `RetrySummary`: Owned by the Runtime Retry Domain.
 - `ObservationIdentity`, `ObservationResult`, `ObservationRecord`, `ObservationCategory`, `ObservationSeverity`, `ObservationSummary`: Owned by the Runtime Observation Domain.
 - `LearningResult`, `LearningPattern`, `LearningCategory`, `LearningConfidence`, `LearningSummary`: Owned by the Runtime Learning Domain.
+- `OptimizationResult`, `OptimizationDecision`, `OptimizationCategory`, `OptimizationPriority`, `OptimizationSummary`: Owned by the Runtime Optimization Domain.
 - `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
@@ -91,3 +92,4 @@ Runtime -> Provider Ecosystem -> Hardware
 - Batch 6.5.5 (Runtime Retry) is complete, establishing the immutable Retry Domain and RuntimeRetry evaluation engine.
 - Batch 6.5.6 (Runtime Observation) is complete, establishing the immutable Observation Domain and RuntimeObservation extraction engine, explicitly distinguished from Monitoring.
 - Batch 6.5.7 (Runtime Learning) is complete, establishing the immutable Learning Domain and RuntimeLearning extraction engine, explicitly distinguished from Prediction and Optimization.
+- Batch 6.5.8 (Runtime Optimization) is complete, establishing the immutable Optimization Domain and RuntimeOptimization engine, strictly concluding the Sprint 6.5 adaptive pipeline.
