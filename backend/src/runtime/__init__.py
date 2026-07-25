@@ -85,6 +85,14 @@ from .domain.runtime_execution_model import (
     RuntimeExecutionInfo,
     RuntimeExecutionResult
 )
+from .domain.runtime_intelligence_model import (
+    RuntimeIntelligenceState,
+    RuntimeDecisionType,
+    RuntimeDecisionReason,
+    RUNTIME_INTELLIGENCE_POLICY,
+    RuntimeIntelligenceInfo,
+    RuntimeDecisionResult
+)
 from .core.execution_model import (
     ExecutionIdentity,
     ExecutionRequest,
@@ -167,4 +175,10 @@ __all__ = [
     "RuntimeExecutionDecision",
     "RuntimeExecutionInfo",
     "RuntimeExecutionResult",
+    "RuntimeIntelligenceState",
+    "RuntimeDecisionType",
+    "RuntimeDecisionReason",
+    "RUNTIME_INTELLIGENCE_POLICY",
+    "RuntimeIntelligenceInfo",
+    "RuntimeDecisionResult",
 ]

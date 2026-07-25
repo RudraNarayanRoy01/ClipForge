@@ -796,6 +796,31 @@ The Provider Ecosystem introduces the canonical architecture for Provider Identi
 - **Identity Decoupling**: `ModelInfo`, `ProviderCapability`, `ProviderHealthInfo`, `ProviderFailoverInfo`, `RuntimeRetryInfo`, `RuntimeScheduleInfo`, and `RuntimeExecutionInfo` reference only immutable provider identifiers (`provider_id`) and never own or embed `ProviderInfo` or each other.
 - **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes the registries and managers. `RuntimeContext` must NEVER register models, evaluate capabilities, evaluate health, evaluate failovers, mutate metadata, perform provider reasoning, or perform orchestration.
 
+## Adaptive Runtime Intelligence (Sprint 6.7)
+
+The Adaptive Runtime Intelligence subsystem introduces the capability for the Runtime to reason about, observe, and optimize its own execution independently.
+
+### Runtime Intelligence Domain (Vocabulary)
+- **Responsibility**: Owns the vocabulary for Runtime Intelligence. Answers "What vocabulary describes Runtime Intelligence?"
+- **Artifacts**: `RuntimeIntelligenceState`, `RuntimeDecisionType`, `RuntimeDecisionReason`, `RuntimeIntelligencePolicy`, `RuntimeIntelligenceInfo`, `RuntimeDecisionResult`.
+- **Constraint**: Must NEVER own decision making, reasoning, observations, confidence scoring, recommendations, execution, optimization, or learning. 
+- **Transport Artifact**: `RuntimeDecisionResult` is a passive immutable transport object returned by future components. It is NOT the decision itself. It contains no execution, scheduling, retry, or hardware metadata, and no reasoning or confidence.
+- **Separation**: The Domain is purely declarative. Future components (Observation, Decision Engine, Reasoning, Confidence, Recommendation) consume this Domain, but the Domain never consumes them. The dependency direction must never invert.
+
+### Runtime Observation (Future)
+- **Responsibility**: Permanently owns the Runtime Snapshot, Runtime Signals, Observation Metadata, Runtime Metrics References, and Runtime Observation Artifacts.
+- **Separation**: Observation consumes the Runtime Intelligence Vocabulary. The Intelligence Domain never consumes observations.
+
+### Future Batch Evolution
+- **Batch 6.7.1**: Runtime Intelligence Vocabulary
+- **Batch 6.7.2**: Runtime Observation
+- **Batch 6.7.3**: Runtime Decision Engine
+- **Batch 6.7.4**: Runtime Reasoning
+- **Batch 6.7.5**: Runtime Confidence
+- **Batch 6.7.6**: Runtime Recommendation
+- **Batch 6.7.7**: Runtime Decision Coordinator
+- **Batch 6.7.8**: Runtime Intelligence Context
+
 ## Runtime Technical Debt Register
 
 To prevent architectural overlap and provide a clear roadmap, execution and provider features are intentionally deferred:
