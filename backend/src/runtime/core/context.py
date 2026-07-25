@@ -19,6 +19,7 @@ from .providers import RuntimeProviderRegistry
 from .provider_registry import ProviderRegistry
 from .provider_capability_registry import ProviderCapabilityRegistry
 from .model_registry import ModelRegistry
+from .model_lifecycle_manager import ModelLifecycleManager
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
@@ -76,6 +77,7 @@ class RuntimeContext:
         self._ai_provider_registry = ProviderRegistry()
         self._provider_capability_registry = ProviderCapabilityRegistry()
         self._model_registry = ModelRegistry()
+        self._model_lifecycle_manager = ModelLifecycleManager()
         self._hardware_discovery = RuntimeHardwareDiscovery()
         self._provider_selection = RuntimeProviderSelection(
             self._capability_registry,
@@ -213,6 +215,16 @@ class RuntimeContext:
         RuntimeContext acts as a passive composition root and does not own registry behavior.
         """
         return self._model_registry
+
+    @property
+    def model_lifecycle_manager(self) -> ModelLifecycleManager:
+        """
+        Expose the canonical declarative Model Lifecycle Manager for this Runtime instance.
+        
+        This serves as the single source of truth for model lifecycle states in Sprint 6.6.
+        RuntimeContext acts as a passive composition root and does not own lifecycle behavior.
+        """
+        return self._model_lifecycle_manager
 
     @property
     def hardware_discovery(self) -> RuntimeHardwareDiscovery:
