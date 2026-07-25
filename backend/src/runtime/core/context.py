@@ -1,6 +1,7 @@
 from typing import Dict, Optional
 
 from .execution_model import ExecutionRequest, ExecutionStatus
+from .scheduling_model import SchedulingDecision
 from .metadata import RuntimeMetadata
 from .lifecycle import RuntimeLifecycleCoordinator
 from .extension import IRuntimeExtensionPoint
@@ -92,6 +93,7 @@ class RuntimeContext:
         # Execution State (Passive References)
         self.active_execution_request: Optional[ExecutionRequest] = None
         self.active_execution_status: Optional[ExecutionStatus] = None
+        self.active_scheduling_decision: Optional[SchedulingDecision] = None
 
     @property
     def metadata(self) -> RuntimeMetadata:

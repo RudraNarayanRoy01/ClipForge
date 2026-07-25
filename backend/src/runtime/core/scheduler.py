@@ -1,119 +1,98 @@
-from dataclasses import dataclass, field
-from enum import Enum, auto
+import time
+import uuid
 from typing import Dict, Any, Optional
 
-from .selection import ProviderSelectionResult
-from .providers import ProviderIdentity
-
-class SchedulingStatus(Enum):
-    """
-    Architectural status of a scheduling outcome.
-    
-    This represents the operational decision outcome only.
-    It must NOT represent execution success, provider health,
-    runtime metrics, or optimization status.
-    """
-    SCHEDULED = auto()
-    REJECTED_NO_ELIGIBLE_PROVIDER = auto()
-    REJECTED_CONSTRAINTS = auto()
-
-
-@dataclass(frozen=True)
-class SchedulerRequest:
-    """
-    Immutable representation of a scheduling decision request.
-    
-    This object represents the intent to schedule architecturally eligible work.
-    It MUST NOT contain:
-    - execution state
-    - retry information
-    - runtime metrics
-    - provider instances
-    - optimization hints
-    - execution progress
-    - allocated resources
-    
-    After creation, this request is completely immutable.
-    """
-    selection_result: ProviderSelectionResult
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass(frozen=True)
-class SchedulerResult:
-    """
-    Immutable representation of the scheduling outcome.
-    
-    This object represents the operational decision of WHERE and WHEN 
-    eligible work should execute.
-    
-    It MUST NOT contain:
-    - execution plans
-    - execution graph
-    - allocated hardware
-    - execution state
-    - provider instances
-    - runtime metrics
-    - optimization decisions
-    - execution results
-    
-    Future Runtime layers should consume SchedulerResult rather than 
-    extending or mutating it.
-    """
-    status: SchedulingStatus
-    execution_placement: Optional[ProviderIdentity]
-    execution_ordering: str
-    scheduling_reasoning: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+from .execution_model import ExecutionRequest
+from .scheduling_model import (
+    SchedulingIdentity,
+    SchedulingDecision,
+    SchedulingStatus,
+    SchedulingPolicy,
+    SchedulingStrategy,
+    SchedulingPriority,
+    QueueClassification
+)
 
 
 class RuntimeScheduler:
     """
     The canonical architectural scheduling engine for the Runtime.
     
-    This subsystem determines *where* and *when* architecturally eligible
-    work should execute.
+    This subsystem determines *whether*, *when*, *how*, and in *which logical queue* 
+    approved work should execute.
     
     It explicitly performs **Operational Decision Making** only.
     
-    It MUST NOT determine:
-    - how work executes
-    - provider optimization
-    - execution graph
-    - dependency graph
-    - retry strategy
-    - workload orchestration
-    - adaptive optimization
+    It MUST NOT:
+    - Execute work (Not an execution engine)
+    - Manage queues (Not a queue manager)
+    - Retry work (Not a retry coordinator)
+    - Manage lifecycle (Not a lifecycle manager)
+    - Define policy (Not a policy engine)
     
-    It intentionally has NO ability to instantiate providers, execute providers,
-    allocate hardware, monitor runtime, or orchestrate execution. Those responsibilities 
-    belong to future Execution, Planning, and Optimization subsystems.
+    The evaluation flow is strictly:
+    ExecutionRequest 
+      -> Read Scheduling Policy 
+      -> Read Scheduling Strategy 
+      -> Evaluate Scheduling Decision 
+      -> Produce immutable SchedulingDecision
+      
+    No mutation occurs.
     """
     def __init__(self) -> None:
         pass
 
-    def schedule(self, request: SchedulerRequest) -> SchedulerResult:
+    def schedule(
+        self, 
+        request: ExecutionRequest,
+        policy: SchedulingPolicy = SchedulingPolicy.IMMEDIATE,
+        strategy: SchedulingStrategy = SchedulingStrategy.FIFO,
+        priority: SchedulingPriority = SchedulingPriority.NORMAL,
+        queue_classification: QueueClassification = QueueClassification.BACKGROUND
+    ) -> SchedulingDecision:
         """
-        Evaluate scheduling constraints and determine execution placement and ordering
-        based on the ProviderSelectionResult.
-        """
-        selection = request.selection_result
+        Evaluate an ExecutionRequest and produce a SchedulingDecision.
         
-        if not selection.selected_provider_identity:
-            return SchedulerResult(
-                status=SchedulingStatus.REJECTED_NO_ELIGIBLE_PROVIDER,
-                execution_placement=None,
-                execution_ordering="IMMEDIATE",  # Fallback ordering
-                scheduling_reasoning="Provider Selection yielded no eligible provider.",
-                metadata={"selection_status": selection.status.name}
-            )
+        The provided arguments (policy, strategy, priority, queue_classification)
+        represent architectural assumptions or inputs supplied by the Runtime Policy layer.
+        The Scheduler consumes these inputs but does NOT own permanent defaults.
+        """
+        
+        # 1. Evaluate Scheduling Identity
+        schedule_id = f"sch_{uuid.uuid4().hex}"
+        current_time = time.time()
+        
+        identity = SchedulingIdentity(
+            schedule_id=schedule_id,
+            created_at=current_time,
+            execution_identity=request.identity
+        )
+        
+        # 2. Evaluate Scheduling Status based on policy and constraints
+        # In a fully fleshed out system, this would evaluate actual readiness.
+        # For this architectural boundary, we assume it's READY.
+        status = SchedulingStatus.READY
+        
+        if policy == SchedulingPolicy.DEFERRED:
+            status = SchedulingStatus.DEFERRED
             
-        # In this foundation batch, scheduling is naive.
-        # If the provider is eligible, it is scheduled for IMMEDIATE placement on that provider.
-        return SchedulerResult(
-            status=SchedulingStatus.SCHEDULED,
-            execution_placement=selection.selected_provider_identity,
-            execution_ordering="IMMEDIATE",
-            scheduling_reasoning=f"Work scheduled for IMMEDIATE placement on provider '{selection.selected_provider_identity.identifier}'.",
-            metadata={"selection_status": selection.status.name}
+        reasoning = (
+            f"Evaluated ExecutionRequest {request.identity.execution_id}. "
+            f"Policy: {policy.name}. Strategy: {strategy.name}."
+        )
+
+        # 3. Produce Immutable SchedulingDecision
+        return SchedulingDecision(
+            identity=identity,
+            execution_identity=request.identity,
+            status=status,
+            priority=priority,
+            policy=policy,
+            strategy=strategy,
+            queue_classification=queue_classification,
+            scheduling_timestamp=current_time,
+            scheduling_reasoning=reasoning,
+            metadata={
+                "source_request_id": request.identity.execution_id
+            }
         )

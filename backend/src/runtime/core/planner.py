@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Dict, Any, List
+from typing import Dict, Any, List, TYPE_CHECKING
 
-from .scheduler import SchedulerResult
+if TYPE_CHECKING:
+    from .scheduling_model import SchedulingDecision
 
 
 class PlanningStatus(Enum):
@@ -41,7 +42,7 @@ class PlanningRequest:
     
     After creation, this request remains completely immutable.
     """
-    scheduler_result: SchedulerResult
+    scheduling_decision: 'SchedulingDecision'
     execution_intent: str
     workload_identity: str
     planning_constraints: Dict[str, Any] = field(default_factory=dict)
@@ -112,11 +113,11 @@ class RuntimeExecutionPlanner:
         into an immutable ExecutionPlan containing logical execution stages.
         """
         # Validate planning inputs
-        if request.scheduler_result is None:
+        if request.scheduling_decision is None:
             return ExecutionPlan(
                 status=PlanningStatus.INVALID_REQUEST,
                 logical_execution_stages=[],
-                planning_rationale="PlanningRequest must contain a valid SchedulerResult.",
+                planning_rationale="PlanningRequest must contain a valid SchedulingDecision.",
                 planning_metadata={}
             )
 
@@ -143,7 +144,7 @@ class RuntimeExecutionPlanner:
                 "Generic Capability Execution"
             ]
 
-        rationale = f"Planned {len(logical_stages)} logical stages for intent '{request.execution_intent}' based on scheduling outcome '{request.scheduler_result.status.name}'."
+        rationale = f"Planned {len(logical_stages)} logical stages for intent '{request.execution_intent}' based on scheduling outcome '{request.scheduling_decision.status.name}'."
 
         return ExecutionPlan(
             status=PlanningStatus.PLANNED,
@@ -151,6 +152,6 @@ class RuntimeExecutionPlanner:
             planning_rationale=rationale,
             planning_metadata={
                 "workload_identity": request.workload_identity,
-                "provider_placement": request.scheduler_result.execution_placement.identifier if request.scheduler_result.execution_placement else "UNASSIGNED"
+                "scheduling_identity": request.scheduling_decision.identity.schedule_id
             }
         )

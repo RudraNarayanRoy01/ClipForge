@@ -18,7 +18,16 @@ from .discovery import ResourceCategory, ResourceDescriptor, DiscoveryResult, Ru
 from .providers import ProviderCategory, ProviderIdentity, ProviderDescriptor, ProviderRegistration, RuntimeProviderRegistry
 from .hardware import HardwareCategory, HardwareIdentity, HardwareDescriptor, HardwareRegistration, RuntimeHardwareDiscovery
 from .selection import ProviderSelectionStatus, ProviderSelectionRequest, ProviderSelectionResult, RuntimeProviderSelection
-from .scheduler import SchedulingStatus, SchedulerRequest, SchedulerResult, RuntimeScheduler
+from .scheduling_model import (
+    SchedulingIdentity, 
+    SchedulingDecision, 
+    SchedulingStatus, 
+    SchedulingPriority, 
+    SchedulingPolicy, 
+    SchedulingStrategy, 
+    QueueClassification
+)
+from .scheduler import RuntimeScheduler
 from .planner import PlanningStatus, PlanningRequest, ExecutionPlan, RuntimeExecutionPlanner
 from .execution_graph import GraphValidationStatus, ExecutionGraphNode, ExecutionDependency, ExecutionGraph, RuntimeExecutionGraphBuilder
 from .resource_allocator import LogicalResourceProfile, AllocationValidationStatus, StageAllocation, AllocationResult, RuntimeResourceAllocator
@@ -74,9 +83,13 @@ __all__ = [
     "ProviderSelectionRequest",
     "ProviderSelectionResult",
     "RuntimeProviderSelection",
+    "SchedulingIdentity",
+    "SchedulingDecision",
     "SchedulingStatus",
-    "SchedulerRequest",
-    "SchedulerResult",
+    "SchedulingPriority",
+    "SchedulingPolicy",
+    "SchedulingStrategy",
+    "QueueClassification",
     "RuntimeScheduler",
     "PlanningStatus",
     "PlanningRequest",

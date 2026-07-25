@@ -128,6 +128,37 @@ Execution artifacts are purely declarative, immutable data objects representing 
 - Execution artifacts may depend upon Runtime Decisions (e.g., `PlanningDecision`, `PolicyDecision`).
 - Runtime Decisions must NEVER depend upon Execution artifacts. Dependency direction must never reverse.
 
+## Runtime Scheduling Domain Model
+
+This section documents the canonical architectural language for Runtime Scheduling (established in Batch 6.5.2).
+
+### Scheduling Artifacts (Immutable Domain)
+
+Scheduling artifacts define "What scheduling is." They are purely declarative, immutable data objects representing scheduling decisions. They contain NO business logic, execution state, retry info, or resource allocation.
+
+- **SchedulingIdentity**: A pure value object representing the permanent identity of a schedule (`schedule_id`, `created_at`, `execution_identity`).
+- **SchedulingDecision**: Represents "What the scheduler decided", never "What actually executed." Encompasses Status, Priority, Policy, Strategy, and Classification.
+- **SchedulingStatus**: The architectural status of the scheduling intent (`READY`, `QUEUED`, `DEFERRED`, `BLOCKED`, `REJECTED`).
+- **SchedulingPriority**: The logical precedence of the work (`CRITICAL`, `HIGH`, `NORMAL`, `LOW`, `BACKGROUND`).
+- **SchedulingPolicy**: The business rules governing the scheduling (`IMMEDIATE`, `DEFERRED`, `BACKGROUND`).
+- **SchedulingStrategy**: How scheduling decisions are evaluated (`PRIORITY_FIRST`, `ROUND_ROBIN`, `FIFO`).
+- **QueueClassification**: Purely declarative logical queue classification (`INTERACTIVE`, `BACKGROUND`, `BATCH`). Does NOT imply physical queue storage.
+
+### RuntimeScheduler Service
+
+The `RuntimeScheduler` performs exactly one responsibility: `ExecutionRequest -> SchedulingDecision`.
+It defines "How scheduling decisions are produced."
+
+- **Policy-Neutral**: The scheduler consumes, evaluates, and produces, but never invents policy. It does not own permanent defaults.
+- **Evaluation Flow**: `ExecutionRequest` -> Read Scheduling Policy -> Read Scheduling Strategy -> Evaluate Scheduling Decision -> Produce immutable `SchedulingDecision`.
+- **Constraints**: It is NOT an execution engine, queue manager, workflow engine, lifecycle manager, or retry coordinator. It owns no execution state and performs no mutations.
+
+### Ownership & Dependency Rules
+
+- `SchedulingDecision` is exclusively produced and owned by `RuntimeScheduler`.
+- Dependency direction strictly flows: `ExecutionRequest` -> `RuntimeScheduler` -> `SchedulingDecision` -> `RuntimeExecutor`.
+- `SchedulingDecision` must never depend on execution artifacts (e.g., `ExecutionResult`).
+
 ## Runtime Dependency Direction
 
 The explicit dependency direction introduced by Runtime Context and Capability Registry:

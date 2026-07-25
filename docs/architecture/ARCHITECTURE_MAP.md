@@ -71,8 +71,10 @@ Runtime -> Provider Ecosystem -> Hardware
 - `BudgetDecision`: Owned exclusively by `RuntimeBudgetPlanner`.
 - `RoutingDecision`: Owned exclusively by `RuntimeRouting`.
 - `ExecutionIdentity`, `ExecutionRequest`, `ExecutionStatus`, `ExecutionResult`: Owned by the Runtime Execution Model.
+- `SchedulingIdentity`, `SchedulingDecision`: Owned by the RuntimeScheduler subsystem.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
 - Sprint 6.4 (Planning & Policy) is formally certified and architecturally complete. Future components integrate via composition on the RuntimeContext.
 - Batch 6.5.1 (Runtime Execution Model) is complete, establishing pure declarative execution artifacts.
+- Batch 6.5.2 (Runtime Scheduler) is complete, establishing the immutable Scheduling Domain Model.
