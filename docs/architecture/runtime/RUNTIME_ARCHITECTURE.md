@@ -751,10 +751,15 @@ The Provider Ecosystem introduces the canonical architecture for Provider Identi
 - **Artifacts**: `ProviderCapability`, `CapabilityLimits`, `CapabilityType`, `ProviderCapabilityResult`.
 - **Constraint**: Must never own Provider Identity. Must never contain execution behavior, ranking logic, or scheduling configurations.
 
+### Model Registry (Models)
+- **Responsibility**: Owns Model Metadata. Answers "What models are available?"
+- **Artifacts**: `ModelInfo`, `ModelType`, `ModelStatus`, `ModelRegistryResult`.
+- **Constraint**: Must never own Provider Identity or Provider Capability. Must never become a Model Loader, Initializer, Resolver, Selector, Evaluator, or Execution Planner.
+
 ### Registry Relationship & Integration
-- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability`.
-- **Identity Decoupling**: `ProviderCapability` references only immutable provider identifiers (`provider_id`) and never owns or embeds `ProviderInfo`.
-- **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes `ProviderCapabilityRegistry` and `ProviderRegistry`. `RuntimeContext` must NEVER register capabilities, update capabilities, evaluate capabilities, compare capabilities, mutate capability metadata, perform provider reasoning, or perform orchestration.
+- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability` -> `ModelRegistry` (Models) -> `ModelInfo`.
+- **Identity Decoupling**: `ModelInfo` and `ProviderCapability` reference only immutable provider identifiers (`provider_id`) and never own or embed `ProviderInfo`.
+- **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes `ProviderCapabilityRegistry`, `ProviderRegistry`, and `ModelRegistry`. `RuntimeContext` must NEVER register models, evaluate capabilities, compare capabilities, mutate metadata, perform provider reasoning, or perform orchestration.
 
 ## Runtime Technical Debt Register
 

@@ -20,6 +20,7 @@ from .core.lifecycle_model import (
 )
 from .core.provider_registry import ProviderRegistry
 from .core.provider_capability_registry import ProviderCapabilityRegistry
+from .core.model_registry import ModelRegistry
 from .domain.provider_registry_model import (
     ProviderType,
     ProviderStatus,
@@ -31,6 +32,12 @@ from .domain.provider_capability_model import (
     CapabilityLimits,
     ProviderCapability,
     ProviderCapabilityResult
+)
+from .domain.model_registry_model import (
+    ModelType,
+    ModelStatus,
+    ModelInfo,
+    ModelRegistryResult
 )
 from .core.execution_model import (
     ExecutionIdentity,
@@ -75,4 +82,9 @@ __all__ = [
     "CapabilityLimits",
     "ProviderCapability",
     "ProviderCapabilityResult",
+    "ModelRegistry",
+    "ModelType",
+    "ModelStatus",
+    "ModelInfo",
+    "ModelRegistryResult",
 ]

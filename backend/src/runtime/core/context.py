@@ -18,6 +18,7 @@ from .discovery import RuntimeResourceDiscovery
 from .providers import RuntimeProviderRegistry
 from .provider_registry import ProviderRegistry
 from .provider_capability_registry import ProviderCapabilityRegistry
+from .model_registry import ModelRegistry
 from .hardware import RuntimeHardwareDiscovery
 from .selection import RuntimeProviderSelection
 from .scheduler import RuntimeScheduler
@@ -74,6 +75,7 @@ class RuntimeContext:
         self._provider_registry = RuntimeProviderRegistry()
         self._ai_provider_registry = ProviderRegistry()
         self._provider_capability_registry = ProviderCapabilityRegistry()
+        self._model_registry = ModelRegistry()
         self._hardware_discovery = RuntimeHardwareDiscovery()
         self._provider_selection = RuntimeProviderSelection(
             self._capability_registry,
@@ -201,6 +203,16 @@ class RuntimeContext:
         RuntimeContext acts as a passive composition root and does not own registry behavior.
         """
         return self._provider_capability_registry
+
+    @property
+    def model_registry(self) -> ModelRegistry:
+        """
+        Expose the canonical metadata Model Registry for this Runtime instance.
+        
+        This serves as the single source of truth for model metadata in Sprint 6.6.
+        RuntimeContext acts as a passive composition root and does not own registry behavior.
+        """
+        return self._model_registry
 
     @property
     def hardware_discovery(self) -> RuntimeHardwareDiscovery:
