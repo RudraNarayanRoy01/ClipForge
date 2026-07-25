@@ -36,6 +36,7 @@ from .metadata import RuntimeMetadata
 from .capabilities import CapabilityCategory, CapabilityDescriptor, RuntimeCapabilityRegistry
 from .discovery import ResourceCategory, ResourceDescriptor, DiscoveryResult, RuntimeResourceDiscovery
 from .providers import ProviderCategory, ProviderIdentity, ProviderDescriptor, ProviderRegistration, RuntimeProviderRegistry
+from .provider_registry import ProviderRegistry
 from .hardware import HardwareCategory, HardwareIdentity, HardwareDescriptor, HardwareRegistration, RuntimeHardwareDiscovery
 from .selection import ProviderSelectionStatus, ProviderSelectionRequest, ProviderSelectionResult, RuntimeProviderSelection
 from .scheduling_model import (
@@ -122,6 +123,7 @@ __all__ = [
     "ProviderDescriptor",
     "ProviderRegistration",
     "RuntimeProviderRegistry",
+    "ProviderRegistry",
     "HardwareCategory",
     "HardwareIdentity",
     "HardwareDescriptor",

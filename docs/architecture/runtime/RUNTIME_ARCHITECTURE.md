@@ -447,6 +447,64 @@ It defines "How scheduling decisions are produced."
 - Dependency direction strictly flows: `ExecutionRequest` -> `RuntimeScheduler` -> `SchedulingDecision` -> `RuntimeExecutor`.
 - `SchedulingDecision` must never depend on execution artifacts (e.g., `ExecutionResult`).
 
+## Runtime Provider Registry Domain Model
+
+This section documents the canonical architectural language for the Provider Registry (established in Batch 6.6.1).
+
+### Provider Registry vs. Provider Execution
+
+- **Provider Registry**: Represents immutable Provider identity and metadata. It answers "What providers exist?".
+- **Provider Execution**: The active process of executing a provider. `ProviderRegistry` strictly performs metadata management and NEVER executes providers or builds provider instances.
+
+### Provider Registry Artifacts (Immutable Domain)
+
+Provider Registry artifacts define "What providers exist." They are purely declarative, immutable data objects representing provider metadata. They contain NO runtime state, authentication, or network logic.
+
+- **ProviderType**: A simple classification (`LOCAL`, `CLOUD`, `HYBRID`).
+- **ProviderStatus**: The registration state (`REGISTERED`, `DISABLED`, `DEPRECATED`).
+- **ProviderInfo**: Represents immutable metadata for a provider (`provider_id`, `display_name`, `provider_type`, `registration_status`, `endpoint_type`).
+- **ProviderRegistryResult**: The immutable outcome of registry operations, containing registered providers and a summary.
+
+### ProviderRegistry Service
+
+The `ProviderRegistry` defines "How provider identity is managed."
+It performs exactly **one responsibility**: Managing provider identity and registration.
+
+It is explicitly **NOT**:
+- A Provider Factory or Builder
+- A Provider Selector
+- A Provider Lifecycle Manager
+- A Provider Health Monitor
+- A Capability Manager
+- A Networking Layer
+
+### Ownership & Dependency Rules
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **ProviderInfo** | Owned by `ProviderRegistry` | Consumed by future Provider Selection components |
+| **ProviderRegistryResult** | Produced and owned by `ProviderRegistry` | Consumed by future Provider Selection components |
+
+**Certification Invariant:**
+
+RuntimeContext
+↓
+Composition Root
+↓
+Dependency Wiring
+↓
+Service Exposure
+
+ProviderRegistry
+↓
+Provider Identity
+↓
+Provider Registration
+↓
+Provider Discovery
+
+These responsibilities remain permanently separated.
+
 ## Runtime Dependency Direction
 
 The explicit dependency direction introduced by Runtime Context and Capability Registry:
