@@ -51,6 +51,7 @@ flowchart TD
     Runtime --> Reasoning[Runtime Reasoning]
     Runtime --> Confidence[Runtime Confidence]
     Runtime --> Recommendation[Runtime Recommendation]
+    Runtime --> DecisionCoordinator[Runtime Decision Coordinator]
     Runtime --> Optimization[Runtime Optimization]
     Runtime --> Learning[Runtime Learning]
     
@@ -76,7 +77,7 @@ flowchart TD
 Application -> Runtime Contracts
 Application -> Runtime Bootstrap -> Runtime Context -> Runtime Capability Registry -> Runtime Resource Discovery -> Runtime Provider Registry -> Runtime Hardware Discovery -> Hardware Registrations -> Runtime Provider Selection -> Runtime Scheduler -> Runtime Execution Planner -> Runtime Execution Graph Builder -> Runtime Resource Allocator -> Runtime Execution Context Factory -> Runtime Orchestrator -> Runtime Executor -> Runtime Lifecycle -> Runtime Retry -> Adaptive Runtime -> Runtime Monitoring -> Runtime Telemetry -> Runtime Metrics -> Runtime Health -> Runtime Diagnostics -> Runtime Optimization -> Runtime Learning -> Runtime Planning Strategy -> Runtime Planning -> Runtime Policy -> Runtime Constraint Engine -> Runtime Budget Planner -> Runtime Routing
 Runtime -> Provider Ecosystem -> Hardware
-ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability -> ModelRegistry -> ModelInfo -> ModelLifecycleManager -> ProviderHealthManager -> ProviderFailoverManager -> RuntimeRetryManager -> RuntimeSchedulingManager -> RuntimeExecutionManager -> Runtime Intelligence Domain -> Runtime Observation -> Runtime Decision Engine -> Runtime Reasoning -> Runtime Confidence -> Runtime Recommendation -> Runtime Intelligence Context
+ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapability -> ModelRegistry -> ModelInfo -> ModelLifecycleManager -> ProviderHealthManager -> ProviderFailoverManager -> RuntimeRetryManager -> RuntimeSchedulingManager -> RuntimeExecutionManager -> Runtime Intelligence Domain -> Runtime Observation -> Runtime Decision Engine -> Runtime Reasoning -> Runtime Confidence -> Runtime Recommendation -> Runtime Decision Coordinator -> Runtime Intelligence Context
 
 **Ownership:**
 - **Application Core**: Owned by Domain Logic.
@@ -110,6 +111,7 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `RuntimeReasoningState`, `RuntimeReasoningType`, `RuntimeReasoningReason`, `RuntimeReasoning`, `RuntimeReasoningInfo`, `RuntimeReasoningResult`: Owned by the Runtime Reasoning Domain.
 - `RuntimeConfidenceState`, `RuntimeConfidenceLevel`, `RuntimeConfidenceFactor`, `RuntimeConfidenceEvidence`, `RuntimeConfidence`, `RuntimeConfidenceInfo`, `RuntimeConfidenceResult`: Owned by the Runtime Confidence Domain.
 - `RuntimeRecommendationState`, `RuntimeRecommendationCategory`, `RuntimeRecommendationPriority`, `RuntimeRecommendationAlternative`, `RuntimeRecommendationRationale`, `RuntimeRecommendation`, `RuntimeRecommendationInfo`, `RuntimeRecommendationResult`: Owned by the Runtime Recommendation Domain.
+- `RuntimeDecisionCoordinatorState`, `RuntimeCoordinationStrategy`, `RuntimeCoordinationPriority`, `RuntimeRecommendationRelationship`, `RuntimeRecommendationDependency`, `RuntimeRecommendationConflict`, `RuntimeDecisionCoordinator`, `RuntimeDecisionCoordinatorInfo`, `RuntimeDecisionCoordinatorResult`: Owned by the Runtime Decision Coordinator.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -137,3 +139,4 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.7.4 (Runtime Reasoning) is complete, establishing the passive immutable domain answering 'Why' a decision exists.
 - Batch 6.7.5 (Runtime Confidence) is complete, establishing the immutable representation of structural confidence in a reasoning artifact.
 - Batch 6.7.6 (Runtime Recommendation) is complete, defining the immutable advisory recommendations of possible future actions based on the Intelligence Pipeline.
+- Batch 6.7.7 (Runtime Decision Coordinator) is complete, establishing the passive immutable coordination artifact permanently decoupled from execution and orchestration.

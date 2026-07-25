@@ -834,7 +834,16 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 - **Provider Agnostic**: Must NEVER recommend specific providers, models, hardware, or implementations (e.g., Gemini, OpenAI, Ollama, llama.cpp, CUDA, CPU, GPU). It may reference only required capabilities, execution characteristics, or resource characteristics. Provider and model selection remain permanently owned by future Runtime components.
 - **Rationale Ownership**: `RuntimeRecommendationRationale` owns only rationale identifiers, summaries, immutable references, and metadata. It NEVER performs reasoning, confidence calculation, evidence evaluation, recommendation ranking, or recommendation generation algorithms. It explains a recommendation; it never creates one.
 - **Alternatives Ownership**: `RuntimeRecommendationAlternative` permanently owns only alternative identifiers, metadata, descriptions, categories, priorities, and immutable references. It NEVER owns execution plans, routing logic, provider selection, scheduling, retry plans, optimization strategies, or orchestration logic.
-- **Boundary**: Consumes only `observation_id`, `decision_id`, `reasoning_id`, `confidence_id`, immutable metadata, and immutable references. Must NEVER embed downstream artifacts. It is the final advisory bounded context before `RuntimeDecisionCoordinator` becomes the first orchestration bounded context. Must NEVER implement orchestration, workflow composition, cross-domain intelligence aggregation, or global state.
+- **Boundary**: Consumes only `observation_id`, `decision_id`, `reasoning_id`, `confidence_id`, immutable metadata, and immutable references. Must NEVER embed downstream artifacts. It is the final advisory bounded context before `RuntimeDecisionCoordinator` becomes the first coordination bounded context. Must NEVER implement orchestration, workflow composition, cross-domain intelligence aggregation, or global state.
+
+### Runtime Decision Coordinator (Batch 6.7.7)
+- **Responsibility**: Defines the canonical immutable coordination artifact. It answers "How should Runtime Recommendations be coordinated?" It owns Coordination Identity, Metadata, Vocabulary, Lifecycle, Recommendation Ordering, Recommendation Selection, Recommendation Grouping, Recommendation Relationships, Recommendation Dependencies, and Recommendation Conflicts.
+- **Constraint**: Must NEVER represent execution, execution planning, execution approval, execution orchestration, workflow execution, provider routing, provider selection, model selection, scheduling, retry strategy, optimization, learning, command generation, or policy enforcement. It represents only the Runtime's immutable coordination of recommendations.
+- **Coordination vs Orchestration**: Coordination means relationship management, dependency description, ordering metadata, grouping metadata, conflict description, and selection metadata. It NEVER means executing work, invoking providers, launching models, dispatching tasks, starting workflows, managing retries, or controlling scheduling.
+- **Provider Agnostic**: Must NEVER reference specific providers (e.g., Gemini, OpenAI, Ollama, llama.cpp), models, or hardware (e.g., CUDA, CPU, GPU). It operates only on Runtime Intelligence artifacts and immutable recommendation identifiers.
+- **Relationships and Dependencies**: `RuntimeRecommendationRelationship` and `RuntimeRecommendationDependency` own only identifiers and metadata. They NEVER own execution dependencies, scheduling behavior, orchestration rules, routing rules, dependency resolution, dependency validation, dependency scheduling, dependency execution, or dependency graph traversal. They describe architecture only.
+- **Conflicts**: `RuntimeRecommendationConflict` owns only conflict identifiers, references, descriptions, and severity. It NEVER performs conflict resolution, prioritization, arbitration, replacement, or suppression.
+- **Boundary**: Acts as the architectural boundary between `RuntimeRecommendation` (advisory) and `RuntimeIntelligenceContext` (aggregation). It depends only upon immutable references and must NEVER embed upstream artifacts like `RuntimeRecommendation` or downstream contexts. It explicitly reserves global aggregation to `RuntimeIntelligenceContext` and execution/orchestration to future Runtime components.
 
 ### Future Batch Evolution
 - **Batch 6.7.1**: Runtime Intelligence Vocabulary
@@ -848,7 +857,7 @@ The Adaptive Runtime Intelligence subsystem introduces the capability for the Ru
 
 ## Runtime Intelligence Pipeline
 
-The Runtime Intelligence Pipeline flows sequentially with strict forward-only dependencies. Runtime Recommendation acts as the architectural boundary where advisory contexts end and orchestration begins.
+The Runtime Intelligence Pipeline flows sequentially with strict forward-only dependencies. Runtime Recommendation is the final advisory bounded context. Runtime Decision Coordinator is the coordination bounded context, serving as the architectural boundary before Runtime Intelligence Context, which becomes the Runtime-wide aggregation bounded context.
 
 `Runtime Intelligence Vocabulary` → `Runtime Observation` → `Runtime Decision` → `Runtime Reasoning` → `Runtime Confidence` → `Runtime Recommendation` → `Runtime Decision Coordinator` → `Runtime Intelligence Context`.
 
