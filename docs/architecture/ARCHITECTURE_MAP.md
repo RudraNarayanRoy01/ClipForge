@@ -52,6 +52,7 @@ flowchart TD
     Runtime --> Confidence[Runtime Confidence]
     Runtime --> Recommendation[Runtime Recommendation]
     Runtime --> DecisionCoordinator[Runtime Decision Coordinator]
+    Runtime --> ContextAggregation[Runtime Intelligence Context]
     Runtime --> Optimization[Runtime Optimization]
     Runtime --> Learning[Runtime Learning]
     
@@ -112,6 +113,7 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - `RuntimeConfidenceState`, `RuntimeConfidenceLevel`, `RuntimeConfidenceFactor`, `RuntimeConfidenceEvidence`, `RuntimeConfidence`, `RuntimeConfidenceInfo`, `RuntimeConfidenceResult`: Owned by the Runtime Confidence Domain.
 - `RuntimeRecommendationState`, `RuntimeRecommendationCategory`, `RuntimeRecommendationPriority`, `RuntimeRecommendationAlternative`, `RuntimeRecommendationRationale`, `RuntimeRecommendation`, `RuntimeRecommendationInfo`, `RuntimeRecommendationResult`: Owned by the Runtime Recommendation Domain.
 - `RuntimeDecisionCoordinatorState`, `RuntimeCoordinationStrategy`, `RuntimeCoordinationPriority`, `RuntimeRecommendationRelationship`, `RuntimeRecommendationDependency`, `RuntimeRecommendationConflict`, `RuntimeDecisionCoordinator`, `RuntimeDecisionCoordinatorInfo`, `RuntimeDecisionCoordinatorResult`: Owned by the Runtime Decision Coordinator.
+- `RuntimeIntelligenceContextState`, `RuntimeIntelligenceSnapshot`, `RuntimeIntelligenceSummary`, `RuntimeIntelligenceContext`, `RuntimeIntelligenceContextInfo`, `RuntimeIntelligenceContextResult`: Owned by the Runtime Intelligence Context.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
@@ -140,3 +142,4 @@ ProviderRegistry -> ProviderInfo -> ProviderCapabilityRegistry -> ProviderCapabi
 - Batch 6.7.5 (Runtime Confidence) is complete, establishing the immutable representation of structural confidence in a reasoning artifact.
 - Batch 6.7.6 (Runtime Recommendation) is complete, defining the immutable advisory recommendations of possible future actions based on the Intelligence Pipeline.
 - Batch 6.7.7 (Runtime Decision Coordinator) is complete, establishing the passive immutable coordination artifact permanently decoupled from execution and orchestration.
+- Batch 6.7.8 (Runtime Intelligence Context) is complete, establishing the canonical immutable aggregation boundary for Runtime Intelligence.

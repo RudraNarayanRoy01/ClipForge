@@ -39,6 +39,15 @@ from .runtime_decision_coordinator_model import (
     RuntimeDecisionCoordinatorResult
 )
 
+from .runtime_intelligence_context_model import (
+    RuntimeIntelligenceContextState,
+    RuntimeIntelligenceSnapshot,
+    RuntimeIntelligenceSummary,
+    RuntimeIntelligenceContext,
+    RuntimeIntelligenceContextInfo,
+    RuntimeIntelligenceContextResult
+)
+
 __all__ = [
     "ProviderType",
     "ProviderStatus",
@@ -67,5 +76,11 @@ __all__ = [
     "RuntimeRecommendationConflict",
     "RuntimeDecisionCoordinator",
     "RuntimeDecisionCoordinatorInfo",
-    "RuntimeDecisionCoordinatorResult"
+    "RuntimeDecisionCoordinatorResult",
+    "RuntimeIntelligenceContextState",
+    "RuntimeIntelligenceSnapshot",
+    "RuntimeIntelligenceSummary",
+    "RuntimeIntelligenceContext",
+    "RuntimeIntelligenceContextInfo",
+    "RuntimeIntelligenceContextResult"
 ]
