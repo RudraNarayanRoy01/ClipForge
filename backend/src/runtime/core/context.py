@@ -1,5 +1,6 @@
-from typing import Dict
+from typing import Dict, Optional
 
+from .execution_model import ExecutionRequest, ExecutionStatus
 from .metadata import RuntimeMetadata
 from .lifecycle import RuntimeLifecycleCoordinator
 from .extension import IRuntimeExtensionPoint
@@ -87,6 +88,10 @@ class RuntimeContext:
         self._runtime_constraint_engine = RuntimeConstraintEngine()
         self._runtime_budget_planner = RuntimeBudgetPlanner()
         self._runtime_routing = RuntimeRouting()
+        
+        # Execution State (Passive References)
+        self.active_execution_request: Optional[ExecutionRequest] = None
+        self.active_execution_status: Optional[ExecutionStatus] = None
 
     @property
     def metadata(self) -> RuntimeMetadata:

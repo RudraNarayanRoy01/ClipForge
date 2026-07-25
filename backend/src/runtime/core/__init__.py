@@ -1,5 +1,14 @@
 # Expose core components
 from .bootstrap import RuntimeBootstrap
+from .execution_model import (
+    ExecutionIdentity,
+    ExecutionRequest,
+    ExecutionState,
+    ExecutionStatus as ModelExecutionStatus,
+    ExecutionPriority,
+    ExecutionOutcome,
+    ExecutionResult as ModelExecutionResult
+)
 from .lifecycle import RuntimeLifecycleState, RuntimeLifecycleCoordinator
 from .extension import IRuntimeExtension, IRuntimeExtensionPoint
 from .context import RuntimeContext
@@ -31,6 +40,13 @@ from .runtime_budget_planner import BudgetDecision, RuntimeBudgetPlanner
 
 __all__ = [
     "RuntimeBootstrap",
+    "ExecutionIdentity",
+    "ExecutionRequest",
+    "ExecutionState",
+    "ModelExecutionStatus",
+    "ExecutionPriority",
+    "ExecutionOutcome",
+    "ModelExecutionResult",
     "RuntimeLifecycleState",
     "RuntimeLifecycleCoordinator",
     "IRuntimeExtension",

@@ -100,6 +100,34 @@ Decision ownership is strictly delineated:
 Future Runtime components must plug into `RuntimeContext` through composition without redesigning the core decision pipeline (`Planning`, `Policy`, `Constraint`, `Budget`, `Routing`). 
 Examples of future components include `RuntimeScheduler`, `RuntimeExecution`, `RuntimeObservation`, `RuntimeLearning`, `RuntimeOptimization`, and `RuntimeGovernance`.
 
+## Runtime Execution Domain Model
+
+This section documents the canonical architectural language used by all future Runtime execution capabilities (established in Batch 6.5.1).
+
+### Execution Artifacts
+
+Execution artifacts are purely declarative, immutable data objects representing work at various stages of execution. They do NOT contain logic for lifecycle transitions, scheduling behavior, progress calculation, or execution coordination.
+
+- **ExecutionIdentity**: A pure value object representing the permanent identity of an execution (`execution_id`, `created_at`). It does NOT contain distributed tracing correlation IDs or execution state.
+- **ExecutionRequest**: Represents approved work waiting for execution. Strictly declarative. Must NEVER contain execution metrics, scheduling decisions, or retry info.
+- **ExecutionStatus**: A snapshot of execution state metadata. Does NOT own lifecycle, perform transitions, or calculate progress.
+- **ExecutionResult**: Represents "What happened". Consumed by future components (Retry, Observation). Must NEVER contain retry decisions, scheduling hints, or drive architecture directly.
+
+### Execution Ownership & Contracts
+
+| Artifact | Production / Ownership | Consumption |
+| :--- | :--- | :--- |
+| **ExecutionIdentity** | Owned by Runtime Execution Model | Consumed by all execution artifacts |
+| **ExecutionRequest** | Produced by Runtime Execution Model | Consumed by RuntimeScheduler |
+| **ExecutionStatus** | Produced by RuntimeExecutor | Consumed by Observation |
+| **ExecutionResult** | Produced by RuntimeExecutor | Consumed by Retry, Observation, Learning, Optimization |
+
+### Execution Dependency Rules
+
+- The dependency direction strictly flows: `ExecutionRequest` -> `Scheduler` -> `Executor` -> `ExecutionResult`.
+- Execution artifacts may depend upon Runtime Decisions (e.g., `PlanningDecision`, `PolicyDecision`).
+- Runtime Decisions must NEVER depend upon Execution artifacts. Dependency direction must never reverse.
+
 ## Runtime Dependency Direction
 
 The explicit dependency direction introduced by Runtime Context and Capability Registry:

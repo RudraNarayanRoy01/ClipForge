@@ -10,10 +10,26 @@ leaving the Runtime to determine the optimal Provider and Schedule for execution
 """
 
 from .core import RuntimeBootstrap, RuntimeLifecycleState, RuntimeContext, RuntimeMetadata
+from .core.execution_model import (
+    ExecutionIdentity,
+    ExecutionRequest,
+    ExecutionState,
+    ExecutionStatus,
+    ExecutionPriority,
+    ExecutionOutcome,
+    ExecutionResult
+)
 from .contracts import ILifecycleAware
 
 __all__ = [
     "RuntimeBootstrap",
+    "ExecutionIdentity",
+    "ExecutionRequest",
+    "ExecutionState",
+    "ExecutionStatus",
+    "ExecutionPriority",
+    "ExecutionOutcome",
+    "ExecutionResult",
     "RuntimeLifecycleState",
     "RuntimeContext",
     "RuntimeMetadata",

@@ -70,7 +70,9 @@ Runtime -> Provider Ecosystem -> Hardware
 - `ConstraintDecision`: Owned exclusively by `RuntimeConstraintEngine`.
 - `BudgetDecision`: Owned exclusively by `RuntimeBudgetPlanner`.
 - `RoutingDecision`: Owned exclusively by `RuntimeRouting`.
+- `ExecutionIdentity`, `ExecutionRequest`, `ExecutionStatus`, `ExecutionResult`: Owned by the Runtime Execution Model.
 - `RuntimeContext`: Owns the Runtime Decision Environment and composition, but NOT the decisions themselves.
 
 **Certification Status:**
 - Sprint 6.4 (Planning & Policy) is formally certified and architecturally complete. Future components integrate via composition on the RuntimeContext.
+- Batch 6.5.1 (Runtime Execution Model) is complete, establishing pure declarative execution artifacts.
