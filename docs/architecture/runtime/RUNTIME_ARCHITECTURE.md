@@ -779,9 +779,21 @@ The Provider Ecosystem introduces the canonical architecture for Provider Identi
 - **Constraint**: Must never execute HTTP requests, route traffic, or perform retry execution, backoff, or scheduling. It is a purely structural recommendation subsystem.
 - **Separation**: Distinct and entirely decoupled from Provider Failover, consuming it only as a read-only dependency. It consumes `RuntimeRetryTrigger` rather than `ProviderFailoverState`. `RuntimeRetryInfo` only references immutable `provider_id` values and never embeds `ProviderInfo`, `ProviderCapability`, `ProviderHealthInfo`, or `ProviderFailoverInfo`. Distinct from the execution-level `RuntimeRetry` (`LifecycleResult` -> `RetryResult`).
 
+### Runtime Scheduling Manager (Execution Eligibility)
+- **Responsibility**: Owns structural Execution Eligibility. Answers "Is this provider execution structurally eligible?"
+- **Artifacts**: `RuntimeScheduleInfo`, `RuntimeScheduleState`, `RuntimeScheduleTrigger`, `RuntimeScheduleDecision`, `RuntimeScheduleResult`, `RuntimeSchedulePolicy`.
+- **Constraint**: Must never evaluate temporal aspects (timers, cron, sleep). It is NOT a Scheduler Engine.
+- **Separation**: Distinct from Runtime Execution. It consumes `RuntimeScheduleTrigger` translated from upstream states (e.g., `RuntimeRetryState`).
+
+### Runtime Execution Manager (Execution Preparation)
+- **Responsibility**: Owns structural Execution Preparation. Answers "How has execution been structurally prepared?"
+- **Artifacts**: `RuntimeExecutionInfo`, `RuntimeExecutionState`, `RuntimeExecutionTrigger`, `RuntimeExecutionDecision`, `RuntimeExecutionResult`, `RuntimeExecutionPolicy`.
+- **Constraint**: Must never decide *if* execution should occur, optimize execution, allocate hardware, or execute workloads. It is purely structural and observational.
+- **Separation**: Completely decoupled from Runtime Scheduling. It consumes `RuntimeExecutionTrigger` translated by a future Translation Layer.
+
 ### Registry Relationship & Integration
-- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability` -> `ModelRegistry` (Models) -> `ModelInfo` -> `ModelLifecycleManager` (Lifecycle) -> `ProviderHealthManager` (Health) -> `ProviderFailoverManager` (Failover) -> `RuntimeRetryManager` (Retry).
-- **Identity Decoupling**: `ModelInfo`, `ProviderCapability`, `ProviderHealthInfo`, `ProviderFailoverInfo`, and `RuntimeRetryInfo` reference only immutable provider identifiers (`provider_id`) and never own or embed `ProviderInfo` or each other.
+- **Dependency Direction**: `ProviderRegistry` (Identity) -> `ProviderInfo` -> `ProviderCapabilityRegistry` (Features) -> `ProviderCapability` -> `ModelRegistry` (Models) -> `ModelInfo` -> `ModelLifecycleManager` (Lifecycle) -> `ProviderHealthManager` (Health) -> `ProviderFailoverManager` (Failover) -> `RuntimeRetryManager` (Retry) -> `RuntimeSchedulingManager` (Scheduling) -> `RuntimeExecutionManager` (Execution).
+- **Identity Decoupling**: `ModelInfo`, `ProviderCapability`, `ProviderHealthInfo`, `ProviderFailoverInfo`, `RuntimeRetryInfo`, `RuntimeScheduleInfo`, and `RuntimeExecutionInfo` reference only immutable provider identifiers (`provider_id`) and never own or embed `ProviderInfo` or each other.
 - **Composition**: `RuntimeContext` acts strictly as a passive Composition Root. It only instantiates and exposes the registries and managers. `RuntimeContext` must NEVER register models, evaluate capabilities, evaluate health, evaluate failovers, mutate metadata, perform provider reasoning, or perform orchestration.
 
 ## Runtime Technical Debt Register
