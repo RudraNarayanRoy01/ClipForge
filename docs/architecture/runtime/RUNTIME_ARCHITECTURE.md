@@ -575,6 +575,42 @@ Runtime Routing
 
 This dependency direction must remain stable. The Runtime must NEVER depend upward on specific Domain features (e.g., Campaign Intelligence).
 
+## Runtime Dependency Model (Batch 6.8.2)
+
+This section establishes the canonical architectural dependency model for the Adaptive Compute Runtime, formally certified in Batch 6.8.2.
+
+### Canonical Dependency Layers
+
+The following layer hierarchy is canonical and strictly enforced:
+
+Application Layer
+↓
+Runtime Layer
+↓
+Capability Layer
+↓
+Planning Layer
+↓
+Execution Layer
+↓
+Provider Layer
+↓
+Infrastructure Layer
+
+**Layer Invariants:**
+- Dependencies strictly flow downward.
+- No upward dependencies exist.
+- No skipped dependency layers exist.
+- No dependency shortcuts or inversions exist.
+
+### Bounded Context Dependencies
+Subsystems (e.g., Runtime Foundation, Capability Registry, Monitoring & Telemetry, Planning & Policy, Scheduler & Execution, Provider Ecosystem, Adaptive Runtime Intelligence) depend only on explicitly approved lower-level contexts. Bounded contexts maintain clear ownership with zero hidden coupling or ownership inversion.
+
+### Dependency Direction and Isolation
+- **Forward-Only**: All dependencies are strictly forward-only. There are no reverse dependencies, bidirectional dependencies, cyclic references, or dependency recursions.
+- **Isolation**: Every dependency crosses approved architectural boundaries only. Planning does not depend on Provider implementations; Execution does not own Runtime Intelligence.
+- **Stable Abstractions**: The Runtime depends on stable abstractions. Future Runtime evolution must occur through new providers, capabilities, execution strategies, or bounded contexts depending upon these stable interfaces rather than altering the certified dependency graph. Dependency stability is a permanent Runtime invariant.
+
 ## Runtime Terminology
 - **Capability**: A generalized AI function (e.g., "Text Generation", "Transcription").
 - **Capability Identity**: A permanent architectural identifier (e.g., `vision.analysis`) describing WHAT the Runtime understands, strictly divorced from HOW it executes.
