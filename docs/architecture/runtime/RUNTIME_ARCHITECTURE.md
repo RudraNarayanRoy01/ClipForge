@@ -957,3 +957,7 @@ Batch 6.4.9 concludes Sprint 6.4 by formally certifying the **Runtime Planning &
 Sprint 6.4 is now declared **architecturally complete** and formally **certified**.
 
 RuntimeContext remains architecturally complete as a passive composition root. It owns the pipeline but never executes workloads or schedules execution. Extensibility certification guarantees that future Sprint components (Scheduler, Execution, Observation, Learning, Optimization) can plug into RuntimeContext via composition without requiring redesign of the certified Planning, Policy, Constraint, Budget, or Routing architecture.
+
+### Sprint 6.8 Platform Validation
+
+Batch 6.8.1 formally certifies the overall architecture of the Adaptive Compute Runtime platform. The Runtime has been validated to have correct layering, clear boundaries, an understandable topology, clean composition, and preserved modularity and isolation. The Runtime architecture remains provider-agnostic and hardware-agnostic.
