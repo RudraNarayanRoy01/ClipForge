@@ -997,3 +997,7 @@ RuntimeContext remains architecturally complete as a passive composition root. I
 ### Sprint 6.8 Platform Validation
 
 Batch 6.8.1 formally certifies the overall architecture of the Adaptive Compute Runtime platform. The Runtime has been validated to have correct layering, clear boundaries, an understandable topology, clean composition, and preserved modularity and isolation. The Runtime architecture remains provider-agnostic and hardware-agnostic.
+
+Batch 6.8.2 formally certifies the canonical dependency graph of the Adaptive Compute Runtime platform. The Runtime dependency model strictly enforces downward-only dependencies, layer isolation, bounded context safety, and dependency stability. The Runtime depends exclusively on stable abstractions and never on concrete implementations or provider details.
+
+Batch 6.8.3 formally certifies the Runtime contract system. All components communicate exclusively through stable, provider-agnostic, hardware-agnostic, and implementation-independent architectural contracts. The contract domain correctly establishes clear responsibilities, definitive ownership, strictly bounded interfaces, lifecycle expectations, and open extension boundaries without implementation leakage.
