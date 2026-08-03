@@ -95,9 +95,9 @@ This inventory is the single canonical inventory for Engineering Manual artifact
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `README.md` | Manual entry point | Approved | Engineering Governance Lead | 6A.1 | Constitution, Execution Plan | Event-driven | Semantic |
 | `01_ENGINEERING_PHILOSOPHY.md` | Philosophy foundation | Approved | Architecture Owner | 6A.1 | Constitution | Event-driven | Semantic |
-| `02_DEVELOPMENT_WORKFLOW.md` | Daily engineering lifecycle | Planned | TPM / Governance Lead | 6A.1 | Workflow model | Event-driven | Semantic |
+| `02_DEVELOPMENT_WORKFLOW.md` | Daily engineering lifecycle | Draft | TPM / Governance Lead | 6A.1 | Workflow model | Event-driven | Semantic |
 | `03_ENGINEERING_SPECIFICATION_STANDARD.md` | Future specification quality | Approved | Architecture Owner | 6A.1 | Constitution, workflow | Event-driven | Semantic |
-| `04_IMPLEMENTATION_STANDARD.md` | Architecture-preserving implementation | Planned | Principal Engineering | 6A.1 | Architecture standards | Event-driven | Semantic |
+| `04_IMPLEMENTATION_STANDARD.md` | Architecture-preserving implementation | Draft | Principal Engineering | 6A.1 | Architecture standards | Event-driven | Semantic |
 | `05_CHANGESET_VERIFICATION.md` | Operational changed-file/integration verification | Deferred | Change-set Verifier | 6A.3 | 6A.2 inspection | Event-driven | Semantic |
 | `06_ARCHITECTURE_VERIFICATION.md` | Drift, coupling, boundary review | Deferred | Architecture Owner | 6A.4 | Map/state/catalog, 6A.3 | Event-driven | Semantic |
 | `07_CERTIFICATION_STANDARD.md` | Evidence matrix, verdict rules | Deferred | Certifier | 6A.5 | 6A.3–6A.4 records | Event-driven | Semantic |
