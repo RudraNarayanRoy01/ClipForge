@@ -100,8 +100,8 @@ This inventory is the single canonical inventory for Engineering Manual artifact
 | `04_IMPLEMENTATION_STANDARD.md` | Architecture-preserving implementation | Draft | Principal Engineering | 6A.1 | Architecture standards | Event-driven | Semantic |
 | `05_CHANGESET_VERIFICATION.md` | Operational changed-file/integration verification | Approved | Change-set Verifier | 6A.1 | 6A.2 inspection | Event-driven | Semantic |
 | `06_REPOSITORY_REVIEW_STANDARD.md` | Evaluates implementation against specification | Approved | Governance Lead | 6A.1 | 6A.1 Standards | Event-driven | Semantic |
-| `07_ARCHITECTURE_VERIFICATION.md` | Drift, coupling, boundary review | Deferred | Architecture Owner | 6A.4 | Map/state/catalog, 6A.3 | Event-driven | Semantic |
-| `08_CERTIFICATION_STANDARD.md` | Evidence matrix, verdict rules | Deferred | Certifier | 6A.5 | 6A.3–6A.4 records | Event-driven | Semantic |
+| `07_ARCHITECTURE_VERIFICATION.md` | Drift, coupling, boundary review | Approved | Architecture Owner | 6A.4 | Map/state/catalog, 6A.3 | Event-driven | Semantic |
+| `08_CERTIFICATION_STANDARD.md` | Evidence matrix, verdict rules | Approved | Certifier | 6A.5 | 6A.3–6A.4 records | Event-driven | Semantic |
 | `09_REPOSITORY_INSPECTION.md` | Repeatable inspection techniques | Deferred | Governance Lead | 6A.2 | 6A.1 manual | Event-driven | Semantic |
 | `10_BATCH_WORKFLOW.md` | Batch sizing, scope, evidence rules | Deferred | TPM | 6A.6 | Pilot learnings | Event-driven | Semantic |
 | `11_SPRINT_WORKFLOW.md` | Sprint planning, review, certification | Deferred | TPM | 6A.6 | Sprint learnings | Event-driven | Semantic |
