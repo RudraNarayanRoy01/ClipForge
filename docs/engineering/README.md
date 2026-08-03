@@ -94,9 +94,9 @@ This inventory is the single canonical inventory for Engineering Manual artifact
 | Name / Path | Purpose | Lifecycle State | Owner | Owning Sprint | Dependencies | Review Cadence | Versioning Mode |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `README.md` | Manual entry point | Approved | Engineering Governance Lead | 6A.1 | Constitution, Execution Plan | Event-driven | Semantic |
-| `01_ENGINEERING_PHILOSOPHY.md` | Philosophy foundation | Planned | Architecture Owner | 6A.1 | Constitution | Event-driven | Semantic |
+| `01_ENGINEERING_PHILOSOPHY.md` | Philosophy foundation | Approved | Architecture Owner | 6A.1 | Constitution | Event-driven | Semantic |
 | `02_DEVELOPMENT_WORKFLOW.md` | Daily engineering lifecycle | Planned | TPM / Governance Lead | 6A.1 | Workflow model | Event-driven | Semantic |
-| `03_ENGINEERING_SPECIFICATION_STANDARD.md` | Future specification quality | Planned | Architecture Owner | 6A.1 | Constitution, workflow | Event-driven | Semantic |
+| `03_ENGINEERING_SPECIFICATION_STANDARD.md` | Future specification quality | Approved | Architecture Owner | 6A.1 | Constitution, workflow | Event-driven | Semantic |
 | `04_IMPLEMENTATION_STANDARD.md` | Architecture-preserving implementation | Planned | Principal Engineering | 6A.1 | Architecture standards | Event-driven | Semantic |
 | `05_CHANGESET_VERIFICATION.md` | Operational changed-file/integration verification | Deferred | Change-set Verifier | 6A.3 | 6A.2 inspection | Event-driven | Semantic |
 | `06_ARCHITECTURE_VERIFICATION.md` | Drift, coupling, boundary review | Deferred | Architecture Owner | 6A.4 | Map/state/catalog, 6A.3 | Event-driven | Semantic |
@@ -108,7 +108,7 @@ This inventory is the single canonical inventory for Engineering Manual artifact
 | `12_ENGINEERING_CHECKLISTS.md` | Role-specific controls | Planned | Governance Lead | 6A.1 | All standards | Event-driven | Semantic |
 | `templates/` (registry) | Controlled template navigation | Planned | Governance Lead | 6A.1 | Relevant standards | Event-driven | Semantic |
 | `templates/ENGINEERING_DOCUMENT_TEMPLATE.md` | Controlled document metadata | Registered Only | Governance Lead | 6A.1 | Execution Plan | Event-driven | Semantic |
-| `templates/ENGINEERING_SPECIFICATION_TEMPLATE.md` | Standard future specification structure | Planned | Architecture Owner | 6A.1 | 03_ENGINEERING_SPECIFICATION_STANDARD.md | Event-driven | Semantic |
+| `templates/ENGINEERING_SPECIFICATION_TEMPLATE.md` | Standard future specification structure | Approved | Architecture Owner | 6A.1 | 03_ENGINEERING_SPECIFICATION_STANDARD.md | Event-driven | Semantic |
 | `templates/IMPLEMENTATION_PROMPT_TEMPLATE.md` | Bounded AI/human implementation instruction | Registered Only | Governance Lead | 6A.5 | Implementation standard | Event-driven | Semantic |
 | `templates/REPOSITORY_EVIDENCE_TEMPLATE.md` | Capture reproducible facts | Deferred | Governance Lead | 6A.2 | 08_REPOSITORY_INSPECTION.md | Event-driven | Semantic |
 | `templates/CHANGESET_VERIFICATION_TEMPLATE.md` | Record integration completeness | Deferred | Change-set Verifier | 6A.3 | 05_CHANGESET_VERIFICATION.md | Event-driven | Semantic |
