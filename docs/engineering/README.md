@@ -102,16 +102,22 @@ This inventory is the single canonical inventory for Engineering Manual artifact
 | `06_REPOSITORY_REVIEW_STANDARD.md` | Evaluates implementation against specification | Approved | Governance Lead | 6A.1 | 6A.1 Standards | Event-driven | Semantic |
 | `07_ARCHITECTURE_VERIFICATION.md` | Drift, coupling, boundary review | Approved | Architecture Owner | 6A.4 | Map/state/catalog, 6A.3 | Event-driven | Semantic |
 | `08_CERTIFICATION_STANDARD.md` | Evidence matrix, verdict rules | Approved | Certifier | 6A.5 | 6A.3–6A.4 records | Event-driven | Semantic |
-| `09_REPOSITORY_INSPECTION.md` | Repeatable inspection techniques | Deferred | Governance Lead | 6A.2 | 6A.1 manual | Event-driven | Semantic |
-| `10_BATCH_WORKFLOW.md` | Batch sizing, scope, evidence rules | Deferred | TPM | 6A.6 | Pilot learnings | Event-driven | Semantic |
-| `11_SPRINT_WORKFLOW.md` | Sprint planning, review, certification | Deferred | TPM | 6A.6 | Sprint learnings | Event-driven | Semantic |
-| `12_MILESTONE_WORKFLOW.md` | Milestone readiness, closeout | Deferred | TPM / Architecture Owner | 6A.6 | Certification strategy | Event-driven | Semantic |
-| `13_ENGINEERING_CHECKLISTS.md` | Role-specific controls | Planned | Governance Lead | 6A.1 | All standards | Event-driven | Semantic |
+| `09_REPOSITORY_SNAPSHOT_STANDARD.md` | Defines objective repository snapshots | Approved | Governance Lead | 6A.2 | 6A.1 manual | Event-driven | Semantic |
+| `10_REPOSITORY_INSPECTION_STANDARD.md` | Repeatable inspection techniques | Approved | Governance Lead | 6A.2 | 6A.1 manual | Event-driven | Semantic |
+| `11_REPOSITORY_QUALITY_DASHBOARD.md` | Objective repository quality state | Approved | Governance Lead | 6A.2 | 6A.1 manual | Event-driven | Semantic |
+| `12_IDENTITY_CARD_STANDARD.md` | Canonical component identity definition | Approved | Governance Lead | 6A.2 | 6A.1 manual | Event-driven | Semantic |
+| `13_ARCHITECTURE_DECISION_RECORD_STANDARD.md` | Canonical architectural decisions | Approved | Architecture Owner | 6A.2 | 6A.1 manual | Event-driven | Semantic |
+| `14_TECHNICAL_DEBT_REGISTER_STANDARD.md` | Canonical technical debt tracking | Approved | Architecture Owner | 6A.2 | Identity Cards, ADR Standard, Engineering Manual | Event-driven | Semantic |
+| `15_RUNTIME_HEALTH_REPORT_STANDARD.md` | Canonical runtime health tracking | Approved | Architecture Owner | 6A.2 | Repository Quality Dashboard, Identity Cards, Technical Debt Register Standard, Engineering Manual | Event-driven | Semantic |
+| `16_BATCH_WORKFLOW.md` | Batch sizing, scope, evidence rules | Deferred | TPM | 6A.6 | Pilot learnings | Event-driven | Semantic |
+| `17_SPRINT_WORKFLOW.md` | Sprint planning, review, certification | Deferred | TPM | 6A.6 | Sprint learnings | Event-driven | Semantic |
+| `18_MILESTONE_WORKFLOW.md` | Milestone readiness, closeout | Deferred | TPM / Architecture Owner | 6A.6 | Certification strategy | Event-driven | Semantic |
+| `19_ENGINEERING_CHECKLISTS.md` | Role-specific controls | Planned | Governance Lead | 6A.1 | All standards | Event-driven | Semantic |
 | `templates/` (registry) | Controlled template navigation | Planned | Governance Lead | 6A.1 | Relevant standards | Event-driven | Semantic |
 | `templates/ENGINEERING_DOCUMENT_TEMPLATE.md` | Controlled document metadata | Registered Only | Governance Lead | 6A.1 | Execution Plan | Event-driven | Semantic |
 | `templates/ENGINEERING_SPECIFICATION_TEMPLATE.md` | Standard future specification structure | Approved | Architecture Owner | 6A.1 | 03_ENGINEERING_SPECIFICATION_STANDARD.md | Event-driven | Semantic |
 | `templates/IMPLEMENTATION_PROMPT_TEMPLATE.md` | Bounded AI/human implementation instruction | Registered Only | Governance Lead | 6A.5 | Implementation standard | Event-driven | Semantic |
-| `templates/REPOSITORY_EVIDENCE_TEMPLATE.md` | Capture reproducible facts | Deferred | Governance Lead | 6A.2 | 09_REPOSITORY_INSPECTION.md | Event-driven | Semantic |
+| `templates/REPOSITORY_EVIDENCE_TEMPLATE.md` | Capture reproducible facts | Deferred | Governance Lead | 6A.2 | 10_REPOSITORY_INSPECTION_STANDARD.md | Event-driven | Semantic |
 | `templates/CHANGESET_VERIFICATION_TEMPLATE.md` | Record integration completeness | Deferred | Change-set Verifier | 6A.3 | 05_CHANGESET_VERIFICATION.md | Event-driven | Semantic |
 | `templates/ARCHITECTURE_VERIFICATION_TEMPLATE.md` | Record dependency, runtime drift | Deferred | Architecture Owner | 6A.4 | 07_ARCHITECTURE_VERIFICATION.md | Event-driven | Semantic |
 | `templates/CERTIFICATION_TEMPLATE.md` | Criterion-to-evidence record | Deferred | Certifier | 6A.5 | 08_CERTIFICATION_STANDARD.md | Event-driven | Semantic |
