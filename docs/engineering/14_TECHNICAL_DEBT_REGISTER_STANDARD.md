@@ -177,6 +177,29 @@ Every debt MUST:
 - Never infer missing information
 - Never recommend implementation
 
+### Origin ADR
+
+Purpose
+
+Records the Architecture Decision Record that explicitly establishes the architectural decision responsible for the recorded Technical Debt.
+
+Rules
+
+• Origin ADR SHALL reference an existing ADR only when that relationship is explicitly documented by Repository Evidence.
+
+• Logical interpretation SHALL NOT be used.
+
+• Architectural inference SHALL NOT be used.
+
+• Historical assumptions SHALL NOT be used.
+
+• If Repository Evidence does not explicitly establish an Origin ADR,
+Origin ADR SHALL be recorded as UNKNOWN.
+
+Rationale
+
+This preserves Repository Truth by ensuring that Technical Debt never invents architectural relationships not already documented by Repository Intelligence.
+
 ## 12 Repository Evidence
 
 Every debt MUST trace back to Repository Evidence.
