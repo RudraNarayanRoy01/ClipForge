@@ -17,6 +17,7 @@ It is responsible for:
 - Provider Abstractions & Interfaces
 - Resource Discovery Mechanisms
 - Optimization & Telemetry rules
+- Runtime Bootstrap Engine (Lifecycle management and state transitions)
 
 ## What Explicitly Does NOT Belong Inside the Runtime
 - Domain-specific logic (e.g., Timeline Engine, Campaign Intelligence)
@@ -40,3 +41,16 @@ The Runtime is designed to evolve progressively without requiring major structur
 - **Sprint 6.6:** Provider Ecosystem
 - **Sprint 6.7:** Adaptive Optimization
 - **Sprint 6.8:** Runtime Certification
+
+## Runtime State Machine
+
+The Runtime operates on a deterministic, immutable state machine initialized by the Bootstrap Engine:
+1. `CREATED`
+2. `BOOTSTRAPPING`
+3. `INITIALIZING`
+4. `VALIDATING`
+5. `READY` (Healthy operations)
+6. `SHUTTING_DOWN`
+7. `STOPPED`
+
+A `FAILED` state exists for unrecoverable errors. Illegal transitions are explicitly blocked and enforced via `InvalidRuntimeStateTransitionException`.
