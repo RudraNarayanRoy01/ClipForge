@@ -189,3 +189,49 @@ The Runtime Dependency Resolution takes ownership directly after Composition:
 **Runtime Dependency Resolution** ("In what order should Components be initialized?")
 ↓
 **Future Runtime Execution** (Handles the actual instantiation and scheduling)
+
+## Runtime Service Composition Foundation
+
+The Runtime Service Composition Foundation (Batch 6A.5.6) establishes the **canonical Runtime Service Blueprint**. It represents the final, immutable declaration of what services the Runtime will expose once instantiated.
+
+### Purpose
+To define exactly **what Runtime Services would exist** once the Runtime is instantiated, utilizing purely structural metadata and identifiers. It bridges the gap between resolved components and executable services without instantiating or executing anything.
+
+### Responsibilities
+- Owning Runtime Service descriptors and metadata
+- Validating service identifiers, duplicates, and descriptor completeness
+- Structuring service relationships, groupings, and ordering
+- Providing immutable service statistics and point-in-time snapshots
+- Yielding the immutable `RuntimeServiceComposition` boundary artifact
+
+### Boundaries & Ownership
+The Runtime Service Composition Foundation explicitly DOES NOT:
+- Implement Dependency Injection, Service Locators, or IoC containers
+- Create object singletons or factories
+- Perform Runtime execution, activation, or lifecycle management
+- Load AI providers, models, or manage hardware/memory
+- Execute telemetry, scheduling, or monitoring logic
+
+### Subsystem Pipeline Relationship
+The Runtime Foundation pipeline evolves as follows:
+
+Bootstrap
+↓
+Registry
+↓
+Dependency Graph
+↓
+Composition
+↓
+Resolution
+↓
+**Service Composition** (You are here)
+↓
+*(Future)* Dependency Injection
+↓
+*(Future)* Runtime Executor
+↓
+*(Future)* Scheduler
+↓
+*(Future)* Provider Runtime
+
