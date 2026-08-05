@@ -88,12 +88,45 @@ It remains completely Provider-agnostic, Hardware-agnostic, and Execution-agnost
 
 The Registry supports being 'frozen' to prevent subsequent mutations. Components can be registered and removed until the registry is frozen, at which point any modification attempt raises a `RegistryFrozenException`.
 
-### Relationship with Bootstrap Engine
+## Runtime Dependency Graph
 
-The Runtime Bootstrap Engine dictates *"How does the Runtime start?"* and manages lifecycle state orchestration.
-The Runtime Component Registry handles *"What is in the Runtime?"* and holds the metadata for all internal parts. 
-The Bootstrap Engine initializes the Registry, allowing it to become the canonical catalog.
+The Runtime Dependency Graph is the canonical structural blueprint of the Runtime. It answers the question: *"How do Runtime Components relate to each other?"*
 
-### Future Integration Points
+### Dependency Terminology
+- **RuntimeDependency**: An immutable representation of a single directed relationship in the graph.
+- **DependencyType**: Pure metadata defining semantics (e.g., `REQUIRED`, `OPTIONAL`, `INITIALIZATION`).
+- **DependencyDirection**: Traversal direction (e.g., `FORWARD`, `REVERSE`).
+- **DependencySnapshot**: An immutable, deterministic point-in-time capture of the graph.
 
-The Registry serves as the foundational catalog that will be queried by future sub-systems (e.g., Execution Engines, Schedulers, and Policy Enforcers). These subsystems will use the Registry's metadata (capabilities, dependencies) to construct Dependency Graphs, perform Runtime Composition, and route execution appropriately.
+### Graph Responsibilities
+The Dependency Graph is exclusively responsible for:
+- Registering and removing dependencies
+- Ensuring deterministic topological ordering and traversal
+- Performing isolated graph validation (cycle detection, orphan nodes, missing components)
+- Yielding immutable snapshots, statistics, and validation results
+- Enforcing graph consistency and duplicate protection
+
+### Graph Boundaries
+The Dependency Graph explicitly DOES NOT:
+- Instantiate Components
+- Execute Logic
+- Perform Dependency Injection
+- Perform Runtime Composition
+- Orchestrate Bootstrap or Scheduling
+- Contain Hardware or Provider Information
+
+It relies on the `DependencyGraphValidator` to orchestrate validation without holding state, and `DependencyTraversal` to perform pure functional traversal.
+
+## Subsystem Relationships & Ownership Boundaries
+
+Ownership transitions clearly as the Runtime boots:
+
+**Runtime Bootstrap Engine** -> Controls the *"When"* (Lifecycle orchestration)
+↓
+**Runtime Component Registry** -> Controls the *"What"* (Component ownership)
+↓
+**Runtime Dependency Graph** -> Controls the *"How they relate"* (Relationship ownership)
+↓
+**Future Runtime Composition** -> Will control the *"How they execute"* (DI & Instantiation)
+
+Each subsystem strictly obeys the Single Responsibility Principle, ensuring the Runtime remains deterministic and testable at every layer.
