@@ -225,13 +225,41 @@ Composition
 ↓
 Resolution
 ↓
-**Service Composition** (You are here)
+Service Composition
 ↓
-*(Future)* Dependency Injection
+**Runtime Dependency Injection Foundation** (You are here)
+↓
+*(Future)* Runtime Bootstrap
 ↓
 *(Future)* Runtime Executor
 ↓
 *(Future)* Scheduler
 ↓
 *(Future)* Provider Runtime
+
+## Runtime Dependency Injection Foundation
+
+The Runtime Dependency Injection Foundation (Batch 6A.5.7) establishes the **canonical Runtime Dependency Injection Composition**.
+
+### Purpose
+To define exactly **how Runtime services are connected**, utilizing purely structural metadata and identifiers. It represents the immutable dependency graph (`RuntimeInjectionGraph`) that future Runtime Bootstrap will consume. 
+This batch aligns the vocabulary perfectly with the broader Runtime Composition ecosystem.
+
+### Responsibilities
+- Owning Runtime Injection bindings and descriptors within a deterministic `RuntimeInjectionGraph`.
+- Validating the dependency injection graph (circular dependencies, missing implementations).
+- Structuring the injection relationships deterministically with distinct graph statistics.
+- Providing immutable injection statistics and point-in-time snapshots with deterministic structural hashes (`binding_hash`, `graph_hash`, `metadata_hash`).
+- Yielding the immutable `RuntimeInjectionComposition` boundary artifact via isolated SRP-compliant factories.
+
+### Boundaries & Ownership
+The Runtime Dependency Injection Foundation explicitly DOES NOT:
+- Implement Dependency Injection, Service Locators, or IoC containers.
+- Create object singletons or factories.
+- Perform Runtime execution, activation, or lifecycle management.
+- Instantiate services or resolve dependencies.
+- Execute telemetry, scheduling, or monitoring logic.
+
+This batch DOES NOT perform Dependency Injection.
+This batch defines only immutable Runtime Injection metadata.
 
