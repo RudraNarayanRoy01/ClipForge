@@ -1,37 +1,30 @@
-from typing import Optional, Dict, Any
-from .runtime_state import RuntimeState
+"""
+Bootstrap Exceptions.
+
+Domain-specific exceptions for the Runtime Bootstrap Foundation.
+"""
 
 
 class RuntimeBootstrapException(Exception):
-    """Base exception for all Runtime Bootstrap failures."""
-    
-    def __init__(self, message: str, state: Optional[RuntimeState] = None, reason: Optional[str] = None, diagnostics: Optional[Dict[str, Any]] = None):
-        super().__init__(message)
-        self.state = state
-        self.reason = reason
-        self.diagnostics = diagnostics or {}
-
-
-class BootstrapInitializationException(RuntimeBootstrapException):
-    """Raised when Runtime initialization fails."""
+    """Base exception for all Runtime Bootstrap errors."""
     pass
 
 
 class BootstrapValidationException(RuntimeBootstrapException):
-    """Raised when Runtime validation fails."""
+    """Raised when the Bootstrap structure fails structural validation."""
     pass
 
 
-class BootstrapShutdownException(RuntimeBootstrapException):
-    """Raised when Runtime shutdown fails."""
+class BootstrapGraphException(RuntimeBootstrapException):
+    """Raised when there are issues with the Bootstrap Graph topology (e.g., cycles)."""
     pass
 
 
-class InvalidRuntimeStateTransitionException(RuntimeBootstrapException):
-    """Raised when an illegal state transition is attempted."""
-    
-    def __init__(self, current_state: RuntimeState, attempted_state: RuntimeState, message: Optional[str] = None):
-        msg = message or f"Illegal Runtime state transition from {current_state.name} to {attempted_state.name}"
-        super().__init__(msg, state=current_state, reason="Invalid state transition")
-        self.current_state = current_state
-        self.attempted_state = attempted_state
+class BootstrapPlanException(RuntimeBootstrapException):
+    """Raised when there are issues with Bootstrap Planning (e.g., invalid ordering)."""
+    pass
+
+
+class BootstrapMetadataException(RuntimeBootstrapException):
+    """Raised when there are issues with Bootstrap Metadata."""
+    pass

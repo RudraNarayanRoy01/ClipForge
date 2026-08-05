@@ -215,27 +215,37 @@ The Runtime Service Composition Foundation explicitly DOES NOT:
 ### Subsystem Pipeline Relationship
 The Runtime Foundation pipeline evolves as follows:
 
-Bootstrap
+RuntimeComposition
 ↓
-Registry
+RuntimeResolution
 ↓
-Dependency Graph
+RuntimeServiceComposition
 ↓
-Composition
+RuntimeInjectionComposition
 ↓
-Resolution
+RuntimeBootstrapComposition
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RuntimeExecution
 ↓
-Service Composition
+RuntimeLifecycle
 ↓
-**Runtime Dependency Injection Foundation** (You are here)
+RuntimeMonitoring
 ↓
-*(Future)* Runtime Bootstrap
-↓
-*(Future)* Runtime Executor
-↓
-*(Future)* Scheduler
-↓
-*(Future)* Provider Runtime
+RuntimeOptimization
+
+Clearly explaining the responsibilities:
+- **RuntimeComposition**: describes Runtime capabilities.
+- **RuntimeResolution**: describes Runtime topological initialization ordering.
+- **RuntimeServiceComposition**: describes Runtime services.
+- **RuntimeInjectionComposition**: describes Runtime dependency topology.
+- **RuntimeBootstrapComposition**: describes Runtime initialization planning.
+- **RuntimeExecution**: will perform execution.
+- **RuntimeLifecycle**: will manage Runtime state transitions.
+
+Every layer above the Metadata Boundary is declarative.
+Every layer below the Metadata Boundary is behavioural.
 
 ## Runtime Dependency Injection Foundation
 
@@ -262,4 +272,37 @@ The Runtime Dependency Injection Foundation explicitly DOES NOT:
 
 This batch DOES NOT perform Dependency Injection.
 This batch defines only immutable Runtime Injection metadata.
+
+## Runtime Bootstrap Foundation
+
+The Runtime Bootstrap Foundation establishes the **canonical Runtime Bootstrap representation** (Batch 6A.5.8).
+
+### Purpose
+To construct an immutable Runtime Bootstrap Composition from the Runtime Foundations.
+It prepares, validates, and readies the initialization structures. It does NOT execute them.
+
+### Responsibilities
+The Runtime Bootstrap Foundation owns:
+- Bootstrap topology
+- Bootstrap planning
+- Immutable bootstrap metadata
+- Immutable bootstrap statistics
+- Immutable snapshots
+
+### Boundaries & Ownership
+The Runtime Bootstrap Foundation explicitly DOES NOT own:
+- Runtime Execution
+- Dependency Injection
+- Object Instantiation
+- Service Activation
+- Provider Loading
+- Runtime Lifecycle
+- Runtime Monitoring
+- Runtime Optimization
+- Runtime Recovery
+- Scheduler Operations
+- Health Evaluation
+
+### Immutability & Determinism
+Everything remains immutable, deterministic, metadata-only, and observational. Lookups are strictly mapped by `MappingProxyType`, and sequences by `tuple`. Topological depth, width, and connection components are pre-computed purely as observational structural metadata.
 
