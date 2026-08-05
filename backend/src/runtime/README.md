@@ -121,12 +121,42 @@ It relies on the `DependencyGraphValidator` to orchestrate validation without ho
 
 Ownership transitions clearly as the Runtime boots:
 
-**Runtime Bootstrap Engine** -> Controls the *"When"* (Lifecycle orchestration)
+**Registry** (Controls "What Components exist?")
 ↓
-**Runtime Component Registry** -> Controls the *"What"* (Component ownership)
+**Dependency Graph** (Controls "How Components relate?")
 ↓
-**Runtime Dependency Graph** -> Controls the *"How they relate"* (Relationship ownership)
+**Composition Builder** (Orchestrates composition, validation, and factories)
 ↓
-**Future Runtime Composition** -> Will control the *"How they execute"* (DI & Instantiation)
+**Runtime Composition** (Immutable, structural representation of "What Runtime looks like?")
+↓
+**Future Runtime Executor** (Will control "How they execute" via DI & Instantiation)
 
 Each subsystem strictly obeys the Single Responsibility Principle, ensuring the Runtime remains deterministic and testable at every layer.
+
+## Runtime Composition Foundation
+
+The Runtime Composition Foundation is the canonical assembled Runtime representation. It represents the complete Runtime Foundation assembled from the Runtime Component Registry and Runtime Dependency Graph.
+
+### Purpose
+To construct an immutable, structural representation of the Runtime, providing a purely observational snapshot of all components and their relationships without executing or instantiating anything.
+
+### Internal Components & Responsibilities
+- **CompositionBuilder**: A thin orchestrator that delegates creation and validation to dedicated components.
+- **CompositionValidator**: Exclusively responsible for structural validation (registry presence, graph consistency, boundary enforcement).
+- **CompositionStatisticsBuilder**: Computes structural Runtime statistics (component/dependency/root/leaf counts) observationally.
+- **CompositionMetadataFactory**: Constructs immutable metadata encapsulating versioning and timestamps.
+- **CompositionIdFactory**: Isolates Composition identifier generation for future extensibility.
+- **CompositionSnapshotFactory**: Constructs immutable, deterministic point-in-time state snapshots.
+
+### Boundaries & Ownership
+The Runtime Composition Foundation explicitly DOES NOT:
+- Execute Runtime or Bootstrap
+- Instantiate Components or perform Dependency Injection
+- Resolve Services or execute Providers
+- Execute AI Models or allocate Hardware
+- Perform Runtime Monitoring, Scheduling, Telemetry, or Health Analysis
+
+### Deterministic & Immutability Guarantees
+- Employs strict immutable data structures (frozen dataclasses, tuples).
+- Output is completely determined by the snapshots of the Registry and Dependency Graph.
+- Internal snapshots and identifiers are inherently isolated to avoid leakage across sequential builds.
