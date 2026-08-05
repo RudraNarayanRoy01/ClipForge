@@ -160,3 +160,32 @@ The Runtime Composition Foundation explicitly DOES NOT:
 - Employs strict immutable data structures (frozen dataclasses, tuples).
 - Output is completely determined by the snapshots of the Registry and Dependency Graph.
 - Internal snapshots and identifiers are inherently isolated to avoid leakage across sequential builds.
+
+## Runtime Dependency Resolution Foundation
+
+The Runtime Dependency Resolution Foundation (Batch 6A.5.5) converts an immutable Runtime Composition into a deterministic Runtime Resolution. It determines the exact initialization ordering required by future Runtime execution without executing any components.
+
+### Purpose
+To compute deterministic topological ordering and layers of component dependencies to establish exactly what order they must be initialized in.
+
+### Responsibilities
+- Deterministic topological ordering of components based on their dependencies.
+- Validation of graphs to prevent dependency cycles or references to missing components.
+- Providing isolated, immutable representations of resolution results, metadata, and statistics.
+- Strict isolation of ordering logic (Algorithm), orchestration (Resolver), and validation (Validator).
+
+### Boundaries & Ownership
+The Runtime Dependency Resolution explicitly DOES NOT:
+- Execute Runtime or instantiate components.
+- Perform Dependency Injection or Runtime activation.
+- Contain execution state or provider awareness.
+- Mutate the Component Registry, Dependency Graph, or Composition.
+
+### Subsystem Pipeline Relationship
+The Runtime Dependency Resolution takes ownership directly after Composition:
+
+**Runtime Composition** ("What does the Runtime look like?")
+↓
+**Runtime Dependency Resolution** ("In what order should Components be initialized?")
+↓
+**Future Runtime Execution** (Handles the actual instantiation and scheduling)
