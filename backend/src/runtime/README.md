@@ -37,7 +37,7 @@ The Runtime is designed to evolve progressively without requiring major structur
 - **Sprint 6.2:** Capability Registry
 - **Sprint 6.3:** Resource Discovery
 - **Sprint 6.4:** Planning Engine
-- **Sprint 6.5:** Execution Engine
+- **Sprint 6.5:** Execution Foundation
 - **Sprint 6.6:** Provider Ecosystem
 - **Sprint 6.7:** Adaptive Optimization
 - **Sprint 6.8:** Runtime Certification
@@ -90,7 +90,7 @@ The Registry supports being 'frozen' to prevent subsequent mutations. Components
 
 ## Runtime Dependency Graph
 
-The Runtime Dependency Graph is the canonical structural blueprint of the Runtime. It answers the question: *"How do Runtime Components relate to each other?"*
+The Runtime Dependency Graph is the canonical structural topology of the Runtime. It answers the question: *"How do Runtime Components relate to each other?"*
 
 ### Dependency Terminology
 - **RuntimeDependency**: An immutable representation of a single directed relationship in the graph.
@@ -192,7 +192,7 @@ The Runtime Dependency Resolution takes ownership directly after Composition:
 
 ## Runtime Service Composition Foundation
 
-The Runtime Service Composition Foundation (Batch 6A.5.6) establishes the **canonical Runtime Service Blueprint**. It represents the final, immutable declaration of what services the Runtime will expose once instantiated.
+The Runtime Service Composition Foundation (Batch 6A.5.6) establishes the **canonical Runtime Service Composition**. It represents the final, immutable declaration of what services the Runtime will expose once instantiated.
 
 ### Purpose
 To define exactly **what Runtime Services would exist** once the Runtime is instantiated, utilizing purely structural metadata and identifiers. It bridges the gap between resolved components and executable services without instantiating or executing anything.
@@ -327,12 +327,16 @@ The Runtime Execution Identity Foundation (Batch 6A.6.1) establishes the **immut
 ### Purpose
 
 This batch answers ONE architectural question:
-*"What is a Runtime Execution?"*
+
+"What Runtime Execution Identity exists?"
 
 It does NOT answer:
-*"How does Runtime execute?"*
 
-Execution behaviour belongs to future batches. This batch is still **ABOVE the Metadata Boundary**.
+"How does Runtime execute?"
+
+Execution behaviour belongs to future batches.
+
+This batch remains ABOVE the Metadata Boundary.
 
 ### Ownership Matrix
 
@@ -341,27 +345,33 @@ RuntimeExecution OWNS ONLY:
 - identity
 
 RuntimeExecutionIdentity OWNS:
-- Descriptor
-- Metadata
-- State
-- Snapshot
-- RuntimeExecution
+- descriptor
+- metadata
+- state
+- snapshot
+- runtime_execution
 
 ### DOES NOT OWN
 
 RuntimeExecutionIdentity DOES NOT OWN:
+- RuntimeExecutionLifecycle
+- RuntimeScheduler
+- RuntimeExecutionEngine
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
+- Provider Loading
+- Hardware Management
+- Prompt Construction
+- Execution Requests
+- Execution Results
+- Dependency Injection
 - RuntimeExecutionGraph
 - RuntimeExecutionPlan
 - RuntimeExecutionContext
 - RuntimeExecutionBuilder
 - RuntimeExecutionComposition
-- RuntimeLifecycle
-- Monitoring
-- Telemetry
-- Optimization
-- Provider Loading
-- Scheduling
-- Hardware Management
 
 ### Hash Hierarchy
 
@@ -392,7 +402,7 @@ RuntimeExecutionContext
 ↓
 RuntimeExecutionComposition
 ↓
-Future RuntimeExecutionBuilder
+RuntimeExecutionBuilder
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Metadata Boundary
@@ -407,17 +417,30 @@ Future Provider Routing
 
 ### Runtime UNKNOWN
 
-RuntimeExecutionIdentity answers:
+RuntimeExecutionIdentity answers ONLY:
+
 "What Runtime Execution Identity exists?"
 
-It MUST NOT answer:
-"How Runtime executes."
+It NEVER answers:
 
-Execution belongs to future Runtime Execution batches.
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
 
 ### Canonical Declaration
 
-RuntimeExecutionIdentity is recognized as the canonical ownership boundary for Runtime Execution identity. It performs no execution and exists solely as immutable Runtime metadata.
+RuntimeExecutionIdentity is recognized as the canonical immutable Runtime Execution Identity representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO execution.
+
+It remains ABOVE the Metadata Boundary.
 
 ## Runtime Execution Graph Foundation
 
@@ -426,7 +449,18 @@ The Runtime Execution Graph (Batch 6A.6.2) establishes the **immutable topology 
 This is NOT an execution graph engine, scheduler, execution planner, or runtime pipeline. It is purely declarative and does not contain execution semantics.
 
 ### Purpose
-To answer: *"What is the immutable topology of Runtime Execution?"*
+
+This batch answers ONE architectural question:
+
+"What Runtime Execution Graph exists?"
+
+It does NOT answer:
+
+"How does Runtime execute?"
+
+Execution behaviour belongs to future batches.
+
+This batch remains ABOVE the Metadata Boundary.
 
 ### Ownership Matrix
 
@@ -435,12 +469,12 @@ RuntimeExecutionGraph OWNS ONLY:
 - identity
 
 RuntimeExecutionGraphIdentity OWNS:
-- Descriptor
-- Metadata
-- Statistics
-- Snapshot
-- RuntimeExecutionNode
-- RuntimeExecutionEdge
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_node
+- runtime_execution_edge
 - node_lookup
 - edge_lookup
 - descriptor_lookup
@@ -452,24 +486,28 @@ RuntimeExecutionGraphIdentity OWNS:
 ### DOES NOT OWN
 
 RuntimeExecutionGraph DOES NOT OWN:
+- RuntimeExecutionLifecycle
+- RuntimeScheduler
+- RuntimeExecutionEngine
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
+- Provider Loading
+- Hardware Management
+- Prompt Construction
+- Execution Requests
+- Execution Results
+- Dependency Injection
 - RuntimeExecutionPlan
 - RuntimeExecutionContext
 - RuntimeExecutionBuilder
 - RuntimeExecutionComposition
-- RuntimeExecutionLifecycle
 - RuntimeExecutionQueue
-- RuntimeExecutionScheduler
-- RuntimeExecutionMonitoring
-- RuntimeExecutionTelemetry
-- RuntimeExecutionOptimization
-- RuntimeExecutionRecovery
 - RuntimeProvider
 - RuntimeModel
-- RuntimePrompt
-- ExecutionRequest
-- ExecutionResult
 
-### Subsystem Pipeline Relationship
+### Pipeline Position
 
 ```text
 RuntimeExecutionIdentity
@@ -482,7 +520,7 @@ RuntimeExecutionContext
 ↓
 RuntimeExecutionComposition
 ↓
-Future RuntimeExecutionBuilder
+RuntimeExecutionBuilder
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Metadata Boundary
@@ -539,30 +577,48 @@ snapshot_hash
 
 ### Runtime UNKNOWN
 
-RuntimeExecutionGraph answers:
-"What Runtime Graph exists?"
+RuntimeExecutionGraph answers ONLY:
 
-It MUST NOT answer:
-"How Runtime executes."
+"What Runtime Execution Graph exists?"
 
-Execution belongs to future Runtime Execution batches.
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
 
 ### Canonical Declaration
 
-RuntimeExecutionGraph is recognized as the canonical immutable topology representation. It performs no execution and exists solely as immutable Runtime metadata.
+RuntimeExecutionGraph is recognized as the canonical immutable Runtime Execution Graph representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO execution.
+
+It remains ABOVE the Metadata Boundary.
 
 ## Runtime Execution Plan Foundation
 
 The Runtime Execution Plan Foundation (Batch 6A.6.3) establishes the **canonical Runtime Execution Plan Foundation**. 
 
 ### Purpose
+
 This batch answers ONE architectural question:
-*"What is the deterministic execution plan for Runtime Execution?"*
+
+"What Runtime Execution Plan exists?"
 
 It does NOT answer:
-*"How does Runtime execute?"*
 
-Execution behaviour belongs to future batches. This batch is still **ABOVE the Metadata Boundary**.
+"How does Runtime execute?"
+
+Execution behaviour belongs to future batches.
+
+This batch remains ABOVE the Metadata Boundary.
 
 ### Ownership Matrix
 
@@ -571,30 +627,33 @@ RuntimeExecutionPlan OWNS ONLY:
 - identity
 
 RuntimeExecutionPlanIdentity OWNS:
-- Descriptor
-- Metadata
-- Statistics
-- Snapshot
-- Layers
-- Layer Lookup
-- Batch Lookup
-- Descriptor Lookup
-- Plan Lookup
+- descriptor
+- metadata
+- statistics
+- snapshot
+- layers
+- layer_lookup
+- batch_lookup
+- descriptor_lookup
+- plan_lookup
 
 ### DOES NOT OWN
 
 RuntimeExecutionPlan DOES NOT OWN:
-- Execution
-- Scheduler
-- Lifecycle
-- Monitoring
-- Telemetry
-- Optimization
+- RuntimeExecutionLifecycle
+- RuntimeScheduler
+- RuntimeExecutionEngine
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
 - Provider Loading
 - Hardware Management
+- Prompt Construction
+- Execution Requests
+- Execution Results
+- Dependency Injection
 - Context
-- Requests
-- Results
 
 ### Hash Hierarchy
 
@@ -629,7 +688,7 @@ RuntimeExecutionContext
 ↓
 RuntimeExecutionComposition
 ↓
-Future RuntimeExecutionBuilder
+RuntimeExecutionBuilder
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Metadata Boundary
@@ -644,17 +703,30 @@ Future Provider Routing
 
 ### Runtime UNKNOWN
 
-RuntimeExecutionPlan answers:
-"What Runtime Plan exists?"
+RuntimeExecutionPlan answers ONLY:
 
-It MUST NOT answer:
-"How Runtime executes."
+"What Runtime Execution Plan exists?"
 
-Execution belongs to future Runtime Execution batches.
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
 
 ### Canonical Declaration
 
-RuntimeExecutionPlan is recognized as the canonical immutable planning representation. It performs no execution and exists solely as immutable Runtime metadata.
+RuntimeExecutionPlan is recognized as the canonical immutable Runtime Execution Plan representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO execution.
+
+It remains ABOVE the Metadata Boundary.
 
 
 ## Runtime Execution Context Foundation
@@ -664,12 +736,16 @@ The Runtime Execution Context Foundation (Batch 6A.6.4) establishes the **canoni
 ### Purpose
 
 This batch answers ONE architectural question:
-*"What is the deterministic execution context for Runtime Execution?"*
+
+"What Runtime Execution Context exists?"
 
 It does NOT answer:
-*"How does Runtime execute?"*
 
-Execution behaviour belongs to future batches. This batch is still **ABOVE the Metadata Boundary**.
+"How does Runtime execute?"
+
+Execution behaviour belongs to future batches.
+
+This batch remains ABOVE the Metadata Boundary.
 
 ### Ownership Matrix
 
@@ -678,12 +754,12 @@ RuntimeExecutionContext OWNS ONLY:
 - identity
 
 RuntimeExecutionContextIdentity OWNS:
-- Descriptor
-- Metadata
-- Statistics
-- Snapshot
-- Variables
-- Bindings
+- descriptor
+- metadata
+- statistics
+- snapshot
+- variables
+- bindings
 - variable_lookup
 - binding_lookup
 - descriptor_lookup
@@ -692,23 +768,22 @@ RuntimeExecutionContextIdentity OWNS:
 ### DOES NOT OWN
 
 RuntimeExecutionContext DOES NOT OWN:
-- RuntimeExecutionBuilder
-- RuntimeExecutionComposition
 - RuntimeExecutionLifecycle
 - RuntimeScheduler
 - RuntimeExecutionEngine
-- Monitoring
-- Telemetry
-- Optimization
-- Recovery
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
 - Provider Loading
 - Hardware Management
+- Prompt Construction
 - Execution Requests
 - Execution Results
-- Prompt Construction
-- Model Management
 - Dependency Injection
-- Execution Behaviour
+- RuntimeExecutionBuilder
+- RuntimeExecutionComposition
+- Model Management
 
 ### Hash Hierarchy
 
@@ -747,7 +822,7 @@ RuntimeExecutionContext
 ↓
 RuntimeExecutionComposition
 ↓
-Future RuntimeExecutionBuilder
+RuntimeExecutionBuilder
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Metadata Boundary
@@ -762,19 +837,45 @@ Future Provider Routing
 
 ### Runtime UNKNOWN
 
-RuntimeExecutionContext answers:
-"What Runtime Context exists?"
+RuntimeExecutionContext answers ONLY:
 
-It MUST NOT answer:
-"How Runtime executes."
+"What Runtime Execution Context exists?"
 
-Execution belongs to future Runtime Execution batches.
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
 
 ### Canonical Declaration
 
-RuntimeExecutionContext is recognized as the canonical immutable Runtime Context representation. It performs no execution and exists solely as immutable Runtime metadata.
+RuntimeExecutionContext is recognized as the canonical immutable Runtime Execution Context representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO execution.
+
+It remains ABOVE the Metadata Boundary.
 
 ## Runtime Execution Composition Foundation
+
+The Runtime Execution Composition Foundation (Batch 6A.6.5) establishes the **canonical Runtime Execution Composition Foundation**.
+
+### Purpose
+
+This batch answers ONE architectural question:
+"What Runtime Execution Composition exists?"
+
+It does NOT answer:
+"How does Runtime execute?"
+
+Execution behaviour belongs to future batches.
+This batch remains ABOVE the Metadata Boundary.
 
 ### Pipeline Position
 
@@ -789,7 +890,7 @@ RuntimeExecutionContext
 ↓
 RuntimeExecutionComposition
 ↓
-Future RuntimeExecutionBuilder
+RuntimeExecutionBuilder
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Metadata Boundary
@@ -809,14 +910,14 @@ RuntimeExecutionComposition OWNS ONLY:
 - identity
 
 RuntimeExecutionCompositionIdentity OWNS:
-- Descriptor
-- Metadata
-- Statistics
-- Snapshot
-- RuntimeExecutionIdentity
-- RuntimeExecutionGraph
-- RuntimeExecutionPlan
-- RuntimeExecutionContext
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_identity
+- runtime_execution_graph
+- runtime_execution_plan
+- runtime_execution_context
 - identity_lookup
 - graph_lookup
 - plan_lookup
@@ -827,18 +928,19 @@ RuntimeExecutionCompositionIdentity OWNS:
 ### DOES NOT OWN
 
 RuntimeExecutionComposition DOES NOT OWN:
-- Execution
-- Lifecycle
-- Scheduler
-- Monitoring
-- Telemetry
-- Optimization
-- Recovery
+- RuntimeExecutionLifecycle
+- RuntimeScheduler
+- RuntimeExecutionEngine
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
 - Provider Loading
 - Hardware Management
 - Prompt Construction
 - Execution Requests
 - Execution Results
+- Dependency Injection
 - RuntimeExecutionBuilder
 
 ### Hash Hierarchy
@@ -875,14 +977,151 @@ composition_hash
 
 ### Runtime UNKNOWN
 
-RuntimeExecutionComposition answers:
-"What Runtime package exists?"
+RuntimeExecutionComposition answers ONLY:
 
-It MUST NOT answer:
-"How Runtime executes."
+"What Runtime Execution Composition exists?"
 
-Execution belongs to future Runtime Execution batches.
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
 
 ### Canonical Declaration
 
-RuntimeExecutionComposition is the final immutable Runtime package above the Metadata Boundary.
+RuntimeExecutionComposition is recognized as the canonical immutable Runtime Execution Composition representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO execution.
+
+It remains ABOVE the Metadata Boundary.
+
+## Runtime Execution Builder Foundation
+
+The Runtime Execution Builder Foundation (Batch 6A.6.6) establishes the **canonical Runtime Execution Builder Foundation**.
+
+### Purpose
+
+This batch answers ONE architectural question:
+
+"What Runtime Execution Builder exists?"
+
+It does NOT answer:
+
+"How does Runtime execute?"
+
+Execution behaviour belongs to future batches.
+
+This batch remains ABOVE the Metadata Boundary.
+
+### Pipeline Position
+
+```text
+RuntimeExecutionIdentity
+↓
+RuntimeExecutionGraph
+↓
+RuntimeExecutionPlan
+↓
+RuntimeExecutionContext
+↓
+RuntimeExecutionComposition
+↓
+RuntimeExecutionBuilder
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Future RuntimeExecutionLifecycle
+Future RuntimeScheduler
+Future RuntimeExecutionEngine
+Future RuntimeTelemetry
+Future Provider Routing
+```
+
+### Ownership Matrix
+
+RuntimeExecutionBuilder OWNS ONLY:
+- identifier
+- identity
+
+RuntimeExecutionBuilderIdentity OWNS:
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_composition
+- composition_lookup
+- descriptor_lookup
+- builder_lookup
+
+### DOES NOT OWN
+
+RuntimeExecutionBuilder DOES NOT OWN:
+- RuntimeExecutionLifecycle
+- RuntimeScheduler
+- RuntimeExecutionEngine
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
+- Provider Loading
+- Hardware Management
+- Prompt Construction
+- Execution Requests
+- Execution Results
+- Dependency Injection
+
+### Hash Hierarchy
+
+RuntimeExecutionBuilder maintains a strict deterministic SHA-256 hash hierarchy:
+
+descriptor_hash
+↓
+composition_hash
+↓
+composition_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+builder_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+builder_hash
+
+### Runtime UNKNOWN
+
+RuntimeExecutionBuilder answers ONLY:
+
+"What Runtime Execution Builder exists?"
+
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime optimizes
+How Runtime monitors
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
+
+### Canonical Declaration
+
+RuntimeExecutionBuilder is recognized as the canonical immutable Runtime Execution Builder representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO execution.
+
+It remains ABOVE the Metadata Boundary.

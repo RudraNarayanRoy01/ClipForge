@@ -82,6 +82,20 @@ from .execution_composition_statistics_builder import ExecutionCompositionStatis
 from .execution_composition_factory import ExecutionCompositionFactory
 from .runtime_execution_composition_factory import RuntimeExecutionCompositionFactory
 
+from .runtime_execution_builder_descriptor import RuntimeExecutionBuilderDescriptor
+from .runtime_execution_builder_metadata import RuntimeExecutionBuilderMetadata
+from .runtime_execution_builder_statistics import RuntimeExecutionBuilderStatistics
+from .runtime_execution_builder_snapshot import RuntimeExecutionBuilderSnapshot
+from .runtime_execution_builder_identity import RuntimeExecutionBuilderIdentity
+from .runtime_execution_builder import RuntimeExecutionBuilder
+from .runtime_execution_builder_validator import RuntimeExecutionBuilderValidator
+from .execution_builder_descriptor_factory import ExecutionBuilderDescriptorFactory
+from .execution_builder_metadata_factory import ExecutionBuilderMetadataFactory
+from .execution_builder_snapshot_factory import ExecutionBuilderSnapshotFactory
+from .execution_builder_statistics_builder import ExecutionBuilderStatisticsBuilder
+from .execution_builder_factory import ExecutionBuilderFactory
+from .runtime_execution_builder_factory import RuntimeExecutionBuilderFactory
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -168,5 +182,20 @@ __all__ = [
     "ExecutionCompositionSnapshotFactory",
     "ExecutionCompositionStatisticsBuilder",
     "ExecutionCompositionFactory",
-    "RuntimeExecutionCompositionFactory"
+    "RuntimeExecutionCompositionFactory",
+    
+    # Builder artifacts in canonical order
+    "RuntimeExecutionBuilderDescriptor",
+    "RuntimeExecutionBuilderMetadata",
+    "RuntimeExecutionBuilderStatistics",
+    "RuntimeExecutionBuilderSnapshot",
+    "RuntimeExecutionBuilderIdentity",
+    "RuntimeExecutionBuilder",
+    "RuntimeExecutionBuilderValidator",
+    "ExecutionBuilderDescriptorFactory",
+    "ExecutionBuilderMetadataFactory",
+    "ExecutionBuilderSnapshotFactory",
+    "ExecutionBuilderStatisticsBuilder",
+    "ExecutionBuilderFactory",
+    "RuntimeExecutionBuilderFactory"
 ]
