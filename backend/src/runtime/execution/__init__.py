@@ -96,6 +96,20 @@ from .execution_builder_statistics_builder import ExecutionBuilderStatisticsBuil
 from .execution_builder_factory import ExecutionBuilderFactory
 from .runtime_execution_builder_factory import RuntimeExecutionBuilderFactory
 
+from .runtime_execution_lifecycle_descriptor import RuntimeExecutionLifecycleDescriptor
+from .runtime_execution_lifecycle_metadata import RuntimeExecutionLifecycleMetadata
+from .runtime_execution_lifecycle_statistics import RuntimeExecutionLifecycleStatistics
+from .runtime_execution_lifecycle_snapshot import RuntimeExecutionLifecycleSnapshot
+from .runtime_execution_lifecycle_identity import RuntimeExecutionLifecycleIdentity
+from .runtime_execution_lifecycle import RuntimeExecutionLifecycle
+from .runtime_execution_lifecycle_validator import RuntimeExecutionLifecycleValidator
+from .execution_lifecycle_descriptor_factory import ExecutionLifecycleDescriptorFactory
+from .execution_lifecycle_metadata_factory import ExecutionLifecycleMetadataFactory
+from .execution_lifecycle_statistics_builder import ExecutionLifecycleStatisticsBuilder
+from .execution_lifecycle_snapshot_factory import ExecutionLifecycleSnapshotFactory
+from .execution_lifecycle_factory import ExecutionLifecycleFactory
+from .runtime_execution_lifecycle_factory import RuntimeExecutionLifecycleFactory
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -197,5 +211,20 @@ __all__ = [
     "ExecutionBuilderSnapshotFactory",
     "ExecutionBuilderStatisticsBuilder",
     "ExecutionBuilderFactory",
-    "RuntimeExecutionBuilderFactory"
+    "RuntimeExecutionBuilderFactory",
+    
+    # Lifecycle artifacts in canonical order
+    "RuntimeExecutionLifecycleDescriptor",
+    "RuntimeExecutionLifecycleMetadata",
+    "RuntimeExecutionLifecycleStatistics",
+    "RuntimeExecutionLifecycleSnapshot",
+    "RuntimeExecutionLifecycleIdentity",
+    "RuntimeExecutionLifecycle",
+    "RuntimeExecutionLifecycleValidator",
+    "ExecutionLifecycleDescriptorFactory",
+    "ExecutionLifecycleMetadataFactory",
+    "ExecutionLifecycleStatisticsBuilder",
+    "ExecutionLifecycleSnapshotFactory",
+    "ExecutionLifecycleFactory",
+    "RuntimeExecutionLifecycleFactory"
 ]
