@@ -372,3 +372,150 @@ Execution behaviour belongs exclusively to later Runtime Execution batches.
 
 RuntimeExecutionIdentity intentionally preserves Runtime UNKNOWN by describing Runtime Execution without defining Runtime Execution behaviour.
 This boundary is mandatory.
+
+## Runtime Execution Graph Foundation
+
+The Runtime Execution Graph (Batch 6A.6.2) establishes the **immutable topology of Runtime Execution**.
+
+This is NOT an execution graph engine, scheduler, execution planner, or runtime pipeline. It is purely declarative and does not contain execution semantics.
+
+### Purpose
+To answer: *"What is the immutable topology of Runtime Execution?"*
+
+### Ownership Matrix
+
+**Runtime Execution Graph OWNS ONLY:**
+- `RuntimeExecutionGraphIdentity`
+
+**RuntimeExecutionGraphIdentity OWNS:**
+- `RuntimeExecutionGraphDescriptor`
+- `RuntimeExecutionGraphMetadata`
+- `RuntimeExecutionGraphStatistics`
+- `RuntimeExecutionGraphSnapshot`
+- `RuntimeExecutionNode`
+- `RuntimeExecutionEdge`
+- `node_lookup`
+- `edge_lookup`
+- `descriptor_lookup`
+- `incoming_lookup`
+- `outgoing_lookup`
+- `roots`
+- `leaves`
+
+**Runtime Execution Graph DOES NOT OWN:**
+- `RuntimeExecutionPlan`
+- `RuntimeExecutionContext`
+- `RuntimeExecutionBuilder`
+- `RuntimeExecutionComposition`
+- `RuntimeExecutionLifecycle`
+- `RuntimeExecutionQueue`
+- `RuntimeExecutionScheduler`
+- `RuntimeExecutionMonitoring`
+- `RuntimeExecutionTelemetry`
+- `RuntimeExecutionOptimization`
+- `RuntimeExecutionRecovery`
+- `RuntimeProvider`
+- `RuntimeModel`
+- `RuntimePrompt`
+- `ExecutionRequest`
+- `ExecutionResult`
+
+### Subsystem Pipeline Relationship
+
+```text
+Runtime Execution Identity
+↓
+Runtime Execution Graph
+↓
+Future Runtime Execution Plan
+↓
+Future Runtime Execution Context
+↓
+Future Runtime Execution Builder
+↓
+Future Runtime Execution Composition
+↓
+Future Runtime Execution
+```
+
+Clearly distinguish:
+**Above Metadata Boundary:**
+Declarative (Everything up to Composition)
+
+**Below Metadata Boundary:**
+Behavioural (Runtime Execution)
+
+### Runtime Execution Graph Construction Pipeline
+
+The Runtime Execution Graph is constructed through a strict, non-behavioral sequence:
+
+```text
+Validation
+↓
+Identifier Generation
+↓
+Metadata Generation
+↓
+Graph Construction
+↓
+Statistics Construction
+↓
+Snapshot Construction
+↓
+Graph Assembly
+↓
+Result Construction
+```
+
+### Hash Hierarchy
+
+The Runtime Execution Graph maintains a strict deterministic SHA-256 hash hierarchy:
+
+```text
+descriptor_hash
+↓
+node_hash
+↓
+edge_hash
+↓
+graph_hash
+↓
+lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+snapshot_hash
+```
+
+Every hash is deterministic SHA-256 containing no timestamps, randomness, or runtime state.
+
+### Metadata Boundary & Runtime UNKNOWN
+
+The Metadata Boundary ensures that the Graph relies only on descriptive references. Everything produced in this batch remains purely declarative.
+
+RuntimeExecutionGraph intentionally preserves **Runtime UNKNOWN**. It describes relationships but does not know *how* or *when* execution occurs. Behavior begins only in future Runtime Execution batches.
+
+### Runtime Execution Graph Philosophy
+
+The Runtime Execution Graph answers: *"What relationships exist?"*
+It does NOT answer: *"How Runtime executes."*
+
+It describes topology. It never performs execution. It uses deterministic, purely functional structures (`MappingProxyType`, `tuple`, `frozenset`). It validates structure (duplicates, missing nodes, broken edges) but not execution validity.
+
+### Canonical Declaration
+
+Runtime Execution Graph is recognized as the canonical immutable topology representation.
+
+It performs:
+- no execution
+- no planning
+- no scheduling
+- no provider loading
+- no lifecycle
+- no monitoring
+- no telemetry
+- no optimization
+
+It exists solely as immutable Runtime metadata.
