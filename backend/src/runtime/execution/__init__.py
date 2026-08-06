@@ -36,6 +36,22 @@ from .execution_graph_snapshot_factory import ExecutionGraphSnapshotFactory
 from .execution_graph_statistics_builder import ExecutionGraphStatisticsBuilder
 from .runtime_execution_graph_factory import RuntimeExecutionGraphFactory
 
+from .runtime_execution_dependency_batch import RuntimeExecutionDependencyBatch
+from .runtime_execution_layer import RuntimeExecutionLayer
+from .runtime_execution_plan_descriptor import RuntimeExecutionPlanDescriptor
+from .runtime_execution_plan_metadata import RuntimeExecutionPlanMetadata
+from .runtime_execution_plan_statistics import RuntimeExecutionPlanStatistics
+from .runtime_execution_plan_snapshot import RuntimeExecutionPlanSnapshot
+from .runtime_execution_plan_identity import RuntimeExecutionPlanIdentity
+from .runtime_execution_plan import RuntimeExecutionPlan
+from .runtime_execution_plan_validator import RuntimeExecutionPlanValidator
+from .execution_plan_descriptor_factory import ExecutionPlanDescriptorFactory
+from .execution_plan_metadata_factory import ExecutionPlanMetadataFactory
+from .execution_plan_snapshot_factory import ExecutionPlanSnapshotFactory
+from .execution_plan_statistics_builder import ExecutionPlanStatisticsBuilder
+from .execution_plan_factory import ExecutionPlanFactory
+from .runtime_execution_plan_factory import RuntimeExecutionPlanFactory
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -73,5 +89,22 @@ __all__ = [
     "ExecutionGraphFactory",
     "ExecutionGraphSnapshotFactory",
     "ExecutionGraphStatisticsBuilder",
-    "RuntimeExecutionGraphFactory"
+    "RuntimeExecutionGraphFactory",
+    
+    # Plan artifacts in canonical order
+    "RuntimeExecutionDependencyBatch",
+    "RuntimeExecutionLayer",
+    "RuntimeExecutionPlanDescriptor",
+    "RuntimeExecutionPlanMetadata",
+    "RuntimeExecutionPlanStatistics",
+    "RuntimeExecutionPlanSnapshot",
+    "RuntimeExecutionPlanIdentity",
+    "RuntimeExecutionPlan",
+    "RuntimeExecutionPlanValidator",
+    "ExecutionPlanDescriptorFactory",
+    "ExecutionPlanMetadataFactory",
+    "ExecutionPlanSnapshotFactory",
+    "ExecutionPlanStatisticsBuilder",
+    "ExecutionPlanFactory",
+    "RuntimeExecutionPlanFactory"
 ]

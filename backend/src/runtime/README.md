@@ -519,3 +519,93 @@ It performs:
 - no optimization
 
 It exists solely as immutable Runtime metadata.
+
+## Runtime Execution Plan Foundation
+
+The Runtime Execution Plan Foundation (Batch 6A.6.3) establishes the **canonical Runtime Execution Plan Foundation**. 
+
+### Purpose
+This batch answers ONE architectural question:
+*"What is the deterministic execution plan for Runtime Execution?"*
+
+It does NOT answer:
+*"How does Runtime execute?"*
+
+Execution behaviour belongs to future batches. This batch is still **ABOVE the Metadata Boundary**.
+
+### Boundaries & Ownership
+
+RuntimeExecutionPlanIdentity OWNS:
+- Descriptor
+- Metadata
+- Statistics
+- Snapshot
+- Layers
+- Layer Lookup
+- Batch Lookup
+- Descriptor Lookup
+- Plan Lookup
+
+RuntimeExecutionPlan DOES NOT OWN:
+- Execution
+- Scheduler
+- Lifecycle
+- Monitoring
+- Telemetry
+- Optimization
+- Provider Loading
+- Hardware Management
+- Context
+- Requests
+- Results
+
+### Hash Hierarchy
+The Runtime Execution Plan maintains a strict deterministic SHA-256 hash hierarchy:
+`descriptor_hash`
+↓
+`layer_hash`
+↓
+`batch_hash`
+↓
+`lookup_hash`
+↓
+`plan_lookup_hash`
+↓
+`metadata_hash`
+↓
+`statistics_hash`
+↓
+`plan_hash`
+
+Every hash is deterministic SHA-256 containing no timestamps, randomness, or runtime state.
+
+### Metadata Boundary & Runtime UNKNOWN
+
+Nothing executes.
+Nothing schedules.
+Nothing activates.
+Nothing loads.
+Nothing orchestrates.
+Nothing optimizes.
+Everything is immutable metadata.
+
+### Pipeline Position
+
+RuntimeExecutionIdentity
+↓
+RuntimeExecutionGraph
+↓
+RuntimeExecutionPlan
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Future RuntimeExecutionContext
+Future RuntimeExecutionBuilder
+Future RuntimeExecutionComposition
+Future RuntimeExecutionEngine
+Future RuntimeExecutionLifecycle
+
+### Canonical Declaration
+
+Runtime Execution Plan is recognized as the canonical immutable planning representation. It performs no execution and exists solely as immutable Runtime metadata.
+
