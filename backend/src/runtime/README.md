@@ -609,3 +609,120 @@ Future RuntimeExecutionLifecycle
 
 Runtime Execution Plan is recognized as the canonical immutable planning representation. It performs no execution and exists solely as immutable Runtime metadata.
 
+
+# Runtime Execution Context Foundation
+
+Runtime Execution Context is recognized as the canonical immutable Runtime Context representation.
+
+It performs
+• no execution
+• no scheduling
+• no lifecycle
+• no provider loading
+• no monitoring
+• no telemetry
+• no optimization
+
+It exists solely as immutable Runtime metadata.
+
+## Pipeline Position
+
+RuntimeExecutionIdentity
+↓
+RuntimeExecutionGraph
+↓
+RuntimeExecutionPlan
+↓
+RuntimeExecutionContext
+↓
+Future RuntimeExecutionComposition
+↓
+Future RuntimeExecutionBuilder
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Future RuntimeExecutionLifecycle
+Future RuntimeScheduler
+Future RuntimeExecutionEngine
+Future RuntimeTelemetry
+Future Provider Routing
+
+## Ownership Matrix
+
+RuntimeExecutionContext OWNS ONLY
+• identifier
+• identity
+
+RuntimeExecutionContextIdentity OWNS
+• Descriptor
+• Metadata
+• Statistics
+• Snapshot
+• Variables
+• Bindings
+• variable_lookup
+• binding_lookup
+• descriptor_lookup
+• context_lookup
+
+## Does Not Own
+
+RuntimeExecutionContext DOES NOT OWN:
+- RuntimeExecutionBuilder
+- RuntimeExecutionComposition
+- RuntimeExecutionLifecycle
+- RuntimeScheduler
+- RuntimeExecutionEngine
+- Monitoring
+- Telemetry
+- Optimization
+- Recovery
+- Provider Loading
+- Hardware Management
+- Execution Requests
+- Execution Results
+- Prompt Construction
+- Model Management
+- Dependency Injection
+- Execution Behaviour
+
+## Deterministic Hash Hierarchy
+
+Explicit SHA-256 deterministic derivation. No timestamps. No randomness.
+
+descriptor_hash
+↓
+variable_hash
+↓
+binding_hash
+↓
+variable_lookup_hash
+↓
+binding_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+context_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+context_hash
+
+## Runtime UNKNOWN
+
+RuntimeExecutionContext answers
+"What Runtime Context exists?"
+NOT
+"How Runtime executes."
+NOT
+"How variables are resolved."
+NOT
+"How bindings execute."
+NOT
+"How providers load."
+NOT
+"How scheduling occurs."

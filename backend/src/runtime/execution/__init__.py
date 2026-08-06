@@ -52,6 +52,22 @@ from .execution_plan_statistics_builder import ExecutionPlanStatisticsBuilder
 from .execution_plan_factory import ExecutionPlanFactory
 from .runtime_execution_plan_factory import RuntimeExecutionPlanFactory
 
+from .runtime_execution_variable import RuntimeExecutionVariable
+from .runtime_execution_binding import RuntimeExecutionBinding
+from .runtime_execution_context_descriptor import RuntimeExecutionContextDescriptor
+from .runtime_execution_context_metadata import RuntimeExecutionContextMetadata
+from .runtime_execution_context_statistics import RuntimeExecutionContextStatistics
+from .runtime_execution_context_snapshot import RuntimeExecutionContextSnapshot
+from .runtime_execution_context_identity import RuntimeExecutionContextIdentity
+from .runtime_execution_context import RuntimeExecutionContext
+from .runtime_execution_context_validator import RuntimeExecutionContextValidator
+from .execution_context_descriptor_factory import ExecutionContextDescriptorFactory
+from .execution_context_metadata_factory import ExecutionContextMetadataFactory
+from .execution_context_snapshot_factory import ExecutionContextSnapshotFactory
+from .execution_context_statistics_builder import ExecutionContextStatisticsBuilder
+from .execution_context_factory import ExecutionContextFactory
+from .runtime_execution_context_factory import RuntimeExecutionContextFactory
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -106,5 +122,22 @@ __all__ = [
     "ExecutionPlanSnapshotFactory",
     "ExecutionPlanStatisticsBuilder",
     "ExecutionPlanFactory",
-    "RuntimeExecutionPlanFactory"
+    "RuntimeExecutionPlanFactory",
+    
+    # Context artifacts in canonical order
+    "RuntimeExecutionVariable",
+    "RuntimeExecutionBinding",
+    "RuntimeExecutionContextDescriptor",
+    "RuntimeExecutionContextMetadata",
+    "RuntimeExecutionContextStatistics",
+    "RuntimeExecutionContextSnapshot",
+    "RuntimeExecutionContextIdentity",
+    "RuntimeExecutionContext",
+    "RuntimeExecutionContextValidator",
+    "ExecutionContextDescriptorFactory",
+    "ExecutionContextMetadataFactory",
+    "ExecutionContextSnapshotFactory",
+    "ExecutionContextStatisticsBuilder",
+    "ExecutionContextFactory",
+    "RuntimeExecutionContextFactory"
 ]
