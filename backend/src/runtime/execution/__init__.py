@@ -110,6 +110,20 @@ from .execution_lifecycle_snapshot_factory import ExecutionLifecycleSnapshotFact
 from .execution_lifecycle_factory import ExecutionLifecycleFactory
 from .runtime_execution_lifecycle_factory import RuntimeExecutionLifecycleFactory
 
+from .runtime_execution_scheduler_descriptor import RuntimeExecutionSchedulerDescriptor
+from .runtime_execution_scheduler_metadata import RuntimeExecutionSchedulerMetadata
+from .runtime_execution_scheduler_statistics import RuntimeExecutionSchedulerStatistics
+from .runtime_execution_scheduler_snapshot import RuntimeExecutionSchedulerSnapshot
+from .runtime_execution_scheduler_identity import RuntimeExecutionSchedulerIdentity
+from .runtime_execution_scheduler import RuntimeExecutionScheduler
+from .runtime_execution_scheduler_validator import RuntimeExecutionSchedulerValidator
+from .execution_scheduler_descriptor_factory import ExecutionSchedulerDescriptorFactory
+from .execution_scheduler_metadata_factory import ExecutionSchedulerMetadataFactory
+from .execution_scheduler_statistics_builder import ExecutionSchedulerStatisticsBuilder
+from .execution_scheduler_snapshot_factory import ExecutionSchedulerSnapshotFactory
+from .execution_scheduler_factory import ExecutionSchedulerFactory
+from .runtime_execution_scheduler_factory import RuntimeExecutionSchedulerFactory
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -226,5 +240,20 @@ __all__ = [
     "ExecutionLifecycleStatisticsBuilder",
     "ExecutionLifecycleSnapshotFactory",
     "ExecutionLifecycleFactory",
-    "RuntimeExecutionLifecycleFactory"
+    "RuntimeExecutionLifecycleFactory",
+    
+    # Scheduler artifacts in canonical order
+    "RuntimeExecutionSchedulerDescriptor",
+    "RuntimeExecutionSchedulerMetadata",
+    "RuntimeExecutionSchedulerStatistics",
+    "RuntimeExecutionSchedulerSnapshot",
+    "RuntimeExecutionSchedulerIdentity",
+    "RuntimeExecutionScheduler",
+    "RuntimeExecutionSchedulerValidator",
+    "ExecutionSchedulerDescriptorFactory",
+    "ExecutionSchedulerMetadataFactory",
+    "ExecutionSchedulerStatisticsBuilder",
+    "ExecutionSchedulerSnapshotFactory",
+    "ExecutionSchedulerFactory",
+    "RuntimeExecutionSchedulerFactory"
 ]

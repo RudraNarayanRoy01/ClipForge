@@ -1254,3 +1254,140 @@ It performs ZERO execution.
 It remains BELOW the Metadata Boundary.
 
 It is the first declarative Runtime component BELOW the Metadata Boundary.
+
+## Runtime Execution Scheduler Foundation
+
+The Runtime Execution Scheduler Foundation (Batch 6A.6.8) establishes the **canonical Runtime Execution Scheduler Foundation**.
+
+### Purpose
+
+This batch answers ONE architectural question:
+
+"What Runtime Execution Scheduler exists?"
+
+It does NOT answer:
+
+"How does Runtime execute?"
+
+Execution behaviour belongs to future Runtime components.
+
+This batch remains BELOW the Metadata Boundary while remaining purely declarative.
+
+### Ownership Matrix
+
+RuntimeExecutionScheduler OWNS ONLY:
+- identifier
+- identity
+
+RuntimeExecutionSchedulerIdentity OWNS:
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_lifecycle
+- lifecycle_lookup
+- descriptor_lookup
+- scheduler_lookup
+
+### DOES NOT OWN
+
+RuntimeExecutionScheduler DOES NOT OWN:
+- RuntimeExecutionEngine
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
+- Provider Loading
+- Hardware Management
+- Prompt Construction
+- Execution Requests
+- Execution Results
+- Dependency Injection
+- Queue Management
+- Dispatch
+- Worker Management
+
+### Hash Hierarchy
+
+RuntimeExecutionScheduler maintains a strict deterministic SHA-256 hash hierarchy:
+
+descriptor_hash
+↓
+lifecycle_hash
+↓
+lifecycle_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+scheduler_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+scheduler_hash
+
+### Pipeline Position
+
+```text
+RuntimeExecutionIdentity
+↓
+
+RuntimeExecutionGraph
+↓
+
+RuntimeExecutionPlan
+↓
+
+RuntimeExecutionContext
+↓
+
+RuntimeExecutionComposition
+↓
+
+RuntimeExecutionBuilder
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RuntimeExecutionLifecycle
+↓
+
+RuntimeExecutionScheduler
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Future RuntimeExecutionEngine
+```
+
+### Runtime UNKNOWN
+
+RuntimeExecutionScheduler answers ONLY:
+
+"What Runtime Execution Scheduler exists?"
+
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime plans
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime performs lifecycle
+How Runtime loads providers
+
+### Canonical Declaration
+
+RuntimeExecutionScheduler is recognized as the canonical immutable Runtime Execution Scheduler representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO scheduling.
+
+It performs ZERO execution.
+
+It remains BELOW the Metadata Boundary.
+
+It is the final declarative Runtime component before Runtime Execution Engine.
