@@ -68,6 +68,20 @@ from .execution_context_statistics_builder import ExecutionContextStatisticsBuil
 from .execution_context_factory import ExecutionContextFactory
 from .runtime_execution_context_factory import RuntimeExecutionContextFactory
 
+from .runtime_execution_composition_descriptor import RuntimeExecutionCompositionDescriptor
+from .runtime_execution_composition_metadata import RuntimeExecutionCompositionMetadata
+from .runtime_execution_composition_statistics import RuntimeExecutionCompositionStatistics
+from .runtime_execution_composition_snapshot import RuntimeExecutionCompositionSnapshot
+from .runtime_execution_composition_identity import RuntimeExecutionCompositionIdentity
+from .runtime_execution_composition import RuntimeExecutionComposition
+from .runtime_execution_composition_validator import RuntimeExecutionCompositionValidator
+from .execution_composition_descriptor_factory import ExecutionCompositionDescriptorFactory
+from .execution_composition_metadata_factory import ExecutionCompositionMetadataFactory
+from .execution_composition_snapshot_factory import ExecutionCompositionSnapshotFactory
+from .execution_composition_statistics_builder import ExecutionCompositionStatisticsBuilder
+from .execution_composition_factory import ExecutionCompositionFactory
+from .runtime_execution_composition_factory import RuntimeExecutionCompositionFactory
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -139,5 +153,20 @@ __all__ = [
     "ExecutionContextSnapshotFactory",
     "ExecutionContextStatisticsBuilder",
     "ExecutionContextFactory",
-    "RuntimeExecutionContextFactory"
+    "RuntimeExecutionContextFactory",
+    
+    # Composition artifacts in canonical order
+    "RuntimeExecutionCompositionDescriptor",
+    "RuntimeExecutionCompositionMetadata",
+    "RuntimeExecutionCompositionStatistics",
+    "RuntimeExecutionCompositionSnapshot",
+    "RuntimeExecutionCompositionIdentity",
+    "RuntimeExecutionComposition",
+    "RuntimeExecutionCompositionValidator",
+    "ExecutionCompositionDescriptorFactory",
+    "ExecutionCompositionMetadataFactory",
+    "ExecutionCompositionSnapshotFactory",
+    "ExecutionCompositionStatisticsBuilder",
+    "ExecutionCompositionFactory",
+    "RuntimeExecutionCompositionFactory"
 ]
