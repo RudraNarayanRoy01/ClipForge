@@ -1391,3 +1391,183 @@ It performs ZERO execution.
 It remains BELOW the Metadata Boundary.
 
 It is the final declarative Runtime component before Runtime Execution Engine.
+
+## Runtime Execution Engine Foundation
+
+The Runtime Execution Engine Foundation (Batch 6A.7.1) establishes the canonical Runtime Execution Engine Foundation.
+
+### Purpose
+
+This batch answers ONE architectural question:
+
+"What Runtime Execution Engine exists?"
+
+It does NOT answer:
+
+"How does Runtime execute?"
+
+Execution behaviour belongs to future Runtime components.
+
+This batch remains BELOW the Metadata Boundary.
+
+### Ownership Matrix
+
+RuntimeExecutionEngine OWNS ONLY:
+- identifier
+- identity
+
+RuntimeExecutionEngineIdentity OWNS:
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_scheduler
+- scheduler_lookup
+- descriptor_lookup
+- engine_lookup
+
+### DOES NOT OWN
+
+RuntimeExecutionEngine DOES NOT OWN:
+- RuntimeExecutionSession
+- RuntimeExecutionState
+- RuntimeExecutionDispatcher
+- RuntimeExecutionCoordinator
+- RuntimeExecutionResult
+- RuntimeMonitoring
+- RuntimeTelemetry
+- RuntimeOptimization
+- RuntimeRecovery
+- Provider Loading
+- Hardware Management
+- Prompt Construction
+- Execution Requests
+- Execution Results
+- Dependency Injection
+
+### Hash Hierarchy
+
+RuntimeExecutionEngine maintains a strict deterministic SHA-256 hash hierarchy:
+
+descriptor_hash
+↓
+scheduler_hash
+↓
+scheduler_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+engine_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+engine_hash
+
+### Pipeline Position
+
+```text
+RuntimeExecutionIdentity
+↓
+RuntimeExecutionGraph
+↓
+RuntimeExecutionPlan
+↓
+RuntimeExecutionContext
+↓
+RuntimeExecutionComposition
+↓
+RuntimeExecutionBuilder
+↓
+RuntimeExecutionLifecycle
+↓
+RuntimeExecutionScheduler
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RuntimeExecutionEngine
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Future RuntimeExecutionSession
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Future RuntimeExecutionState
+```
+
+### Runtime UNKNOWN
+
+RuntimeExecutionEngine answers ONLY:
+
+"What Runtime Execution Engine exists?"
+
+It NEVER answers:
+
+How Runtime executes
+How Runtime schedules
+How Runtime dispatches
+How Runtime coordinates
+How Runtime monitors
+How Runtime optimizes
+How Runtime routes
+How Runtime loads providers
+How Runtime executes AI
+
+### Canonical Declaration
+
+RuntimeExecutionEngine is recognized as the canonical immutable Runtime Execution Engine representation.
+
+It exists solely as immutable Runtime metadata.
+
+It performs ZERO provider execution.
+
+It performs ZERO AI execution.
+
+It performs ZERO model execution.
+
+It remains BELOW the Metadata Boundary.
+
+It is the first Runtime orchestration component consuming the RuntimeExecutionScheduler while remaining completely provider agnostic.
+
+### Dependency Boundary
+
+RuntimeExecutionEngine consumes:
+- RuntimeExecutionScheduler
+
+RuntimeExecutionEngine MUST NOT consume:
+- RuntimeExecutionSession
+- RuntimeExecutionWorker
+- RuntimeExecutionDispatcher
+- RuntimeExecutionMonitor
+- RuntimeExecutionTelemetry
+- RuntimeExecutionOptimizer
+- RuntimeExecutionProvider
+
+Future Runtime components consume RuntimeExecutionEngine.
+
+### Forbidden Imports
+
+The RuntimeExecutionEngine Foundation MUST NOT import:
+- AI Providers
+- Inference Engines
+- Hardware Managers
+- GPU Utilities
+- Thread Pools
+- Worker Pools
+- Runtime Schedulers
+- Runtime Execution Sessions
+- Runtime Execution Workers
+- Dispatchers
+- Monitoring Systems
+- Telemetry Systems
+- Optimization Systems
+- Networking
+- HTTP Clients
+- Database Sessions
+- Dependency Injection Containers
+
+ONLY immutable Runtime Foundation components may be imported.
