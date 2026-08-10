@@ -1479,15 +1479,15 @@ RuntimeExecutionContext
 RuntimeExecutionComposition
 ↓
 RuntimeExecutionBuilder
-↓
-RuntimeExecutionLifecycle
-↓
-RuntimeExecutionScheduler
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Metadata Boundary
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+RuntimeExecutionLifecycle
+↓
+RuntimeExecutionScheduler
+↓
 RuntimeExecutionEngine
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1565,6 +1565,192 @@ The RuntimeExecutionEngine Foundation MUST NOT import:
 - Monitoring Systems
 - Telemetry Systems
 - Optimization Systems
+- Networking
+- HTTP Clients
+- Database Sessions
+- Dependency Injection Containers
+
+ONLY immutable Runtime Foundation components may be imported.
+
+## Runtime Execution Session Foundation
+
+The Runtime Execution Session Foundation (Batch 6A.7.2) establishes the canonical immutable Runtime Execution Session representation immediately downstream of RuntimeExecutionEngine.
+
+### Purpose
+
+This batch answers ONE architectural question:
+
+"What Runtime Execution Session exists?"
+
+It does NOT answer:
+
+"How does the Runtime Execution Session behave?"
+"How does the Runtime Execution Session execute?"
+"How does the Runtime Execution Session change state?"
+
+Execution behaviour belongs to future Runtime components.
+
+This batch explicitly distinguishes Session from Session State. The Session Foundation represents WHAT SESSION EXISTS. It does NOT represent current session state, execution state, execution progress, session status, active task, current step, active worker, queue state, scheduling state, provider state, model state, monitoring state, telemetry state, recovery state, execution result, or runtime mutation.
+
+### Ownership Matrix
+
+RuntimeExecutionSession OWNS ONLY:
+- identifier
+- identity
+
+RuntimeExecutionSessionIdentity OWNS:
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_engine
+- engine_lookup
+- descriptor_lookup
+- session_lookup
+
+### DOES NOT OWN
+
+RuntimeExecutionSession DOES NOT OWN:
+- session state
+- execution state
+- progress
+- workers
+- queues
+- scheduling
+- providers
+- models
+- monitoring
+- telemetry
+- optimization
+- hardware
+- execution behaviour
+
+### Hash Hierarchy
+
+RuntimeExecutionSessionSnapshot maintains a strict deterministic SHA-256 hash hierarchy:
+
+descriptor_hash
+↓
+engine_hash
+↓
+engine_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+session_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+session_hash
+
+### Pipeline Position
+
+```text
+RuntimeExecutionIdentity
+↓
+RuntimeExecutionGraph
+↓
+RuntimeExecutionPlan
+↓
+RuntimeExecutionContext
+↓
+RuntimeExecutionComposition
+↓
+RuntimeExecutionBuilder
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Metadata Boundary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RuntimeExecutionLifecycle
+↓
+RuntimeExecutionScheduler
+↓
+RuntimeExecutionEngine
+↓
+RuntimeExecutionSession
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Future RuntimeExecutionState
+```
+
+### Runtime UNKNOWN
+
+RuntimeExecutionSession answers ONLY:
+
+"What Runtime Execution Session exists?"
+
+It NEVER answers:
+
+- What state the Session is in
+- What the Session is currently doing
+- How the Session executes
+- How the Session changes state
+- How the Session schedules
+- How the Session dispatches
+- How the Session recovers
+- How the Session monitors
+- How the Session interacts with providers
+- How the Session uses hardware
+
+### Canonical Declaration
+
+RuntimeExecutionSession is recognized as the canonical immutable Runtime Execution Session representation.
+
+It consumes RuntimeExecutionEngine.
+
+It performs ZERO execution.
+
+It performs ZERO Session behaviour.
+
+It owns ZERO Session state.
+
+Future Runtime components consume RuntimeExecutionSession.
+
+It remains BELOW the Metadata Boundary.
+
+### Dependency Boundary
+
+RuntimeExecutionSession consumes ONLY:
+- RuntimeExecutionEngine
+
+RuntimeExecutionSession MUST NOT consume:
+- RuntimeExecutionState
+- RuntimeExecutionWorker
+- RuntimeExecutionDispatcher
+- RuntimeExecutionQueue
+- RuntimeExecutionMonitor
+- RuntimeExecutionTelemetry
+- RuntimeExecutionOptimizer
+- RuntimeExecutionRecovery
+- RuntimeExecutionProvider
+- model runtime
+- hardware runtime
+
+Future Runtime components consume RuntimeExecutionSession.
+
+### Forbidden Imports
+
+The Session Foundation MUST NOT import:
+- AI Providers
+- Inference Engines
+- Model Runtimes
+- Hardware Managers
+- GPU Utilities
+- CPU Utilities
+- Thread Pools
+- Worker Pools
+- Runtime Schedulers
+- Runtime Dispatchers
+- Runtime Queues
+- Runtime Execution State Managers
+- Monitoring Systems
+- Telemetry Systems
+- Optimization Systems
+- Recovery Systems
 - Networking
 - HTTP Clients
 - Database Sessions

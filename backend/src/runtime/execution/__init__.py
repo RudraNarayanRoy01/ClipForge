@@ -137,6 +137,20 @@ from .execution_engine_statistics_builder import ExecutionEngineStatisticsBuilde
 from .execution_engine_snapshot_factory import ExecutionEngineSnapshotFactory
 from .execution_engine_factory import ExecutionEngineFactory
 from .runtime_execution_engine_factory import RuntimeExecutionEngineFactory
+
+from .runtime_execution_session_descriptor import RuntimeExecutionSessionDescriptor
+from .runtime_execution_session_metadata import RuntimeExecutionSessionMetadata
+from .runtime_execution_session_statistics import RuntimeExecutionSessionStatistics
+from .runtime_execution_session_snapshot import RuntimeExecutionSessionSnapshot
+from .runtime_execution_session_identity import RuntimeExecutionSessionIdentity
+from .runtime_execution_session import RuntimeExecutionSession
+from .runtime_execution_session_validator import RuntimeExecutionSessionValidator
+from .execution_session_descriptor_factory import ExecutionSessionDescriptorFactory
+from .execution_session_metadata_factory import ExecutionSessionMetadataFactory
+from .execution_session_statistics_builder import ExecutionSessionStatisticsBuilder
+from .execution_session_snapshot_factory import ExecutionSessionSnapshotFactory
+from .execution_session_factory import ExecutionSessionFactory
+from .runtime_execution_session_factory import RuntimeExecutionSessionFactory
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -283,5 +297,20 @@ __all__ = [
     "ExecutionEngineStatisticsBuilder",
     "ExecutionEngineSnapshotFactory",
     "ExecutionEngineFactory",
-    "RuntimeExecutionEngineFactory"
+    "RuntimeExecutionEngineFactory",
+    
+    # Session artifacts in canonical order
+    "RuntimeExecutionSessionDescriptor",
+    "RuntimeExecutionSessionMetadata",
+    "RuntimeExecutionSessionStatistics",
+    "RuntimeExecutionSessionSnapshot",
+    "RuntimeExecutionSessionIdentity",
+    "RuntimeExecutionSession",
+    "RuntimeExecutionSessionValidator",
+    "ExecutionSessionDescriptorFactory",
+    "ExecutionSessionMetadataFactory",
+    "ExecutionSessionStatisticsBuilder",
+    "ExecutionSessionSnapshotFactory",
+    "ExecutionSessionFactory",
+    "RuntimeExecutionSessionFactory"
 ]
