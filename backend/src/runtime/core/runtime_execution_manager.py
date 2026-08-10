@@ -2,7 +2,7 @@ from typing import Dict, Optional
 from datetime import datetime
 
 from ..domain.runtime_execution_model import (
-    RuntimeExecutionState,
+    RuntimeExecutionStatus,
     RuntimeExecutionTrigger,
     RuntimeExecutionDecision,
     RuntimeExecutionInfo,
@@ -42,7 +42,7 @@ class RuntimeExecutionManager:
         # Future architecture will introduce RuntimeExecutionStore for persistence.
         self._execution_records: Dict[str, RuntimeExecutionInfo] = {}
 
-    def _validate_trigger(self, trigger: RuntimeExecutionTrigger) -> RuntimeExecutionState:
+    def _validate_trigger(self, trigger: RuntimeExecutionTrigger) -> RuntimeExecutionStatus:
         """
         Validate trigger structurally using the centralized execution policy.
         """
@@ -67,7 +67,7 @@ class RuntimeExecutionManager:
         now = datetime.utcnow()
         info = RuntimeExecutionInfo(
             provider_id=provider_id,
-            current_state=RuntimeExecutionState.ABORTED,
+            current_status=RuntimeExecutionStatus.ABORTED,
             created_at=now,
             updated_at=now
         )
@@ -87,11 +87,11 @@ class RuntimeExecutionManager:
             raise KeyError(f"Execution record for provider '{provider_id}' not found.")
         return self._execution_records[provider_id]
 
-    def get_state(self, provider_id: str) -> RuntimeExecutionState:
+    def get_status(self, provider_id: str) -> RuntimeExecutionStatus:
         """
-        Retrieve just the current execution preparation state of a provider.
+        Retrieve just the current execution preparation status of a provider.
         """
-        return self.get_execution(provider_id).current_state
+        return self.get_execution(provider_id).current_status
 
     def prepare_execution(
         self, 
@@ -104,24 +104,24 @@ class RuntimeExecutionManager:
         This does NOT execute the work, create timers, sleep, or wait.
         """
         info = self.get_execution(provider_id)
-        current_state = info.current_state
+        current_status = info.current_status
         
-        target_state = self._validate_trigger(trigger)
+        target_status = self._validate_trigger(trigger)
         
         now = datetime.utcnow()
         decision = RuntimeExecutionDecision(
             provider_id=provider_id,
             trigger=trigger,
-            execution_state=target_state,
+            execution_status=target_status,
             timestamp=now
         )
         
         updated_info = RuntimeExecutionInfo(
             provider_id=provider_id,
-            current_state=target_state,
+            current_status=target_status,
             created_at=info.created_at,
             updated_at=now,
-            previous_state=current_state,
+            previous_status=current_status,
             trigger=trigger,
             last_decision=decision,
             reason=reason
@@ -131,7 +131,7 @@ class RuntimeExecutionManager:
         
         return RuntimeExecutionResult(
             execution_info=updated_info,
-            operation_summary=f"Successfully evaluated execution preparation for provider {provider_id} to {target_state.name}.",
+            operation_summary=f"Successfully evaluated execution preparation for provider {provider_id} to {target_status.name}.",
             validation_result=True
         )
 
@@ -159,22 +159,22 @@ class RuntimeExecutionManager:
         Resets the execution preparation state structurally back to ABORTED.
         """
         info = self.get_execution(provider_id)
-        current_state = info.current_state
+        current_status = info.current_status
         
         now = datetime.utcnow()
         decision = RuntimeExecutionDecision(
             provider_id=provider_id,
             trigger=RuntimeExecutionTrigger.UNKNOWN,
-            execution_state=RuntimeExecutionState.ABORTED,
+            execution_status=RuntimeExecutionStatus.ABORTED,
             timestamp=now
         )
         
         updated_info = RuntimeExecutionInfo(
             provider_id=provider_id,
-            current_state=RuntimeExecutionState.ABORTED,
+            current_status=RuntimeExecutionStatus.ABORTED,
             created_at=info.created_at,
             updated_at=now,
-            previous_state=current_state,
+            previous_status=current_status,
             trigger=RuntimeExecutionTrigger.UNKNOWN,
             last_decision=decision,
             reason=reason

@@ -36,7 +36,7 @@ def mock_identity():
     return RuntimeExecutionIdentity(
         descriptor=MockDescriptor("exec-123"),
         metadata=None,
-        state=None,
+        status=None,
         snapshot=None
     )
 

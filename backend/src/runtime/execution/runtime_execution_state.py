@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from .execution_stage import ExecutionStage
+from .runtime_execution_state_identity import RuntimeExecutionStateIdentity
 
 @dataclass(frozen=True)
 class RuntimeExecutionState:
-    stage: ExecutionStage
+    identifier: str
+    identity: RuntimeExecutionStateIdentity

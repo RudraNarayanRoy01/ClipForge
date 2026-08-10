@@ -79,11 +79,12 @@ from .domain.runtime_schedule_model import (
     RuntimeScheduleResult
 )
 from .domain.runtime_execution_model import (
-    RuntimeExecutionState,
+    RuntimeExecutionStatus,
     RuntimeExecutionTrigger,
     RuntimeExecutionDecision,
     RuntimeExecutionInfo,
-    RuntimeExecutionResult
+    RuntimeExecutionResult,
+    RUNTIME_EXECUTION_POLICY
 )
 from .domain.runtime_intelligence_model import (
     RuntimeIntelligenceState,
@@ -192,7 +193,7 @@ __all__ = [
     "RuntimeScheduleInfo",
     "RuntimeScheduleResult",
     "RuntimeExecutionManager",
-    "RuntimeExecutionState",
+    "RuntimeExecutionStatus",
     "RuntimeExecutionTrigger",
     "RuntimeExecutionDecision",
     "RuntimeExecutionInfo",

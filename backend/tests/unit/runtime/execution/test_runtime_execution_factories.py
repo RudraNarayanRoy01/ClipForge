@@ -5,10 +5,9 @@ from src.runtime.execution import (
     ExecutionSnapshotFactory,
     RuntimeExecutionFactory,
     RuntimeExecutionDescriptor,
-    RuntimeExecutionState,
-    RuntimeExecutionIdentity,
-    ExecutionStage
+    RuntimeExecutionIdentity
 )
+from src.runtime.domain.runtime_execution_model import RuntimeExecutionStatus
 
 def test_execution_id_factory():
     exec_id = ExecutionIdFactory.generate_execution_id()
@@ -31,9 +30,9 @@ def test_metadata_factory():
 def test_snapshot_factory():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     
-    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp_hash_123")
+    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp_hash_123")
     assert snap.execution_hash
     assert snap.identity_hash
     assert snap.descriptor_hash
@@ -44,10 +43,10 @@ def test_snapshot_factory():
 def test_execution_factory():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
-    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp_hash_123")
+    status = RuntimeExecutionStatus.READY
+    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp_hash_123")
     
-    identity = RuntimeExecutionIdentity(desc, meta, state, snap)
+    identity = RuntimeExecutionIdentity(desc, meta, status, snap)
     
     exec_obj = RuntimeExecutionFactory.create_execution("exec-1", identity)
     assert exec_obj.identifier == "exec-1"

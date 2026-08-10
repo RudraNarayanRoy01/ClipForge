@@ -2,10 +2,9 @@ import pytest
 from src.runtime.execution import (
     ExecutionMetadataFactory,
     ExecutionSnapshotFactory,
-    RuntimeExecutionDescriptor,
-    RuntimeExecutionState,
-    ExecutionStage
+    RuntimeExecutionDescriptor
 )
+from src.runtime.domain.runtime_execution_model import RuntimeExecutionStatus
 
 def test_metadata_factory_empty_collections():
     meta = ExecutionMetadataFactory.create_metadata("Test")
@@ -16,10 +15,10 @@ def test_metadata_factory_empty_collections():
 def test_snapshot_factory_determinism():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     
-    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp_hash_123")
-    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp_hash_123")
+    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp_hash_123")
+    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp_hash_123")
     
     assert snap1.execution_hash == snap2.execution_hash
     assert snap1.descriptor_hash == snap2.descriptor_hash
@@ -41,10 +40,10 @@ def test_snapshot_factory_hash_changes_with_descriptor():
     desc1 = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     desc2 = RuntimeExecutionDescriptor("1-mod", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     
-    snap1 = ExecutionSnapshotFactory.create_snapshot(desc1, meta, state, "comp_hash_123")
-    snap2 = ExecutionSnapshotFactory.create_snapshot(desc2, meta, state, "comp_hash_123")
+    snap1 = ExecutionSnapshotFactory.create_snapshot(desc1, meta, status, "comp_hash_123")
+    snap2 = ExecutionSnapshotFactory.create_snapshot(desc2, meta, status, "comp_hash_123")
     
     assert snap1.descriptor_hash != snap2.descriptor_hash
     assert snap1.execution_hash != snap2.execution_hash
@@ -53,10 +52,10 @@ def test_snapshot_factory_hash_changes_with_metadata():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta1 = ExecutionMetadataFactory.create_metadata("Test")
     meta2 = ExecutionMetadataFactory.create_metadata("Test-mod")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     
-    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta1, state, "comp_hash_123")
-    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta2, state, "comp_hash_123")
+    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta1, status, "comp_hash_123")
+    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta2, status, "comp_hash_123")
     
     assert snap1.metadata_hash != snap2.metadata_hash
     assert snap1.execution_hash != snap2.execution_hash
@@ -64,11 +63,11 @@ def test_snapshot_factory_hash_changes_with_metadata():
 def test_snapshot_factory_hash_changes_with_state():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state1 = RuntimeExecutionState(ExecutionStage.READY)
-    state2 = RuntimeExecutionState(ExecutionStage.VALIDATED)
+    status1 = RuntimeExecutionStatus.READY
+    status2 = RuntimeExecutionStatus.PREPARED
     
-    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state1, "comp_hash_123")
-    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state2, "comp_hash_123")
+    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status1, "comp_hash_123")
+    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status2, "comp_hash_123")
     
     assert snap1.state_hash != snap2.state_hash
     assert snap1.execution_hash != snap2.execution_hash
@@ -76,18 +75,17 @@ def test_snapshot_factory_hash_changes_with_state():
 def test_snapshot_factory_hash_changes_with_composition():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     
-    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp_hash_1")
-    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp_hash_2")
+    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp_hash_1")
+    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp_hash_2")
     
     assert snap1.composition_hash != snap2.composition_hash
     assert snap1.execution_hash != snap2.execution_hash
 
 def test_state_enum_members():
-    assert ExecutionStage.UNINITIALIZED.name == "UNINITIALIZED"
-    assert ExecutionStage.PREPARED.name == "PREPARED"
-    assert ExecutionStage.VALIDATED.name == "VALIDATED"
+    assert RuntimeExecutionStatus.PREPARED.name == "PREPARED"
+    assert RuntimeExecutionStatus.READY.name == "READY"
     assert ExecutionStage.READY.name == "READY"
     assert len(ExecutionStage) == 4
 
@@ -109,10 +107,10 @@ def test_result_creation():
     from src.runtime.execution import RuntimeExecutionResult, RuntimeExecutionException, RuntimeExecutionFactory, RuntimeExecutionIdentity
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
-    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp")
+    status = RuntimeExecutionStatus.READY
+    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp")
     
-    identity = RuntimeExecutionIdentity(desc, meta, state, snap)
+    identity = RuntimeExecutionIdentity(desc, meta, status, snap)
     exec_obj = RuntimeExecutionFactory.create_execution("exec-1", identity)
     
     warns = ("warning 1", "warning 2")
@@ -135,22 +133,22 @@ def test_execution_identity_creation():
     from src.runtime.execution import RuntimeExecutionIdentity, RuntimeExecutionSnapshot
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     snap = RuntimeExecutionSnapshot("a", "b", "c", "d", "e", "f")
     
-    identity = RuntimeExecutionIdentity(desc, meta, state, snap)
+    identity = RuntimeExecutionIdentity(desc, meta, status, snap)
     assert identity.descriptor == desc
     assert identity.metadata == meta
-    assert identity.state == state
+    assert identity.status == status
     assert identity.snapshot == snap
 
 def test_execution_identity_immutability():
     from src.runtime.execution import RuntimeExecutionIdentity, RuntimeExecutionSnapshot
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     snap = RuntimeExecutionSnapshot("a", "b", "c", "d", "e", "f")
-    identity = RuntimeExecutionIdentity(desc, meta, state, snap)
+    identity = RuntimeExecutionIdentity(desc, meta, status, snap)
     
     with pytest.raises(Exception):
         identity.descriptor = None
@@ -168,10 +166,10 @@ def test_frozenset_protection():
 def test_identity_hash_determinism():
     desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
     meta = ExecutionMetadataFactory.create_metadata("Test")
-    state = RuntimeExecutionState(ExecutionStage.READY)
+    status = RuntimeExecutionStatus.READY
     
-    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp")
-    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, state, "comp")
+    snap1 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp")
+    snap2 = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp")
     
     assert snap1.identity_hash == snap2.identity_hash
     assert snap1.execution_hash == snap2.execution_hash

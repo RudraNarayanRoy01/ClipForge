@@ -1,7 +1,7 @@
 import hashlib
 from .runtime_execution_descriptor import RuntimeExecutionDescriptor
 from .runtime_execution_metadata import RuntimeExecutionMetadata
-from .runtime_execution_state import RuntimeExecutionState
+from src.runtime.domain.runtime_execution_model import RuntimeExecutionStatus
 from .runtime_execution_snapshot import RuntimeExecutionSnapshot
 
 class ExecutionSnapshotFactory:
@@ -13,7 +13,7 @@ class ExecutionSnapshotFactory:
     def create_snapshot(
         descriptor: RuntimeExecutionDescriptor,
         metadata: RuntimeExecutionMetadata,
-        state: RuntimeExecutionState,
+        status: RuntimeExecutionStatus,
         composition_hash: str
     ) -> RuntimeExecutionSnapshot:
         descriptor_hash = ExecutionSnapshotFactory._hash_string(
@@ -24,10 +24,10 @@ class ExecutionSnapshotFactory:
         metadata_hash = ExecutionSnapshotFactory._hash_string(
             f"{metadata.name}:{metadata.description}:{metadata.created_at.isoformat()}:{metadata.updated_at.isoformat()}:{tags_str}:{annotations_str}:{metadata.metadata_version}"
         )
-        state_hash = ExecutionSnapshotFactory._hash_string(f"{state.stage.name}")
+        status_hash = ExecutionSnapshotFactory._hash_string(f"{status.name}")
         
         identity_hash = ExecutionSnapshotFactory._hash_string(
-            f"{descriptor_hash}:{metadata_hash}:{state_hash}"
+            f"{descriptor_hash}:{metadata_hash}:{status_hash}"
         )
         
         execution_hash = ExecutionSnapshotFactory._hash_string(
@@ -39,6 +39,6 @@ class ExecutionSnapshotFactory:
             identity_hash=identity_hash,
             descriptor_hash=descriptor_hash,
             metadata_hash=metadata_hash,
-            state_hash=state_hash,
+            state_hash=status_hash,
             composition_hash=composition_hash
         )

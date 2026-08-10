@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from datetime import datetime
 
 
-class RuntimeExecutionState(str, Enum):
+class RuntimeExecutionStatus(str, Enum):
     """
     Immutable representation of Runtime Execution states.
     
@@ -46,7 +46,7 @@ class RuntimeExecutionDecision:
     """
     provider_id: str
     trigger: RuntimeExecutionTrigger
-    execution_state: RuntimeExecutionState
+    execution_status: RuntimeExecutionStatus
     timestamp: datetime
 
 
@@ -61,10 +61,10 @@ class RuntimeExecutionInfo:
     Must NOT contain execution statistics, metrics, memory usage, or hardware info.
     """
     provider_id: str
-    current_state: RuntimeExecutionState
+    current_status: RuntimeExecutionStatus
     created_at: datetime
     updated_at: datetime
-    previous_state: Optional[RuntimeExecutionState] = None
+    previous_status: Optional[RuntimeExecutionStatus] = None
     trigger: RuntimeExecutionTrigger = RuntimeExecutionTrigger.UNKNOWN
     last_decision: Optional[RuntimeExecutionDecision] = None
     reason: str = ""
@@ -87,10 +87,10 @@ class RuntimeExecutionResult:
 # This policy permanently belongs to Runtime Execution Domain, NOT RuntimeExecutionManager.
 # Defines structural mappings from trigger to state representing execution preparation.
 # Must NEVER directly map RuntimeScheduleState.
-RUNTIME_EXECUTION_POLICY: Dict[RuntimeExecutionTrigger, RuntimeExecutionState] = {
-    RuntimeExecutionTrigger.SCHEDULE_READY: RuntimeExecutionState.READY,
-    RuntimeExecutionTrigger.MANUAL_EXECUTION: RuntimeExecutionState.PREPARED,
-    RuntimeExecutionTrigger.SYSTEM_REQUEST: RuntimeExecutionState.READY,
-    RuntimeExecutionTrigger.PIPELINE_REQUEST: RuntimeExecutionState.PREPARED,
-    RuntimeExecutionTrigger.UNKNOWN: RuntimeExecutionState.ABORTED
+RUNTIME_EXECUTION_POLICY: Dict[RuntimeExecutionTrigger, RuntimeExecutionStatus] = {
+    RuntimeExecutionTrigger.SCHEDULE_READY: RuntimeExecutionStatus.READY,
+    RuntimeExecutionTrigger.MANUAL_EXECUTION: RuntimeExecutionStatus.PREPARED,
+    RuntimeExecutionTrigger.SYSTEM_REQUEST: RuntimeExecutionStatus.READY,
+    RuntimeExecutionTrigger.PIPELINE_REQUEST: RuntimeExecutionStatus.PREPARED,
+    RuntimeExecutionTrigger.UNKNOWN: RuntimeExecutionStatus.ABORTED
 }

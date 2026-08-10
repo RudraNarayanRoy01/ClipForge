@@ -5,7 +5,7 @@ from dataclasses import is_dataclass
 from typing import Dict
 
 from src.runtime.domain.runtime_execution_model import (
-    RuntimeExecutionState,
+    RuntimeExecutionStatus,
     RuntimeExecutionTrigger,
     RuntimeExecutionDecision,
     RuntimeExecutionInfo,
@@ -17,14 +17,14 @@ from src.runtime.core.context import RuntimeContext
 
 
 def test_runtime_execution_state_immutability():
-    """Verify that RuntimeExecutionState is an immutable Enum with no behavior."""
+    """Verify that RuntimeExecutionStatus is an immutable Enum with no behavior."""
     from enum import Enum
-    assert issubclass(RuntimeExecutionState, Enum)
-    assert issubclass(RuntimeExecutionState, str)
+    assert issubclass(RuntimeExecutionStatus, Enum)
+    assert issubclass(RuntimeExecutionStatus, str)
     
     # Ensure it only contains the allowed states for preparation
     expected_states = {"PREPARED", "READY", "EXECUTING", "COMPLETED", "FAILED", "ABORTED"}
-    actual_states = {state.name for state in RuntimeExecutionState}
+    actual_states = {state.name for state in RuntimeExecutionStatus}
     assert expected_states == actual_states
     
 
@@ -82,9 +82,9 @@ def test_runtime_execution_policy_independence():
     for k in RUNTIME_EXECUTION_POLICY.keys():
         assert isinstance(k, RuntimeExecutionTrigger)
         
-    # Values must be RuntimeExecutionState
+    # Values must be RuntimeExecutionStatus
     for v in RUNTIME_EXECUTION_POLICY.values():
-        assert isinstance(v, RuntimeExecutionState)
+        assert isinstance(v, RuntimeExecutionStatus)
 
 
 def test_runtime_execution_manager_forbidden_imports():

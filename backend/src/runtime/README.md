@@ -1757,3 +1757,170 @@ The Session Foundation MUST NOT import:
 - Dependency Injection Containers
 
 ONLY immutable Runtime Foundation components may be imported.
+
+## Runtime Execution State Foundation
+
+### Purpose
+
+The Runtime Execution State Foundation establishes the canonical immutable structural representation of Runtime Execution State. It answers "What Runtime Execution State exists?" without implementing any behaviour or state transitions.
+
+### Ownership Matrix
+
+RuntimeExecutionState OWNS ONLY:
+- identifier
+- identity
+
+RuntimeExecutionStateIdentity OWNS ONLY:
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_session
+- session_lookup
+- descriptor_lookup
+- state_lookup
+
+### DOES NOT OWN
+
+RuntimeExecutionState DOES NOT OWN:
+- mutable state
+- status
+- progress
+- active task
+- current step
+- worker
+- queue
+- provider
+- model
+- execution result
+- retry information
+- recovery information
+- telemetry
+- timestamps
+- runtime metrics
+- transition logic
+
+### Hash Hierarchy
+
+RuntimeExecutionState maintains a strict deterministic SHA-256 hash hierarchy:
+
+descriptor_hash
+↓
+session_hash
+↓
+session_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+state_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+state_hash
+
+### Pipeline Position
+
+```text
+    RuntimeExecutionIdentity
+            ↓
+    RuntimeExecutionGraph
+            ↓
+    RuntimeExecutionPlan
+            ↓
+    RuntimeExecutionContext
+            ↓
+    RuntimeExecutionComposition
+            ↓
+    RuntimeExecutionBuilder
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              Metadata Boundary
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    RuntimeExecutionLifecycle
+            ↓
+    RuntimeExecutionScheduler
+            ↓
+    RuntimeExecutionEngine
+            ↓
+    RuntimeExecutionSession
+            ↓
+    RuntimeExecutionState
+```
+
+### Runtime UNKNOWN
+
+RuntimeExecutionState answers ONLY:
+
+"What Runtime Execution State exists?"
+
+It NEVER answers:
+
+- What state should come next?
+- Why did the state change?
+- How should the state change?
+- Who changes the state?
+- When should the state change?
+- Whether execution is running.
+- Whether execution succeeded.
+- Whether execution failed.
+- Whether recovery is required.
+- Whether a retry should occur.
+- Which provider should execute.
+- Which worker should execute.
+- How hardware should be used.
+
+### Canonical Declaration
+
+RuntimeExecutionState is a purely structural representation. It is NOT a State Machine, a State Manager, a State Controller, a Transition Engine, a Workflow Engine, or an Execution Controller.
+
+### Dependency Boundary
+
+RuntimeExecutionState consumes ONLY:
+- RuntimeExecutionSession
+
+It MUST NOT consume:
+- RuntimeExecutionWorker
+- RuntimeExecutionDispatcher
+- RuntimeExecutionCoordinator
+- RuntimeExecutionQueue
+- RuntimeExecutionMonitor
+- RuntimeExecutionTelemetry
+- RuntimeExecutionOptimizer
+- RuntimeExecutionRecovery
+- RuntimeExecutionProvider
+- model runtime
+- hardware runtime
+- execution result
+- future state manager
+- future state machine
+
+### Forbidden Imports
+
+The Runtime Execution State Foundation MUST NOT import:
+- AI Providers
+- Inference Engines
+- Model Runtimes
+- Hardware Managers
+- GPU Utilities
+- CPU Utilities
+- Thread Pools
+- Worker Pools
+- Runtime Schedulers
+- Runtime Dispatchers
+- Runtime Queues
+- Runtime State Managers
+- Runtime State Machines
+- Runtime State Controllers
+- Monitoring Systems
+- Telemetry Systems
+- Optimization Systems
+- Recovery Systems
+- Networking
+- HTTP Clients
+- Database Sessions
+- Dependency Injection Containers
+
+ONLY immutable Runtime Foundation components may be imported.

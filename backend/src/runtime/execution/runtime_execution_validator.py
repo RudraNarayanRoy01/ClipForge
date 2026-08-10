@@ -1,15 +1,14 @@
 from .runtime_execution import RuntimeExecution
 from .runtime_execution_metadata import RuntimeExecutionMetadata
-from .runtime_execution_state import RuntimeExecutionState
+from src.runtime.domain.runtime_execution_model import RuntimeExecutionStatus
 from .runtime_execution_exceptions import ExecutionValidationException, ExecutionMetadataException, ExecutionStateException
-from .execution_stage import ExecutionStage
 
 class RuntimeExecutionValidator:
     """
     Validator validates ONLY:
     - RuntimeExecutionDescriptor
     - RuntimeExecutionMetadata
-    - RuntimeExecutionState
+    - RuntimeExecutionStatus
 
     Validator MUST NOT validate:
     - Execution Graph
@@ -33,7 +32,7 @@ class RuntimeExecutionValidator:
         if not execution.identity:
             raise ExecutionValidationException("Execution must have a valid identity.")
         RuntimeExecutionValidator.validate_metadata(execution.identity.metadata)
-        RuntimeExecutionValidator.validate_state(execution.identity.state)
+        RuntimeExecutionValidator.validate_status(execution.identity.status)
 
     @staticmethod
     def validate_metadata(metadata: RuntimeExecutionMetadata) -> None:
@@ -47,8 +46,8 @@ class RuntimeExecutionValidator:
             raise ExecutionMetadataException("Metadata annotations cannot be None.")
 
     @staticmethod
-    def validate_state(state: RuntimeExecutionState) -> None:
-        if not state:
-            raise ExecutionStateException("State cannot be None.")
-        if not isinstance(state.stage, ExecutionStage):
-            raise ExecutionStateException("State stage must be a valid ExecutionStage.")
+    def validate_status(status: RuntimeExecutionStatus) -> None:
+        if not status:
+            raise ExecutionStateException("Status cannot be None.")
+        if not isinstance(status, RuntimeExecutionStatus):
+            raise ExecutionStateException("Status must be a valid RuntimeExecutionStatus.")
