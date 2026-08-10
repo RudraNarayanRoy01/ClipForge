@@ -1,6 +1,6 @@
 from typing import Dict, Set
 from .resolution_statistics import ResolutionStatistics
-from backend.src.runtime.composition.runtime_composition import RuntimeComposition
+from src.runtime.composition.runtime_composition import RuntimeComposition
 
 class ResolutionStatisticsBuilder:
     """

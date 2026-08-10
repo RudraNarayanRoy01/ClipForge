@@ -1,12 +1,12 @@
 import pytest
 from types import MappingProxyType
-from backend.src.runtime.injection.runtime_injection_composition import RuntimeInjectionComposition
-from backend.src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
-from backend.src.runtime.injection.runtime_injection_graph import RuntimeInjectionGraph
-from backend.src.runtime.injection.injection_metadata import InjectionMetadata
-from backend.src.runtime.injection.injection_statistics import InjectionStatistics
-from backend.src.runtime.injection.runtime_injection_graph_statistics import RuntimeInjectionGraphStatistics
-from backend.src.runtime.injection.injection_snapshot import InjectionSnapshot
+from src.runtime.injection.runtime_injection_composition import RuntimeInjectionComposition
+from src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
+from src.runtime.injection.runtime_injection_graph import RuntimeInjectionGraph
+from src.runtime.injection.injection_metadata import InjectionMetadata
+from src.runtime.injection.injection_statistics import InjectionStatistics
+from src.runtime.injection.runtime_injection_graph_statistics import RuntimeInjectionGraphStatistics
+from src.runtime.injection.injection_snapshot import InjectionSnapshot
 
 
 def _create_mock_objects():

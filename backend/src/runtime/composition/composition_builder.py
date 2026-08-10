@@ -1,7 +1,7 @@
 from typing import Tuple, List
 
-from backend.src.runtime.registry.component_registry import RuntimeComponentRegistry
-from backend.src.runtime.dependency.dependency_graph import RuntimeDependencyGraph
+from src.runtime.registry.component_registry import RuntimeComponentRegistry
+from src.runtime.dependency.dependency_graph import RuntimeDependencyGraph
 
 from .runtime_composition import RuntimeComposition
 from .composition_result import CompositionResult

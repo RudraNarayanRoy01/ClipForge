@@ -1924,3 +1924,162 @@ The Runtime Execution State Foundation MUST NOT import:
 - Dependency Injection Containers
 
 ONLY immutable Runtime Foundation components may be imported.
+
+## Runtime Execution Dispatcher Foundation
+
+### Purpose
+
+The Runtime Execution Dispatcher Foundation (Batch 6A.7.4) establishes the canonical immutable structural representation of Runtime Execution Dispatch. It answers "What Runtime Execution Dispatch exists?" without implementing any behaviour, routing, or dispatch logic.
+
+### Ownership Matrix
+
+RuntimeExecutionDispatcher OWNS ONLY:
+- identifier
+- identity
+
+RuntimeExecutionDispatcherIdentity OWNS ONLY:
+- descriptor
+- metadata
+- statistics
+- snapshot
+- runtime_execution_state
+- state_lookup
+- descriptor_lookup
+- dispatcher_lookup
+
+### DOES NOT OWN
+
+RuntimeExecutionDispatcher DOES NOT OWN:
+- mutable state
+- status
+- dispatch_status
+- dispatch_state
+- dispatch_result
+- dispatch_decision
+- dispatch_target
+- dispatch_route
+- worker
+- worker_id
+- queue
+- queue_id
+- provider
+- provider_id
+- model
+- model_id
+- routing
+- scheduling
+- retry_count
+- failure_count
+- telemetry
+- metrics
+- latency
+- hardware
+- execution_progress
+- execution_result
+
+### Hash Hierarchy
+
+RuntimeExecutionDispatcher maintains a strict deterministic SHA-256 hash hierarchy:
+
+descriptor_hash
+↓
+state_hash
+↓
+state_lookup_hash
+↓
+descriptor_lookup_hash
+↓
+dispatcher_lookup_hash
+↓
+metadata_hash
+↓
+statistics_hash
+↓
+dispatcher_hash
+
+### Pipeline Position
+
+```text
+    RuntimeExecutionLifecycle
+            ↓
+    RuntimeExecutionScheduler
+            ↓
+    RuntimeExecutionEngine
+            ↓
+    RuntimeExecutionSession
+            ↓
+    RuntimeExecutionState
+            ↓
+    RuntimeExecutionDispatcher
+```
+
+### Runtime UNKNOWN
+
+RuntimeExecutionDispatcher answers ONLY:
+
+"What Runtime Execution Dispatch exists?"
+
+It NEVER answers:
+
+- Who will dispatch?
+- What worker will dispatch?
+- What queue will receive work?
+- What provider will execute?
+- What model will execute?
+- Whether dispatch succeeds?
+- Whether execution succeeds?
+- Whether retry occurs?
+- Whether recovery occurs?
+- What hardware will be used?
+- What performance will occur?
+
+### Canonical Declaration
+
+RuntimeExecutionDispatcher is a purely structural representation. It is NOT a Dispatcher Service, a Router, a Scheduler, a Queue Manager, a Worker Manager, a Provider Selector, a Model Selector, an Execution Engine, a Result Manager, a Retry Manager, a Recovery Manager, a Telemetry Engine, a Monitoring Engine, an Optimization Engine, or a Hardware Manager.
+
+### Dependency Boundary
+
+RuntimeExecutionDispatcher consumes ONLY:
+- RuntimeExecutionState
+
+It MUST NOT consume:
+- RuntimeExecutionWorker
+- RuntimeExecutionCoordinator
+- RuntimeExecutionQueue
+- RuntimeExecutionMonitor
+- RuntimeExecutionTelemetry
+- RuntimeExecutionOptimizer
+- RuntimeExecutionRecovery
+- RuntimeExecutionProvider
+- model runtime
+- hardware runtime
+- execution result
+
+State MUST NOT consume Dispatcher.
+
+### Forbidden Imports
+
+The Runtime Execution Dispatcher Foundation MUST NOT import:
+- AI Providers
+- Inference Engines
+- Model Runtimes
+- Hardware Managers
+- GPU Utilities
+- CPU Utilities
+- Thread Pools
+- Worker Pools
+- Runtime Schedulers
+- Runtime Queues
+- Runtime State Managers
+- Runtime State Machines
+- Runtime State Controllers
+- Monitoring Systems
+- Telemetry Systems
+- Optimization Systems
+- Recovery Systems
+- Networking
+- HTTP Clients
+- Database Sessions
+- Dependency Injection Containers
+
+ONLY immutable Runtime Foundation components may be imported.

@@ -1,8 +1,8 @@
 import pytest
-from backend.src.runtime.injection.injection_validator import InjectionValidator
-from backend.src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
-from backend.src.runtime.injection.injection_descriptor import InjectionDescriptor
-from backend.src.runtime.injection.injection_exceptions import (
+from src.runtime.injection.injection_validator import InjectionValidator
+from src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
+from src.runtime.injection.injection_descriptor import InjectionDescriptor
+from src.runtime.injection.injection_exceptions import (
     DuplicateBindingException,
     CircularInjectionException,
     MissingImplementationException,

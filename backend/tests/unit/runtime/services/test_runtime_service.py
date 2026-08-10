@@ -1,5 +1,5 @@
 import pytest
-from runtime.services import RuntimeService
+from src.runtime.services import RuntimeService
 from types import MappingProxyType
 
 def test_runtime_service_immutability():

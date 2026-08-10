@@ -1,5 +1,5 @@
 import pytest
-from backend.src.runtime.injection.injection_descriptor import InjectionDescriptor
+from src.runtime.injection.injection_descriptor import InjectionDescriptor
 
 
 def test_descriptor_immutability():

@@ -1,5 +1,6 @@
 from dataclasses import FrozenInstanceError
 import pytest
+from unittest.mock import Mock
 
 from src.runtime.core.context import RuntimeContext
 from src.runtime.core.planner import (
@@ -9,7 +10,7 @@ from src.runtime.core.planner import (
     RuntimeExecutionPlanner
 )
 from src.runtime.core.scheduler import (
-    SchedulerResult,
+    SchedulingDecision,
     SchedulingStatus
 )
 from src.runtime.core.providers import ProviderIdentity
@@ -24,15 +25,21 @@ class TestRuntimeExecutionPlanner:
 
     def test_planning_request_immutability(self):
         """PlanningRequest must be completely immutable after creation."""
-        scheduler_result = SchedulerResult(
-            status=SchedulingStatus.SCHEDULED,
-            execution_placement=None,
-            execution_ordering="IMMEDIATE",
-            scheduling_reasoning="Test"
+        scheduler_result = SchedulingDecision(
+            identity=Mock(schedule_id="sch-1"),
+            execution_identity=None, # type: ignore
+            status=SchedulingStatus.READY,
+            priority=None, # type: ignore
+            policy=None, # type: ignore
+            strategy=None, # type: ignore
+            queue_classification=None, # type: ignore
+            scheduling_timestamp=0.0,
+            scheduling_reasoning="Test",
+            metadata={}
         )
         
         request = PlanningRequest(
-            scheduler_result=scheduler_result,
+            scheduling_decision=scheduler_result,
             execution_intent="TEST_INTENT",
             workload_identity="test-123",
             planning_constraints={},
@@ -69,15 +76,21 @@ class TestRuntimeExecutionPlanner:
         """
         planner = RuntimeExecutionPlanner()
         
-        scheduler_result = SchedulerResult(
-            status=SchedulingStatus.SCHEDULED,
-            execution_placement=ProviderIdentity("test_provider"),
-            execution_ordering="IMMEDIATE",
-            scheduling_reasoning="Test placement"
+        scheduler_result = SchedulingDecision(
+            identity=Mock(schedule_id="sch-1"),
+            execution_identity=None, # type: ignore
+            status=SchedulingStatus.READY,
+            priority=None, # type: ignore
+            policy=None, # type: ignore
+            strategy=None, # type: ignore
+            queue_classification=None, # type: ignore
+            scheduling_timestamp=0.0,
+            scheduling_reasoning="Test placement",
+            metadata={}
         )
         
         request = PlanningRequest(
-            scheduler_result=scheduler_result,
+            scheduling_decision=scheduler_result,
             execution_intent="VIDEO_PROCESSING",
             workload_identity="workload-456"
         )
@@ -100,7 +113,7 @@ class TestRuntimeExecutionPlanner:
         planner = RuntimeExecutionPlanner()
         
         request = PlanningRequest(
-            scheduler_result=None,  # type: ignore # intentional for test
+            scheduling_decision=None,  # type: ignore # intentional for test
             execution_intent="TEST",
             workload_identity="test"
         )

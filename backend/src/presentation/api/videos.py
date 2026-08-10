@@ -3,7 +3,8 @@ import uuid
 
 from src.presentation.schemas import AnalyzeVideoRequest, JobAcceptedResponse, ClipListResponse
 from src.services.video_service import VideoService
-from src.domain.ports import IWorkflowDispatcher, IJobRepository, IProjectRepository, IVideoRepository, IVideoProcessor, IAudioAnalyzer, IVisionAnalyzer, ILLMReasoningEngine
+from src.domain.ports import IWorkflowDispatcher, IJobRepository, IProjectRepository, IVideoRepository, IVideoProcessor, ILLMReasoningEngine
+from src.transcription.interfaces import ITranscriptionService
 from src.presentation.api.campaigns import get_request_container
 from src.application.use_cases import GenerateClipsUseCase
 from src.domain.job import Job
@@ -29,8 +30,7 @@ def get_generate_clips_use_case(container = Depends(get_request_container)) -> G
     project_repo = container.resolve(IProjectRepository)
     video_processor = container.resolve(IVideoProcessor)
     return GenerateClipsUseCase(
-        audio_analyzer=container.resolve(IAudioAnalyzer),
-        vision_analyzer=container.resolve(IVisionAnalyzer),
+        transcription_service=container.resolve(ITranscriptionService),
         llm_engine=container.resolve(ILLMReasoningEngine),
         timeline_repo=None, # type: ignore
         project_repo=project_repo,

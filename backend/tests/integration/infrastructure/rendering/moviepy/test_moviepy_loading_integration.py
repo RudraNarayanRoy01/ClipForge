@@ -5,7 +5,8 @@ import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.application.execution_models import RenderExecutionRequest, ValidatedRenderPlan, RenderFailureCategory, RenderExecutionStatus
+from src.application.execution_models import RenderExecutionRequest, ValidatedRenderPlan
+from src.domain.models.render_result import RenderResult, RenderStatus
 from src.domain.render_plan import (
     RenderPlan, 
     RenderMetadata, 
@@ -75,17 +76,16 @@ def test_backend_execute_loads_and_cleans_up(test_video_file, tmp_path):
     )
     
     backend = MoviePyRenderingBackend()
-    result = asyncio.run(backend.execute(request))
+    result = asyncio.run(backend.execute(request.validated_plan.plan, request.output_destination))
     
     # If the video file was loaded successfully by MoviePy, it should succeed.
     # If ffmpeg wasn't available and it created an empty file, MoviePy will fail
     # to load it, and we should get a translated error.
-    if result.status == RenderExecutionStatus.COMPLETED:
-        assert result.output_artifact_path == str(tmp_path / "output.mp4")
+    if result.status == RenderStatus.COMPLETED:
+        assert result.rendered_output_location == str(tmp_path / "output.mp4")
     else:
         # If it failed to load, it should be translated.
-        assert result.diagnostics is not None
-        assert result.diagnostics.category in [RenderFailureCategory.RESOURCE_EXHAUSTED, RenderFailureCategory.BACKEND_FAILURE]
+        assert result.rendering_metadata is not None
 
 
 def test_backend_execute_missing_asset_translation(tmp_path):
@@ -124,9 +124,8 @@ def test_backend_execute_missing_asset_translation(tmp_path):
     )
     
     backend = MoviePyRenderingBackend()
-    result = asyncio.run(backend.execute(request))
+    result = asyncio.run(backend.execute(request.validated_plan.plan, request.output_destination))
     
-    assert result.status == RenderExecutionStatus.FAILED
-    assert result.diagnostics is not None
-    assert result.diagnostics.category == RenderFailureCategory.RESOURCE_EXHAUSTED
-    assert "not found" in result.diagnostics.message.lower()
+    assert result.status == RenderStatus.FAILED
+    assert result.rendering_metadata is not None
+    assert "not found" in str(result.message).lower() or "not found" in str(result.rendering_metadata).lower()

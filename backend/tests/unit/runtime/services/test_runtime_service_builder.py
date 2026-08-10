@@ -1,5 +1,5 @@
 import pytest
-from runtime.services import RuntimeServiceBuilder, ServiceDescriptor
+from src.runtime.services import RuntimeServiceBuilder, ServiceDescriptor
 
 def test_builder_successful_composition():
     builder = RuntimeServiceBuilder()

@@ -4,7 +4,7 @@ from .resolution_metadata import ResolutionMetadata
 from .resolution_statistics import ResolutionStatistics
 from .resolution_snapshot import ResolutionSnapshot
 from .resolution_validator import ResolutionValidationResult
-from backend.src.runtime.registry.runtime_component import RuntimeComponent
+from src.runtime.registry.runtime_component import RuntimeComponent
 
 @dataclass(frozen=True)
 class RuntimeResolution:

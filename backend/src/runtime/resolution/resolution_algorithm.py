@@ -1,5 +1,5 @@
 from typing import Tuple, FrozenSet, Dict, List, Set
-from backend.src.runtime.registry.runtime_component import RuntimeComponent
+from src.runtime.registry.runtime_component import RuntimeComponent
 from .resolution_exceptions import ResolutionCycleException, ResolutionOrderingException
 
 class ResolutionAlgorithm:

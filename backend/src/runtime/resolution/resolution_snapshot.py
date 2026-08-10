@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Tuple, FrozenSet
-from backend.src.runtime.registry.runtime_component import RuntimeComponent
+from src.runtime.registry.runtime_component import RuntimeComponent
 from .resolution_metadata import ResolutionMetadata
 from .resolution_statistics import ResolutionStatistics
 

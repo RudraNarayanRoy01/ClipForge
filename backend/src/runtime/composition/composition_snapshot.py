@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Tuple
 from datetime import datetime
-from backend.src.runtime.registry.runtime_component import RuntimeComponent
-from backend.src.runtime.dependency.runtime_dependency import RuntimeDependency
+from src.runtime.registry.runtime_component import RuntimeComponent
+from src.runtime.dependency.runtime_dependency import RuntimeDependency
 from .composition_metadata import CompositionMetadata
 
 @dataclass(frozen=True)

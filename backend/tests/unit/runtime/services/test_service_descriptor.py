@@ -1,5 +1,5 @@
 import pytest
-from runtime.services import ServiceDescriptor
+from src.runtime.services import ServiceDescriptor
 from types import MappingProxyType
 
 def test_service_descriptor_immutability():

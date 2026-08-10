@@ -164,6 +164,20 @@ from .execution_state_statistics_builder import ExecutionStateStatisticsBuilder
 from .execution_state_snapshot_factory import ExecutionStateSnapshotFactory
 from .execution_state_factory import ExecutionStateFactory
 from .runtime_execution_state_factory import RuntimeExecutionStateFactory
+
+from .runtime_execution_dispatcher_descriptor import RuntimeExecutionDispatcherDescriptor
+from .runtime_execution_dispatcher_metadata import RuntimeExecutionDispatcherMetadata
+from .runtime_execution_dispatcher_statistics import RuntimeExecutionDispatcherStatistics
+from .runtime_execution_dispatcher_snapshot import RuntimeExecutionDispatcherSnapshot
+from .runtime_execution_dispatcher_identity import RuntimeExecutionDispatcherIdentity
+from .runtime_execution_dispatcher import RuntimeExecutionDispatcher
+from .runtime_execution_dispatcher_validator import RuntimeExecutionDispatcherValidator
+from .execution_dispatcher_descriptor_factory import ExecutionDispatcherDescriptorFactory
+from .execution_dispatcher_metadata_factory import ExecutionDispatcherMetadataFactory
+from .execution_dispatcher_statistics_builder import ExecutionDispatcherStatisticsBuilder
+from .execution_dispatcher_snapshot_factory import ExecutionDispatcherSnapshotFactory
+from .execution_dispatcher_factory import ExecutionDispatcherFactory
+from .runtime_execution_dispatcher_factory import RuntimeExecutionDispatcherFactory
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -339,5 +353,20 @@ __all__ = [
     "ExecutionStateStatisticsBuilder",
     "ExecutionStateSnapshotFactory",
     "ExecutionStateFactory",
-    "RuntimeExecutionStateFactory"
+    "RuntimeExecutionStateFactory",
+    
+    # Dispatcher artifacts in canonical order
+    "RuntimeExecutionDispatcherDescriptor",
+    "RuntimeExecutionDispatcherMetadata",
+    "RuntimeExecutionDispatcherStatistics",
+    "RuntimeExecutionDispatcherSnapshot",
+    "RuntimeExecutionDispatcherIdentity",
+    "RuntimeExecutionDispatcher",
+    "RuntimeExecutionDispatcherValidator",
+    "ExecutionDispatcherDescriptorFactory",
+    "ExecutionDispatcherMetadataFactory",
+    "ExecutionDispatcherSnapshotFactory",
+    "ExecutionDispatcherStatisticsBuilder",
+    "ExecutionDispatcherFactory",
+    "RuntimeExecutionDispatcherFactory"
 ]

@@ -1,5 +1,5 @@
 import pytest
-from backend.src.runtime.injection.runtime_injection_graph_statistics import RuntimeInjectionGraphStatistics
+from src.runtime.injection.runtime_injection_graph_statistics import RuntimeInjectionGraphStatistics
 
 def test_graph_statistics_immutability():
     stats = RuntimeInjectionGraphStatistics(

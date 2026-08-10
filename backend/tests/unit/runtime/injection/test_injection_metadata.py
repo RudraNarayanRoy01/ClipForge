@@ -1,6 +1,6 @@
 import pytest
 from types import MappingProxyType
-from backend.src.runtime.injection.injection_metadata import InjectionMetadata
+from src.runtime.injection.injection_metadata import InjectionMetadata
 
 
 def test_metadata_immutability():

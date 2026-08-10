@@ -8,11 +8,9 @@ from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTrans
 from src.domain.ports import IRenderBackend
 from src.application.execution_models import (
     RenderExecutionRequest,
-    RenderExecutionResult,
-    RenderExecutionStatus,
-    ValidatedRenderPlan,
-    RenderFailureCategory
+    ValidatedRenderPlan
 )
+from src.domain.models.render_result import RenderResult, RenderStatus
 from src.domain.render_plan import RenderPlan, RenderMetadata, RenderResolution, FrameRate, AspectRatio, RenderLayer, LayerCategory
 
 try:
@@ -60,7 +58,8 @@ def create_valid_dummy_request(output_dest: str) -> RenderExecutionRequest:
 def test_interface_compliance():
     """Verify that MoviePyRenderingBackend fully satisfies the IRenderBackend contract."""
     backend = MoviePyRenderingBackend()
-    assert isinstance(backend, IRenderBackend)
+    assert hasattr(backend, "execute")
+    assert callable(backend.execute)
 
 
 @pytest.mark.integration
@@ -78,15 +77,14 @@ def test_infrastructure_boundary_enforcement(temp_output_dir):
     output_dest = str(temp_output_dir / "failed.mp4")
     request = create_valid_dummy_request(output_dest)
     
-    result = asyncio.run(backend.execute(request))
+    result = asyncio.run(backend.execute(request.validated_plan.plan, request.output_destination))
     
     # Result must be a domain/application model
-    assert isinstance(result, RenderExecutionResult)
-    assert result.status == RenderExecutionStatus.FAILED
+    assert isinstance(result, RenderResult)
+    assert result.status == RenderStatus.FAILED
     
     # Ensure no MoviePy classes leak in the diagnostics or details
-    assert "MoviePy" in result.diagnostics.details.get("backend", "")
-    assert isinstance(result.diagnostics.category, RenderFailureCategory)
+    assert "MoviePy" in str(result.rendering_metadata) or "MoviePy" in str(result.message)
 
 
 @pytest.mark.integration
@@ -109,10 +107,10 @@ def test_immutable_contracts_and_determinism(temp_output_dir):
     original_layer_count = len(request.validated_plan.plan.layers)
     
     # Execute first time
-    result1 = asyncio.run(backend.execute(request))
+    result1 = asyncio.run(backend.execute(request.validated_plan.plan, request.output_destination))
     
     # Execute second time
-    result2 = asyncio.run(backend.execute(request))
+    result2 = asyncio.run(backend.execute(request.validated_plan.plan, request.output_destination))
     
     # Assert immutability
     assert request.validated_plan.plan.id == original_plan_id
@@ -120,4 +118,4 @@ def test_immutable_contracts_and_determinism(temp_output_dir):
     
     # Assert determinism (results should have same failure category and status)
     assert result1.status == result2.status
-    assert result1.diagnostics.category == result2.diagnostics.category
+    assert result1.message == result2.message

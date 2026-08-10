@@ -10,11 +10,9 @@ from src.infrastructure.rendering.moviepy.translation import MoviePyRequestTrans
 from src.infrastructure.rendering.moviepy.structures import MoviePyRenderTask, MoviePyResourcePool
 from src.application.execution_models import (
     RenderExecutionRequest, 
-    ValidatedRenderPlan,
-    RenderExecutionResult,
-    RenderExecutionStatus,
-    RenderFailureCategory
+    ValidatedRenderPlan
 )
+from src.domain.models.render_result import RenderResult, RenderStatus
 from src.domain.render_plan import RenderPlan, RenderMetadata
 from src.domain.models.render_profile import RenderProfile
 from src.domain.entities import Resolution
@@ -73,13 +71,13 @@ def test_moviepy_backend_success_execution(mock_output_composer, mock_executor, 
         metadata={"codec": "libx264"}
     )
     
-    result = asyncio.run(backend.execute(dummy_request))
+    result = asyncio.run(backend.execute(dummy_request.validated_plan.plan, dummy_request.output_destination))
     
-    assert isinstance(result, RenderExecutionResult)
-    assert result.status == RenderExecutionStatus.COMPLETED
-    assert result.output_artifact_path == "/tmp/output.mp4"
-    assert result.duration_seconds >= 0.0
-    assert result.diagnostics is None
+    assert isinstance(result, RenderResult)
+    assert result.status == RenderStatus.COMPLETED
+    assert result.rendered_output_location == "/tmp/output.mp4"
+    assert result.rendered_duration >= 0.0
+    assert not result.rendering_metadata.get("error_type")
 
 
 def test_moviepy_backend_exception_translation(dummy_request):
@@ -92,22 +90,20 @@ def test_moviepy_backend_exception_translation(dummy_request):
     mock_translator.translate.side_effect = OSError("Disk full")
     
     backend = MoviePyRenderingBackend(translator=mock_translator)
-    result = asyncio.run(backend.execute(dummy_request))
+    result = asyncio.run(backend.execute(dummy_request.validated_plan.plan, dummy_request.output_destination))
     
-    assert isinstance(result, RenderExecutionResult)
-    assert result.status == RenderExecutionStatus.FAILED
-    assert result.diagnostics is not None
-    assert result.diagnostics.category == RenderFailureCategory.RESOURCE_EXHAUSTED
-    assert "IO or OS error" in result.diagnostics.message
-    assert result.diagnostics.details["error_type"] == "OSError"
-    assert result.diagnostics.details["error_message"] == "Disk full"
+    assert isinstance(result, RenderResult)
+    assert result.status == RenderStatus.FAILED
+    assert "IO or OS error" in str(result.message)
+    assert result.rendering_metadata["error_type"] == "OSError"
+    assert result.rendering_metadata["error_message"] == "Disk full"
 
 def test_request_translation(dummy_request):
     """
-    Verify the translator successfully translates ValidatedRenderPlan -> MoviePyRenderTask.
+    Verify the translator successfully translates RenderPlan -> MoviePyRenderTask.
     """
     translator = MoviePyRequestTranslator()
-    task = translator.translate(dummy_request.validated_plan, dummy_request.output_destination)
+    task = translator.translate(dummy_request.validated_plan.plan, dummy_request.output_destination)
     
     assert isinstance(task, MoviePyRenderTask)
     assert task.original_plan_id == dummy_request.validated_plan.plan.id

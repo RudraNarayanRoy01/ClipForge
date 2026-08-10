@@ -1,6 +1,6 @@
 import pytest
-from backend.src.runtime.injection.runtime_injection_builder import RuntimeInjectionBuilder
-from backend.src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
+from src.runtime.injection.runtime_injection_builder import RuntimeInjectionBuilder
+from src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
 
 
 def test_builder_success():

@@ -1,6 +1,6 @@
 from typing import List, Optional
-from backend.src.runtime.registry.component_registry import RuntimeComponentRegistry
-from backend.src.runtime.dependency.dependency_graph import RuntimeDependencyGraph
+from src.runtime.registry.component_registry import RuntimeComponentRegistry
+from src.runtime.dependency.dependency_graph import RuntimeDependencyGraph
 from .composition_exceptions import CompositionValidationException, IncompleteCompositionException
 
 class CompositionValidator:

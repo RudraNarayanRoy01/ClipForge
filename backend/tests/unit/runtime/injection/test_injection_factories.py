@@ -1,12 +1,12 @@
 import pytest
-from backend.src.runtime.injection.injection_id_factory import InjectionIdFactory
-from backend.src.runtime.injection.injection_metadata_factory import InjectionMetadataFactory
-from backend.src.runtime.injection.runtime_injection_factory import RuntimeInjectionFactory
-from backend.src.runtime.injection.injection_graph_factory import InjectionGraphFactory
-from backend.src.runtime.injection.injection_snapshot import InjectionSnapshot
-from backend.src.runtime.injection.injection_statistics import InjectionStatistics
-from backend.src.runtime.injection.runtime_injection_graph_statistics import RuntimeInjectionGraphStatistics
-from backend.src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
+from src.runtime.injection.injection_id_factory import InjectionIdFactory
+from src.runtime.injection.injection_metadata_factory import InjectionMetadataFactory
+from src.runtime.injection.runtime_injection_factory import RuntimeInjectionFactory
+from src.runtime.injection.injection_graph_factory import InjectionGraphFactory
+from src.runtime.injection.injection_snapshot import InjectionSnapshot
+from src.runtime.injection.injection_statistics import InjectionStatistics
+from src.runtime.injection.runtime_injection_graph_statistics import RuntimeInjectionGraphStatistics
+from src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
 
 
 def test_id_factory_generates_unique_composition_ids():

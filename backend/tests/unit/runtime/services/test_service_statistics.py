@@ -1,5 +1,5 @@
 import pytest
-from runtime.services import ServiceStatistics
+from src.runtime.services import ServiceStatistics
 
 def test_service_statistics_immutability():
     stats = ServiceStatistics(

@@ -1,5 +1,5 @@
-from backend.src.runtime.registry.registry_snapshot import RegistrySnapshot
-from backend.src.runtime.dependency.dependency_snapshot import DependencySnapshot
+from src.runtime.registry.registry_snapshot import RegistrySnapshot
+from src.runtime.dependency.dependency_snapshot import DependencySnapshot
 from .composition_statistics import CompositionStatistics
 
 class CompositionStatisticsBuilder:

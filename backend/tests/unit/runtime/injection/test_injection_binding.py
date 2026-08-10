@@ -1,6 +1,6 @@
 import pytest
 from types import MappingProxyType
-from backend.src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
+from src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
 
 
 def test_binding_immutability():

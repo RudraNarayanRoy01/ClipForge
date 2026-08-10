@@ -1,4 +1,4 @@
-from backend.src.runtime.composition.runtime_composition import RuntimeComposition
+from src.runtime.composition.runtime_composition import RuntimeComposition
 from .runtime_resolution import RuntimeResolution
 from .resolution_result import ResolutionResult
 from .resolution_validator import ResolutionValidator

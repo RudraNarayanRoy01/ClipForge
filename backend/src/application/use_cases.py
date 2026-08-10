@@ -1,15 +1,16 @@
 import uuid
 import asyncio
-from typing import List
+from typing import List, Optional
 from src.domain.ports import (
-    IAudioAnalyzer, IVisionAnalyzer, ILLMReasoningEngine, 
+    ILLMReasoningEngine, 
     ITimelineContextRepository, IVideoProcessor
 )
-from src.domain.entities import TimelineContext, ClipSegment
+from src.transcription.interfaces import ITranscriptionService
+from src.domain.entities import TimelineContext, ClipSegment, WordLevelTimestamp, TimeRange
 from src.domain.ports import IProjectRepository
 from src.knowledge.builders.video_knowledge_builder import VideoKnowledgeBuilder
 from src.media.dtos import MediaMetadata
-from src.transcription.dtos import Transcript, TranscriptionSegment, TranscriptionWord
+from src.transcription.dtos import Transcript, TranscriptionSegment, TranscriptionWord, TranscriptionRequest
 from src.video_understanding.dtos import VideoUnderstandingResult, Topic
 
 from datetime import datetime, timezone
@@ -38,15 +39,13 @@ class GenerateClipsUseCase:
     """
     def __init__(
         self,
-        audio_analyzer: IAudioAnalyzer,
-        vision_analyzer: IVisionAnalyzer,
+        transcription_service: ITranscriptionService,
         llm_engine: ILLMReasoningEngine,
         timeline_repo: ITimelineContextRepository,
         project_repo: IProjectRepository,
         video_processor: IVideoProcessor
     ):
-        self.audio = audio_analyzer
-        self.vision = vision_analyzer
+        self.transcription = transcription_service
         self.llm = llm_engine
         self.timeline_repo = timeline_repo
         self.project_repo = project_repo
@@ -63,37 +62,23 @@ class GenerateClipsUseCase:
             # Offload synchronous blocking subprocess to threadpool
             await asyncio.to_thread(self.video.extract_audio, video_path, audio_path)
             
-            # In a real scenario, these would also be async or offloaded
-            words = await asyncio.to_thread(self.audio.transcribe, audio_path)
-            speakers = await asyncio.to_thread(self.audio.detect_speakers, audio_path)
-            energy = await asyncio.to_thread(self.audio.measure_energy, audio_path)
-            silences = await asyncio.to_thread(self.audio.detect_silence, audio_path)
+            # Get the complete Transcript object directly
+            transcript_dto = await self.transcription.transcribe(
+                TranscriptionRequest(media_path=audio_path)
+            )
             
-            scenes = await asyncio.to_thread(self.vision.detect_scenes, video_path)
-            faces = await asyncio.to_thread(self.vision.detect_faces, video_path)
-            emotions = await asyncio.to_thread(self.vision.detect_emotions, video_path)
-            gestures = await asyncio.to_thread(self.vision.detect_gestures, video_path)
-            objects = await asyncio.to_thread(self.vision.detect_objects, video_path)
-            ocr = await asyncio.to_thread(self.vision.read_text_ocr, video_path)
+            # Use transcript_dto for downstream AI
+            topics = await asyncio.to_thread(self.llm.detect_topics, transcript_dto.full_text)
             
-            full_text = " ".join([w.word for w in words])
-            topics = await asyncio.to_thread(self.llm.detect_topics, full_text)
+            # Extract words for TimelineContext legacy representation
+            words = []
+            for segment in transcript_dto.segments:
+                if segment.words:
+                    for word in segment.words:
+                        words.append(WordLevelTimestamp(word.text, TimeRange(word.start_time, word.end_time)))
             
             # Knowledge Extraction (Transformation)
             knowledge_builder = VideoKnowledgeBuilder()
-            
-            # Mappings from internal entities to DTOs for Knowledge Builder
-            transcript_dto = Transcript(
-                full_text=full_text,
-                segments=[
-                    TranscriptionSegment(
-                        text=" ".join(w.word for w in words),
-                        start_time=words[0].timestamp if words else 0.0,
-                        end_time=words[-1].timestamp if words else 0.0,
-                        words=[TranscriptionWord(text=w.word, start_time=w.timestamp, end_time=w.timestamp, confidence=1.0) for w in words]
-                    )
-                ]
-            )
             media_meta_dto = MediaMetadata(video_id=str(video_asset_id), duration_seconds=120.0, width=1920, height=1080, fps=30.0)
             understanding_dto = VideoUnderstandingResult(
                 video_id=str(video_asset_id),
@@ -115,9 +100,9 @@ class GenerateClipsUseCase:
             
             context = TimelineContext(
                 video_asset_id=video_asset_id,
-                words=words, speakers=speakers, energy=energy, silences=silences,
-                scenes=scenes, faces=faces, emotions=emotions, gestures=gestures,
-                objects=objects, ocr_texts=ocr, topics=topics
+                words=words, speakers=[], energy=[], silences=[],
+                scenes=[], faces=[], emotions=[], gestures=[],
+                objects=[], ocr_texts=[], topics=topics
             )
             
             # Persist Timeline Context (Timeline Generation)

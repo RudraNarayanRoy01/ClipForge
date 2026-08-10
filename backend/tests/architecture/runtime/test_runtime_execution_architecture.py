@@ -151,3 +151,47 @@ def test_dependency_direction():
             assert 'runtime_execution_manager' not in (node.module or ""), "Scheduling must not depend on Execution."
             for alias in node.names:
                 assert 'RuntimeExecution' not in alias.name, "Scheduling must not depend on Execution."
+
+def test_dispatcher_structural_immutability():
+    """Verify that RuntimeExecutionDispatcher and its components are immutable and structural."""
+    from src.runtime.execution.runtime_execution_dispatcher import RuntimeExecutionDispatcher
+    from src.runtime.execution.runtime_execution_dispatcher_identity import RuntimeExecutionDispatcherIdentity
+    assert is_dataclass(RuntimeExecutionDispatcher)
+    assert is_dataclass(RuntimeExecutionDispatcherIdentity)
+    
+    # Must not contain operational fields
+    import dataclasses
+    dispatcher_fields = {f.name for f in dataclasses.fields(RuntimeExecutionDispatcher)}
+    assert dispatcher_fields == {"identifier", "identity"}
+    
+    identity_fields = {f.name for f in dataclasses.fields(RuntimeExecutionDispatcherIdentity)}
+    forbidden = {"status", "dispatch_status", "worker", "queue", "provider", "model", "routing", "telemetry", "hardware"}
+    assert not any(f in identity_fields for f in forbidden)
+
+def test_dispatcher_dependency_direction():
+    """Verify State -> Dispatcher dependency is correct (State doesn't know Dispatcher)."""
+    import ast
+    
+    # State must not import Dispatcher
+    with open('backend/src/runtime/execution/runtime_execution_state.py', 'r') as f:
+        tree = ast.parse(f.read())
+        
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert 'dispatcher' not in (node.module or "").lower(), "State must not depend on Dispatcher"
+            for alias in node.names:
+                assert 'Dispatcher' not in alias.name, "State must not depend on Dispatcher"
+
+def test_dispatcher_zero_behaviour():
+    """Verify Dispatcher has no behavioural methods."""
+    from src.runtime.execution.runtime_execution_dispatcher import RuntimeExecutionDispatcher
+    
+    methods = [func for func in dir(RuntimeExecutionDispatcher) if callable(getattr(RuntimeExecutionDispatcher, func)) and not func.startswith("__")]
+    
+    forbidden_methods = [
+        "dispatch", "execute", "route", "schedule", "enqueue", "dequeue",
+        "assign", "retry", "recover", "transition", "update", "mutate"
+    ]
+    
+    for method in methods:
+        assert method not in forbidden_methods, f"Dispatcher must not have behavioural method: {method}"

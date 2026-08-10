@@ -1,5 +1,5 @@
 import pytest
-from runtime.services import ServiceMetadata
+from src.runtime.services import ServiceMetadata
 from types import MappingProxyType
 
 def test_service_metadata_immutability():

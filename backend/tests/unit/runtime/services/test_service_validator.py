@@ -1,6 +1,6 @@
 import pytest
-from runtime.services import ServiceValidator, ServiceDescriptor
-from runtime.services.service_exceptions import (
+from src.runtime.services import ServiceValidator, ServiceDescriptor
+from src.runtime.services.service_exceptions import (
     DuplicateServiceException, InvalidServiceDescriptorException
 )
 

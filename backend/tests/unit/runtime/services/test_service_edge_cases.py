@@ -1,8 +1,8 @@
 import pytest
-from runtime.services import (
+from src.runtime.services import (
     RuntimeServiceBuilder, ServiceDescriptor, ServiceValidator
 )
-from runtime.services.service_exceptions import ServiceBuildException
+from src.runtime.services.service_exceptions import ServiceBuildException
 
 def test_large_service_graph_performance():
     builder = RuntimeServiceBuilder()

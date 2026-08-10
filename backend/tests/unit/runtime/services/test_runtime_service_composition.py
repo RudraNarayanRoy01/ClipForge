@@ -1,6 +1,6 @@
 import pytest
 from types import MappingProxyType
-from runtime.services import (
+from src.runtime.services import (
     RuntimeServiceComposition, ValidationResult, ServiceSnapshot,
     RuntimeService, ServiceMetadata, ServiceStatistics
 )

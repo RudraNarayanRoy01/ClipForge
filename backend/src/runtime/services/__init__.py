@@ -9,6 +9,7 @@ from .service_statistics import ServiceStatistics
 from .service_snapshot import ServiceSnapshot
 from .service_result import ServiceResult
 from .runtime_service_builder import RuntimeServiceBuilder
+from .service_validator import ServiceValidator
 from .service_exceptions import (
     ServiceCompositionException,
     ServiceValidationException,
@@ -30,6 +31,7 @@ __all__ = [
     "ServiceSnapshot",
     "ServiceResult",
     "RuntimeServiceBuilder",
+    "ServiceValidator",
     "ServiceCompositionException",
     "ServiceValidationException",
     "DuplicateServiceException",

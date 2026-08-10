@@ -2,7 +2,8 @@ import pytest
 from src.runtime.execution import (
     ExecutionMetadataFactory,
     ExecutionSnapshotFactory,
-    RuntimeExecutionDescriptor
+    RuntimeExecutionDescriptor,
+    ExecutionStage
 )
 from src.runtime.domain.runtime_execution_model import RuntimeExecutionStatus
 

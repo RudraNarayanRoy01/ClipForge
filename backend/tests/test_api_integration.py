@@ -1,12 +1,11 @@
 import pytest
 import uuid
-from fastapi.testclient import TestClient
-
 from src.main import app
-
-client = TestClient(app)
-
-def test_health_endpoint_schema_and_status():
+from src.domain.entities import Project, VideoAsset
+from src.infrastructure.database import AsyncSessionLocal
+from src.repositories.project_repository import ProjectRepository
+from src.repositories.video_repository import VideoRepository
+def test_health_endpoint_schema_and_status(client):
     """Verify the health endpoint returns the correct production-grade JSON schema."""
     response = client.get("/api/v1/health")
     assert response.status_code == 200
@@ -24,7 +23,7 @@ def test_health_endpoint_schema_and_status():
     assert set(data.keys()) == expected_keys
     assert data["status"] in ["ok", "degraded", "error"]
 
-def test_projects_create_schema_and_error():
+def test_projects_create_schema_and_error(client):
     """Verify that project creation enforces the input schema and currently returns 501."""
     # Valid schema payload, expecting 201
     import uuid
@@ -39,13 +38,26 @@ def test_projects_create_schema_and_error():
     assert "error" in data
     assert data["error"]["code"] == "VALIDATION_ERROR"
 
-def test_videos_analyze_mock_success():
+@pytest.mark.asyncio
+async def test_videos_analyze_mock_success(client):
     """Verify that video analysis accepts valid parameters and returns a 202 JobAcceptedResponse."""
-    video_id = str(uuid.uuid4())
+    # Pre-seed the database using an explicitly scoped async session
+    async with AsyncSessionLocal() as session:
+        project_repo = ProjectRepository(session)
+        video_repo = VideoRepository(session)
+
+        project = Project(name="Test Project", storage_path="/tmp")
+        video = VideoAsset(project_id=project.id, file_path="/tmp/video.mp4")
+
+        await project_repo.create(project)
+        await video_repo.save_video(video)
+
+    video_id = str(video.id)
     payload = {
         "pipeline_profile": "fast_audio_only",
         "target_length_seconds": 60
     }
+    
     response = client.post(f"/api/v1/videos/{video_id}/analyze", json=payload)
     
     assert response.status_code == 202
@@ -54,7 +66,7 @@ def test_videos_analyze_mock_success():
     assert "message" in data
     assert "Mock AI Pipeline started" in data["message"]
 
-def test_videos_analyze_validation_error():
+def test_videos_analyze_validation_error(client):
     """Verify that video analysis enforces bounds (e.g. target_length_seconds >= 15)."""
     video_id = str(uuid.uuid4())
     payload = {
@@ -66,7 +78,7 @@ def test_videos_analyze_validation_error():
     assert response.status_code == 422
     assert response.headers["content-type"] == "application/json"
 
-def test_clips_get_not_implemented():
+def test_clips_get_not_implemented(client):
     """Verify that the clips endpoint exists but returns 501."""
     clip_id = str(uuid.uuid4())
     response = client.get(f"/api/v1/clips/{clip_id}")

@@ -79,7 +79,7 @@ class MoviePyRenderTask:
     """
     A backend-specific representation of a rendering task.
     
-    It maps the attributes of a ValidatedRenderPlan into MoviePy-friendly 
+    It maps the attributes of a RenderPlan into MoviePy-friendly 
     internal state, acting as the single source of truth for a rendering execution
     within the MoviePy backend.
     """

@@ -1,7 +1,7 @@
 import pytest
-from backend.src.runtime.injection.injection_statistics_builder import InjectionStatisticsBuilder
-from backend.src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
-from backend.src.runtime.injection.injection_descriptor import InjectionDescriptor
+from src.runtime.injection.injection_statistics_builder import InjectionStatisticsBuilder
+from src.runtime.injection.runtime_injection_binding import RuntimeInjectionBinding
+from src.runtime.injection.injection_descriptor import InjectionDescriptor
 
 
 def test_statistics_builder_computes_correctly():

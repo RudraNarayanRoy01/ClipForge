@@ -1,8 +1,8 @@
 import pytest
-from runtime.services.service_id_factory import ServiceIdFactory
-from runtime.services.service_metadata_factory import ServiceMetadataFactory
-from runtime.services.runtime_service_factory import RuntimeServiceFactory
-from runtime.services import ServiceDescriptor
+from src.runtime.services.service_id_factory import ServiceIdFactory
+from src.runtime.services.service_metadata_factory import ServiceMetadataFactory
+from src.runtime.services.runtime_service_factory import RuntimeServiceFactory
+from src.runtime.services import ServiceDescriptor
 
 def test_service_id_factory():
     id1 = ServiceIdFactory.create_id()

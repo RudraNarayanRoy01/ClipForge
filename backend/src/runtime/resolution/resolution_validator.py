@@ -25,7 +25,7 @@ class ResolutionValidator:
     
     @staticmethod
     def validate(composition: 'RuntimeComposition') -> ResolutionValidationResult:
-        from backend.src.runtime.composition.runtime_composition import RuntimeComposition
+        from src.runtime.composition.runtime_composition import RuntimeComposition
         
         if not isinstance(composition, RuntimeComposition):
             return ResolutionValidationResult(False, errors=("Invalid composition type provided.",))

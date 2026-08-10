@@ -16,7 +16,8 @@ from src.domain.render_plan import (
     RenderPlan, RenderMetadata, RenderResolution, FrameRate, AspectRatio,
     RenderLayer, LayerCategory, RenderTrack, RenderSegment, TimelinePosition, RenderInstruction
 )
-from src.application.execution_models import RenderExecutionRequest, ValidatedRenderPlan, RenderExecutionStatus
+from src.application.execution_models import RenderExecutionRequest, ValidatedRenderPlan
+from src.domain.models.render_result import RenderResult, RenderStatus
 
 @pytest.fixture
 def temp_video_file():
@@ -108,8 +109,9 @@ async def test_backend_execution_incorporates_composition(mock_executor, integra
     request = RenderExecutionRequest(validated_plan=validated, output_destination="/tmp/never_written.mp4")
     
     backend = MoviePyRenderingBackend()
-    result = await backend.execute(request)
+    result = await backend.execute(request.validated_plan.plan, request.output_destination)
     
-    assert result.status == RenderExecutionStatus.COMPLETED
-    assert result.output_artifact_path == "/tmp/never_written.mp4"
+    assert isinstance(result, RenderResult)
+    assert result.status == RenderStatus.COMPLETED
+    assert result.rendered_output_location == "/tmp/never_written.mp4"
     assert not os.path.exists("/tmp/never_written.mp4")

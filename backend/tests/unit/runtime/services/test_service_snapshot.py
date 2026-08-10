@@ -1,5 +1,5 @@
 import pytest
-from runtime.services import ServiceSnapshot, ServiceMetadata, ServiceStatistics
+from src.runtime.services import ServiceSnapshot, ServiceMetadata, ServiceStatistics
 
 def test_service_snapshot_immutability():
     meta = ServiceMetadata(schema_version="1", builder_version="1")

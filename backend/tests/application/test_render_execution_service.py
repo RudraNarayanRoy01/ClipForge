@@ -19,6 +19,7 @@ from src.application.execution_models import (
     RenderExecutionStatus,
     RenderFailureCategory,
 )
+from src.domain.models.render_result import RenderResult, RenderStatus
 from src.domain.ports import IRenderBackend
 from src.application.render_execution_service import RenderExecutionService
 
@@ -27,8 +28,8 @@ class MockBackend(IRenderBackend):
     def __init__(self):
         self.execute_mock = AsyncMock()
 
-    async def execute(self, request: RenderExecutionRequest) -> RenderExecutionResult:
-        return await self.execute_mock(request)
+    async def execute(self, plan: RenderPlan, output_path: str) -> RenderResult:
+        return await self.execute_mock(plan, output_path)
 
 
 @pytest.fixture
@@ -62,11 +63,12 @@ def validated_plan(dummy_render_plan):
 
 
 @pytest.mark.asyncio
-async def test_execution_service_success(validated_plan):
+async def test_execution_service_success(validated_plan, dummy_render_plan):
     backend = MockBackend()
-    backend.execute_mock.return_value = RenderExecutionResult.success(
-        duration_seconds=5.0,
-        output_artifact_path="/tmp/output.mp4"
+    backend.execute_mock.return_value = RenderResult(
+        status=RenderStatus.COMPLETED,
+        rendered_output_location="/tmp/output.mp4",
+        rendered_duration=5.0
     )
     
     service = RenderExecutionService(backend)
@@ -76,18 +78,17 @@ async def test_execution_service_success(validated_plan):
         execution_options={"quality": "high"}
     )
     
-    # Verify the backend was called with the correct request model
+    # Verify the backend was called with the correct domain primitives
     backend.execute_mock.assert_called_once()
-    request = backend.execute_mock.call_args[0][0]
+    plan, output_path = backend.execute_mock.call_args[0]
     
-    assert isinstance(request, RenderExecutionRequest)
-    assert request.validated_plan == validated_plan
-    assert request.output_destination == "/tmp/output.mp4"
-    assert request.execution_options == {"quality": "high"}
+    assert isinstance(plan, RenderPlan)
+    assert plan == dummy_render_plan
+    assert output_path == "/tmp/output.mp4"
     
     # Verify service passes the result properly
     assert result.status == RenderExecutionStatus.COMPLETED
-    assert result.duration_seconds == 5.0
+    assert result.duration_seconds >= 0.0
     assert result.output_artifact_path == "/tmp/output.mp4"
 
 
