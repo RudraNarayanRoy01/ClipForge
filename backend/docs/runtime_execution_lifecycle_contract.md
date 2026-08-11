@@ -84,7 +84,7 @@ The conceptual lifecycle spans four phases:
 4. **Terminalization**: The attempt concludes (`COMPLETED`, `FAILED`, `ABORTED`).
 
 ### 4.1. Transition Matrix
-**Note on Machinery**: This transition matrix describes *architectural semantics* and is an abstract representation of the documented conceptual lifecycle. It is **not** an executable state-transition engine. The runtime currently does not enforce active transition logic within these states.
+**Note on Machinery:** This transition matrix defines the architectural lifecycle semantics and serves as the canonical transition contract. Transition legality is enforced by `RuntimeExecutionTransitionValidator`, while `RuntimeExecutionTransitionEngine` applies valid transitions. `RuntimeExecutionLifecycleState` owns the immutable current lifecycle position and delegates transition application to the certified engine. The matrix itself remains declarative documentation and is not duplicated as executable logic inside the state boundary.
 
 Based on the existing repository contract, the following transitions represent conceptual progression:
 
@@ -134,9 +134,9 @@ Likewise, `RuntimeExecutionStatus.FAILED` represents a lifecycle that terminated
 7. `RuntimeExecutionResult` remains immutable and untouchable after construction.
 
 ## 7. Future / Out-of-Scope Functionality
-- **Retry Semantics**: Automatic recovery and retry semantics are explicitly outside the scope of Sprint 6A.8.1.
+- **Retry Semantics:** Automatic recovery and retry semantics are explicitly outside the scope of Sprint 6A.8.
 - **Cancellation Machinery**: The mechanisms for cancelling an execution attempt (cancellation tokens, queues, thread aborts) are not implemented. Only the semantic outcome (`CANCELLED`) is defined.
-- **State Machine Implementation**: The active transition engine and orchestrator for moving between these states is deferred to subsequent batches.
+- **State Machine Implementation**: While the transition engine is implemented, a full automated state-machine orchestrator for progressing between these states without external invocation is deferred to subsequent batches.
 
 ## 8. Transition Validation Contract
 
@@ -254,3 +254,60 @@ The validator explicitly does **not**:
 - create or reconstruct results;
 - act as a state machine;
 - perform lifecycle transitions.
+
+## 12. Lifecycle Failure Semantics Contract
+
+### 12.1 Failure Taxonomy
+The runtime formally distinguishes between four separate failure categories:
+1. **Scheduling rejection**: Execution was not eligible to begin (e.g., `REJECTED`).
+2. **Lifecycle contract violation**: An illegal lifecycle transition was requested (e.g., `COMPLETED` → `EXECUTING`).
+3. **Execution failure**: An actual execution attempt failed.
+4. **Terminal consistency violation**: Lifecycle state and execution result are semantically incompatible.
+
+These categories must not be collapsed into a single generic `FAILED` concept.
+
+### 12.2 Scheduling Rejection Semantics
+A `SchedulingStatus.REJECTED` decision occurs before any execution attempt. The `RuntimeExecutionCoordinator` intercepts this and prevents the `RuntimeExecutor` from executing. 
+- A scheduling rejection does not create a `RuntimeExecutionResult`.
+- A scheduling rejection is distinct from `RuntimeExecutionOutcome.FAILED`.
+
+### 12.3 Lifecycle Contract Violation Semantics
+An invalid lifecycle transition violates the structural contract.
+- Invalid transitions are rejected by the `RuntimeExecutionTransitionEngine`, which strictly raises a standard `ValueError`.
+- A lifecycle contract violation leaves the `RuntimeExecutionLifecycleState` unmodified.
+- A lifecycle contract violation does NOT synthesize a `RuntimeExecutionResult`.
+
+### 12.4 Execution Failure Semantics
+Execution failure belongs strictly to the domain of the `RuntimeExecutor`.
+- When an execution attempt fails, the `RuntimeExecutor` catches the domain error and produces a `RuntimeExecutionResult` with `outcome=RuntimeExecutionOutcome.FAILED`.
+- The `failure_reason` is populated with the domain exception details.
+- Architecturally, this is the only authorized mechanism for generating a `FAILED` execution result.
+
+### 12.5 Terminal Consistency Violation Semantics
+The `RuntimeExecutionTerminalConsistencyValidator` observes the compatibility between the lifecycle position and the terminal outcome. See Section 11 for the full consistency contract.
+
+### 12.6 Ownership Boundaries
+- **Scheduling**: Owns eligibility/rejection.
+- **Lifecycle Transition Engine**: Owns lifecycle transition legality.
+- **Lifecycle State**: Owns the immutable lifecycle position.
+- **RuntimeExecutor**: Owns the execution attempt behavior and failure translation.
+- **RuntimeExecutionResult**: Owns the historical execution result.
+- **TerminalConsistencyValidator**: Owns state/result compatibility observation.
+
+### 12.7 ValueError Semantics
+`ValueError` is the established, certified mechanism for rejecting invalid lifecycle transitions. No custom `LifecycleFailureException` or `RecoveryException` is authorized. The `ValueError` must never be translated into an execution result by the lifecycle machinery.
+
+### 12.8 Result Creation Boundary
+- **Lifecycle contract violations** must never fabricate an execution result.
+- Architecturally, **actual execution attempts** (via `RuntimeExecutor`) are the only authorized source of execution results. Python does not physically prevent manual construction of a result, but doing so outside of the executor violates the contract.
+
+### 12.9 Terminal State Protection & Duplicate Terminalization
+The certified transition matrix explicitly prevents terminal states (`COMPLETED`, `FAILED`, `ABORTED`) from regressing to active states or re-transitioning into themselves (e.g., `COMPLETED` → `COMPLETED` is invalid and raises `ValueError`). This provides strict lifecycle semantic protection.
+
+### 12.10 ABORTED vs CANCELLED
+As documented in Section 5.2, `RuntimeExecutionStatus.ABORTED` is distinct from `RuntimeExecutionOutcome.CANCELLED`. A lifecycle violation does not map these together. `CANCELLED` remains an execution outcome, while `ABORTED` remains a structural lifecycle state.
+
+### 12.11 Recovery Boundary & Non-Responsibilities
+This failure semantics contract describes **observation and constraint**, not recovery.
+- Automatic recovery, retry, restart, resume, rollback, retry queues, and backoff policies are explicitly **out of scope**.
+- A lifecycle violation terminates the attempted transition operation via exception (`ValueError`). There must be no implication that the lifecycle automatically retries or repairs itself.
