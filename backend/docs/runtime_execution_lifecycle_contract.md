@@ -162,3 +162,29 @@ All other transitions are invalid under the current contract. This includes skip
 
 ### Initialization
 > Initialization to `PREPARED` is not represented as a transition by the validator.
+
+## 9. Transition Application Contract
+
+### Validation vs Application
+> **TransitionValidator**: Determines whether a transition is legal.
+> **TransitionEngine**: Applies a legal transition and returns the target status.
+
+The Transition Engine does not own lifecycle state. It produces the resulting `RuntimeExecutionStatus` for a requested transition and does not mutate `RuntimeExecutionState`.
+
+### Engine Constraints
+The Transition Engine:
+- is stateless;
+- does not own lifecycle state;
+- does not persist state;
+- does not execute workloads;
+- does not orchestrate;
+- does not schedule;
+- does not manage providers;
+- does not implement cancellation;
+- does not implement retry;
+- does not duplicate the transition matrix.
+
+### Immutable Semantics
+Explicitly preserved:
+- `ABORTED` != `CANCELLED`
+- `COMPLETED` != `SUCCESS`
