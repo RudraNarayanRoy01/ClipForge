@@ -36,6 +36,9 @@ from src.application.execution_models import ValidatedRenderPlan, RenderExecutio
 from src.application.render_execution_service import RenderExecutionService
 from src.application.execution_models import RenderExecutionRequest, RenderFailureCategory
 from src.domain.ports import IRenderBackend
+from src.domain.models.render_result import RenderResult, RenderStatus
+from src.editing.domain.pipeline.export import FinalizedEdit
+from unittest.mock import MagicMock
 
 # Mock AI Service that returns valid schemas for deterministic testing
 class MockAIService(IAIService):
@@ -107,10 +110,11 @@ class MockAIService(IAIService):
 
 # Mock Render Backend for Execution
 class MockRenderingBackend(IRenderBackend):
-    async def execute(self, request: RenderExecutionRequest) -> RenderExecutionResult:
-        return RenderExecutionResult.success(
-            duration_seconds=1.0,
-            output_artifact_path=request.output_destination
+    async def execute(self, plan: RenderPlan, output_path: str) -> RenderResult:
+        return RenderResult(
+            status=RenderStatus.COMPLETED,
+            rendered_duration=1.0,
+            rendered_output_location=output_path
         )
 
 
@@ -180,7 +184,13 @@ async def test_scenario_1_simple_campaign(dummy_timeline_state, dummy_render_pro
         composer=RenderCompositionService()
     )
     
-    render_plan = planning_pipeline.execute(dummy_timeline_state, dummy_render_profile)
+    finalized_edit = FinalizedEdit(
+        timeline=dummy_timeline_state,
+        editing_sequence=MagicMock(),
+        subtitle_track=MagicMock(),
+        export_profile=MagicMock()
+    )
+    render_plan = planning_pipeline.execute(finalized_edit, dummy_render_profile)
     assert isinstance(render_plan, RenderPlan)
     assert len(render_plan.layers) == 4
 
@@ -216,7 +226,13 @@ async def test_scenario_2_multiple_assets(dummy_render_profile):
         planner=RenderPlanner(), validator=RenderValidator(), composer=RenderCompositionService()
     )
     
-    render_plan = planning_pipeline.execute(complex_timeline, dummy_render_profile)
+    finalized_edit = FinalizedEdit(
+        timeline=complex_timeline,
+        editing_sequence=MagicMock(),
+        subtitle_track=MagicMock(),
+        export_profile=MagicMock()
+    )
+    render_plan = planning_pipeline.execute(finalized_edit, dummy_render_profile)
     assert isinstance(render_plan, RenderPlan)
     assert len(render_plan.layers) == 4 # E.g., Background + Video Tracks/Clips + Subtitles
 

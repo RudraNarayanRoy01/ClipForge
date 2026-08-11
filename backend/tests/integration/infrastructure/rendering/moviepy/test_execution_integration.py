@@ -136,7 +136,7 @@ def test_execution_handles_invalid_destination(temp_output_dir):
     
     # Assertions
     assert result.success is False
-    assert result.failure_category is not None
+    assert result.error_reason is not None
     assert result.failure_message is not None
     
     # Cleanup should still have occurred

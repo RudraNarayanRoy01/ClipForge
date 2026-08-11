@@ -1,6 +1,7 @@
 import pytest
 import inspect
 import sys
+import pathlib
 from dataclasses import is_dataclass
 from typing import Dict
 
@@ -94,7 +95,8 @@ def test_runtime_execution_manager_forbidden_imports():
     """
     # Import the module as text to avoid executing it
     import ast
-    with open('backend/src/runtime/core/runtime_execution_manager.py', 'r') as f:
+    manager_path = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "src" / "runtime" / "core" / "runtime_execution_manager.py"
+    with open(manager_path, 'r') as f:
         tree = ast.parse(f.read())
         
     for node in ast.walk(tree):
@@ -132,7 +134,8 @@ def test_dependency_direction():
     import ast
     
     # Check execution manager imports scheduling manager
-    with open('backend/src/runtime/core/runtime_execution_manager.py', 'r') as f:
+    base_path = pathlib.Path(__file__).resolve().parent.parent.parent.parent
+    with open(base_path / "src" / "runtime" / "core" / "runtime_execution_manager.py", 'r') as f:
         execution_tree = ast.parse(f.read())
         
     has_scheduling_import = False
@@ -143,7 +146,7 @@ def test_dependency_direction():
     assert has_scheduling_import, "RuntimeExecutionManager must consume RuntimeSchedulingManager."
     
     # Check scheduling manager DOES NOT import execution manager
-    with open('backend/src/runtime/core/runtime_scheduling_manager.py', 'r') as f:
+    with open(base_path / "src" / "runtime" / "core" / "runtime_scheduling_manager.py", 'r') as f:
         scheduling_tree = ast.parse(f.read())
         
     for node in ast.walk(scheduling_tree):
@@ -173,7 +176,8 @@ def test_dispatcher_dependency_direction():
     import ast
     
     # State must not import Dispatcher
-    with open('backend/src/runtime/execution/runtime_execution_state.py', 'r') as f:
+    state_path = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "src" / "runtime" / "execution" / "runtime_execution_state.py"
+    with open(state_path, 'r') as f:
         tree = ast.parse(f.read())
         
     for node in ast.walk(tree):

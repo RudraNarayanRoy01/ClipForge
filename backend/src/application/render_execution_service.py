@@ -58,9 +58,17 @@ class RenderExecutionService:
                     output_artifact_path=domain_result.rendered_output_location or output_destination
                 )
             else:
+                error_reason = domain_result.rendering_metadata.get("error_reason")
+                if error_reason == "resource_exhausted":
+                    category = RenderFailureCategory.RESOURCE_EXHAUSTED
+                elif error_reason == "validation":
+                    category = RenderFailureCategory.VALIDATION_REQUIRED
+                else:
+                    category = RenderFailureCategory.BACKEND_FAILURE
+
                 return RenderExecutionResult.failure(
                     duration_seconds=duration,
-                    category=RenderFailureCategory.BACKEND_FAILURE,
+                    category=category,
                     message=domain_result.message or "Backend rendering failed.",
                     details=domain_result.rendering_metadata
                 )

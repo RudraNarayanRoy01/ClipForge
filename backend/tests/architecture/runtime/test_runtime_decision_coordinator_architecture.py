@@ -1,4 +1,5 @@
 import pytest
+import pathlib
 from dataclasses import is_dataclass
 from typing import get_type_hints, get_args, get_origin
 from src.runtime.domain.runtime_decision_coordinator_model import (
@@ -118,7 +119,8 @@ def test_runtime_decision_coordinator_contains_only_immutable_identifiers():
 
 def test_provider_agnostic_design():
     """Verify no provider or hardware references exist in the domain module."""
-    with open("backend/src/runtime/domain/runtime_decision_coordinator_model.py", "r") as f:
+    model_path = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "src" / "runtime" / "domain" / "runtime_decision_coordinator_model.py"
+    with open(model_path, "r") as f:
         content = f.read()
         
     forbidden_terms = [
@@ -156,7 +158,8 @@ def test_no_execution_or_orchestration_logic():
 
 def test_no_downstream_imports():
     """Verify no circular or downstream dependencies exist (e.g., Runtime Intelligence Context)."""
-    with open("backend/src/runtime/domain/runtime_decision_coordinator_model.py", "r") as f:
+    model_path = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "src" / "runtime" / "domain" / "runtime_decision_coordinator_model.py"
+    with open(model_path, "r") as f:
         content = f.read()
         
     forbidden_imports = [

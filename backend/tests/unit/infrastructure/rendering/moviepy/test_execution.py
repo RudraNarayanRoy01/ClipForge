@@ -2,11 +2,10 @@ import uuid
 import pytest
 from unittest.mock import Mock, patch
 
-from src.application.execution_models import RenderFailureCategory
+
 from src.infrastructure.rendering.moviepy.execution import (
     MoviePyExecutionContext,
     MoviePyExecutionResult,
-    MoviePyExecutionExceptionTranslator,
     MoviePyRenderExecutor
 )
 from src.infrastructure.rendering.moviepy.structures import MoviePyResourcePool
@@ -121,7 +120,7 @@ def test_execution_failure_translates_exceptions(mock_render_output, mock_contex
     result = MoviePyRenderExecutor.execute(mock_render_output, mock_context)
     
     assert result.success is False
-    assert result.failure_category == RenderFailureCategory.RESOURCE_EXHAUSTED
+    assert result.error_reason == "resource_exhausted"
     assert "IO or OS error" in result.failure_message
     assert result.diagnostics["error_type"] == "OSError"
     assert "Disk full" in result.diagnostics["error_message"]
@@ -157,7 +156,7 @@ def test_execution_failure_with_cleanup_failure(mock_render_output, mock_context
     
     # The original error must take precedence
     assert result.success is False
-    assert result.failure_category == RenderFailureCategory.VALIDATION_REQUIRED
+    assert result.error_reason == "validation"
     assert result.diagnostics["error_type"] == "ValueError"
     assert "Invalid codec" in result.diagnostics["error_message"]
     

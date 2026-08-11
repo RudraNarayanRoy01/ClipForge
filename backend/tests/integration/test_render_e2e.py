@@ -14,6 +14,7 @@ from src.application.execution_models import ValidatedRenderPlan, RenderExecutio
 from src.application.render_execution_service import RenderExecutionService
 from src.application.execution_models import RenderExecutionRequest, RenderFailureCategory
 from src.domain.ports import IRenderBackend
+from src.domain.models.render_result import RenderResult, RenderStatus
 
 class DummyRenderingBackend(IRenderBackend):
     """
@@ -23,17 +24,18 @@ class DummyRenderingBackend(IRenderBackend):
     def __init__(self, simulate_failure: bool = False):
         self.simulate_failure = simulate_failure
 
-    async def execute(self, request: RenderExecutionRequest) -> RenderExecutionResult:
+    async def execute(self, plan: RenderPlan, output_path: str) -> RenderResult:
         if self.simulate_failure:
-            return RenderExecutionResult.failure(
-                duration_seconds=0.5,
-                category=RenderFailureCategory.BACKEND_FAILURE,
+            return RenderResult(
+                status=RenderStatus.FAILED,
+                rendered_duration=0.5,
                 message="Simulated architectural backend failure.",
-                details={"error_code": "SIM_FAIL"}
+                rendering_metadata={"error_code": "SIM_FAIL"}
             )
-        return RenderExecutionResult.success(
-            duration_seconds=1.0,
-            output_artifact_path=request.output_destination
+        return RenderResult(
+            status=RenderStatus.COMPLETED,
+            rendered_duration=1.0,
+            rendered_output_location=output_path
         )
 from src.domain.render_plan import RenderPlan
 from src.domain.models.render_profile import RenderProfile
@@ -46,6 +48,8 @@ from src.editing.domain.models.items import Clip, Subtitle, Overlay
 from src.editing.domain.enums.items import TimelineItemType, ScalingMode
 from src.editing.domain.value_objects.time import Time, TimeRange
 from src.editing.domain.value_objects.spatial import BoundingBox, Position, Size
+from src.editing.domain.pipeline.export import FinalizedEdit
+from unittest.mock import MagicMock
 
 def test_end_to_end_render_pipeline():
     """
@@ -142,8 +146,14 @@ def test_end_to_end_render_pipeline():
     execution_service = RenderExecutionService(backend=backend)
     
     # 3. Execute Planning Phase
-    # TimelineState -> RenderPlanningPipeline -> RenderPlan
-    render_plan = planning_pipeline.execute(timeline_state, render_profile)
+    # FinalizedEdit -> RenderPlanningPipeline -> RenderPlan
+    finalized_edit = FinalizedEdit(
+        timeline=timeline_state,
+        editing_sequence=MagicMock(),
+        subtitle_track=MagicMock(),
+        export_profile=MagicMock()
+    )
+    render_plan = planning_pipeline.execute(finalized_edit, render_profile)
     
     assert isinstance(render_plan, RenderPlan)
     assert len(render_plan.layers) == 4
@@ -219,7 +229,14 @@ def test_end_to_end_render_pipeline_failure():
     backend = DummyRenderingBackend(simulate_failure=True)
     execution_service = RenderExecutionService(backend=backend)
     
-    render_plan = planning_pipeline.execute(timeline_state, render_profile)
+    finalized_edit = FinalizedEdit(
+        timeline=timeline_state,
+        editing_sequence=MagicMock(),
+        subtitle_track=MagicMock(),
+        export_profile=MagicMock()
+    )
+    
+    render_plan = planning_pipeline.execute(finalized_edit, render_profile)
     
     import datetime
     validated_plan = ValidatedRenderPlan(plan=render_plan, validated_at=datetime.datetime.utcnow())

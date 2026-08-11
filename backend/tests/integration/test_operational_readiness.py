@@ -19,7 +19,6 @@ def patch_for_healthy_startup():
         with patch("httpx.AsyncClient.get") as mock_get, \
              patch("alembic.script.ScriptDirectory.from_config") as mock_script_dir, \
              patch("alembic.runtime.migration.MigrationContext.configure") as mock_mig_ctx, \
-             patch("src.infrastructure.database.engine.dispose") as mock_dispose, \
              patch("shutil.which") as mock_which:
             
             # Ollama healthy

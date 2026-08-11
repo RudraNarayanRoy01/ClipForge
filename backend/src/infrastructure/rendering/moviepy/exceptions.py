@@ -1,5 +1,4 @@
 from typing import Dict, Any, Tuple
-from src.application.execution_models import RenderFailureCategory
 
 class MoviePyExceptionTranslator:
     """
@@ -11,7 +10,7 @@ class MoviePyExceptionTranslator:
     """
     
     @classmethod
-    def translate(cls, exception: Exception) -> Tuple[RenderFailureCategory, str, Dict[str, Any]]:
+    def translate(cls, exception: Exception) -> Tuple[str, str, Dict[str, Any]]:
         """
         Translates a raw exception into neutral failure components.
         
@@ -20,7 +19,7 @@ class MoviePyExceptionTranslator:
             
         Returns:
             Tuple containing:
-            - RenderFailureCategory: The mapped category of the failure.
+            - str: A neutral error reason string.
             - str: A generic message safe for the application layer.
             - Dict[str, Any]: Detailed diagnostic information.
         """
@@ -31,20 +30,21 @@ class MoviePyExceptionTranslator:
         }
         
         if isinstance(exception, FileNotFoundError):
-            category = RenderFailureCategory.RESOURCE_EXHAUSTED
+            error_reason = "resource_exhausted"
             message = "Required asset not found on disk."
         elif isinstance(exception, PermissionError):
-            category = RenderFailureCategory.RESOURCE_EXHAUSTED
+            error_reason = "resource_exhausted"
             message = "Permission denied when accessing required asset."
         elif isinstance(exception, ValueError):
-            category = RenderFailureCategory.VALIDATION_REQUIRED
+            error_reason = "validation"
             message = "Invalid parameters or unsupported asset provided to the rendering backend."
         elif isinstance(exception, (OSError, IOError)):
             # MoviePy often raises OSError when it cannot read a file or probe it via ffmpeg
-            category = RenderFailureCategory.RESOURCE_EXHAUSTED
+            error_reason = "resource_exhausted"
             message = "An IO or OS error occurred while loading or processing media."
         else:
-            category = RenderFailureCategory.BACKEND_FAILURE
+            error_reason = "backend_failure"
             message = "An unexpected rendering backend error occurred."
             
-        return category, message, details
+        details["error_reason"] = error_reason
+        return error_reason, message, details

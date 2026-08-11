@@ -3,7 +3,8 @@ import contextlib
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, Tuple
 
-from src.application.execution_models import RenderFailureCategory
+
+from src.infrastructure.rendering.moviepy.exceptions import MoviePyExceptionTranslator
 from src.infrastructure.rendering.moviepy.output import MoviePyRenderOutput
 from src.infrastructure.rendering.moviepy.structures import MoviePyResourcePool
 
@@ -33,7 +34,7 @@ class MoviePyExecutionResult:
     elapsed_time_seconds: float
     output_metadata: Dict[str, Any] = field(default_factory=dict)
     diagnostics: Dict[str, Any] = field(default_factory=dict)
-    failure_category: Optional[RenderFailureCategory] = None
+    error_reason: Optional[str] = None
     failure_message: Optional[str] = None
 
     @classmethod
@@ -48,50 +49,19 @@ class MoviePyExecutionResult:
     def create_failure(
         cls, 
         elapsed_time_seconds: float, 
-        category: RenderFailureCategory, 
+        error_reason: str, 
         message: str, 
         diagnostics: Dict[str, Any]
     ) -> 'MoviePyExecutionResult':
         return cls(
             success=False,
             elapsed_time_seconds=elapsed_time_seconds,
-            failure_category=category,
+            error_reason=error_reason,
             failure_message=message,
             diagnostics=diagnostics
         )
 
 
-class MoviePyExecutionExceptionTranslator:
-    """
-    Translates raw backend exceptions (MoviePy, FFmpeg, filesystem, etc.) 
-    into backend-neutral execution diagnostics and failure categories.
-    """
-    
-    @classmethod
-    def translate(cls, exception: Exception) -> Tuple[RenderFailureCategory, str, Dict[str, Any]]:
-        details: Dict[str, Any] = {
-            "error_type": type(exception).__name__,
-            "error_message": str(exception),
-            "backend": "MoviePy"
-        }
-        
-        if isinstance(exception, FileNotFoundError):
-            category = RenderFailureCategory.RESOURCE_EXHAUSTED
-            message = "Required asset not found on disk."
-        elif isinstance(exception, PermissionError):
-            category = RenderFailureCategory.RESOURCE_EXHAUSTED
-            message = "Permission denied when accessing required asset or destination."
-        elif isinstance(exception, ValueError):
-            category = RenderFailureCategory.VALIDATION_REQUIRED
-            message = "Invalid parameters or unsupported asset provided to the rendering backend."
-        elif isinstance(exception, (OSError, IOError)):
-            category = RenderFailureCategory.RESOURCE_EXHAUSTED
-            message = "An IO or OS error occurred while executing render (e.g., FFmpeg failure, insufficient disk space)."
-        else:
-            category = RenderFailureCategory.BACKEND_FAILURE
-            message = "An unexpected rendering execution error occurred."
-            
-        return category, message, details
 
 
 class MoviePyRenderExecutor:
@@ -207,11 +177,13 @@ class MoviePyRenderExecutor:
         Collects execution metadata and translates exceptions to produce an immutable result.
         """
         if exception:
-            category, message, diagnostics = MoviePyExecutionExceptionTranslator.translate(exception)
+            error_reason, message, diagnostics = MoviePyExceptionTranslator.translate(exception)
             diagnostics.update(cleanup_diagnostics)
+            # Make sure error_reason is included in diagnostics so it gets propagated to RenderResult.rendering_metadata
+            diagnostics["error_reason"] = error_reason
             return MoviePyExecutionResult.create_failure(
                 elapsed_time_seconds=elapsed_time,
-                category=category,
+                error_reason=error_reason,
                 message=message,
                 diagnostics=diagnostics
             )

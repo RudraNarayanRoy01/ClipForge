@@ -12,6 +12,8 @@ from src.domain.entities import Resolution
 from src.domain.value_objects import AspectRatio
 from src.domain.render_plan import LayerCategory
 from src.domain.models.render_draft import RenderDraft
+from src.editing.domain.pipeline.export import FinalizedEdit
+from unittest.mock import MagicMock
 
 def create_dummy_data():
     metadata = TimelineMetadata(fps=30.0, resolution=(1920, 1080), sample_rate=44100)
@@ -67,7 +69,13 @@ def create_dummy_data():
 
 def test_composition_is_deterministic():
     timeline_state, render_profile = create_dummy_data()
-    draft = RenderDraft(timeline_state=timeline_state, render_profile=render_profile)
+    finalized_edit = FinalizedEdit(
+        timeline=timeline_state,
+        editing_sequence=MagicMock(),
+        subtitle_track=MagicMock(),
+        export_profile=MagicMock()
+    )
+    draft = RenderDraft(finalized_edit=finalized_edit, render_profile=render_profile)
     
     service = RenderCompositionService()
     plan1 = service.compose(draft)
@@ -94,7 +102,13 @@ def test_composition_is_deterministic():
 
 def test_item_normalization():
     timeline_state, render_profile = create_dummy_data()
-    draft = RenderDraft(timeline_state=timeline_state, render_profile=render_profile)
+    finalized_edit = FinalizedEdit(
+        timeline=timeline_state,
+        editing_sequence=MagicMock(),
+        subtitle_track=MagicMock(),
+        export_profile=MagicMock()
+    )
+    draft = RenderDraft(finalized_edit=finalized_edit, render_profile=render_profile)
     service = RenderCompositionService()
     plan = service.compose(draft)
     

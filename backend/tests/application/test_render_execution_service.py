@@ -110,3 +110,37 @@ async def test_execution_service_backend_exception_handling(validated_plan):
     assert result.diagnostics.message == "An unexpected error occurred during backend execution."
     assert result.diagnostics.details["error_type"] == "RuntimeError"
     assert result.diagnostics.details["error_message"] == "FFmpeg crashed unexpectedly"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("error_reason, expected_category", [
+    ("resource_exhausted", RenderFailureCategory.RESOURCE_EXHAUSTED),
+    ("validation", RenderFailureCategory.VALIDATION_REQUIRED),
+    ("backend_failure", RenderFailureCategory.BACKEND_FAILURE),
+    (None, RenderFailureCategory.BACKEND_FAILURE),
+    ("unknown_reason", RenderFailureCategory.BACKEND_FAILURE),
+])
+async def test_execution_service_maps_error_reasons(
+    validated_plan, error_reason, expected_category
+):
+    backend = MockBackend()
+    metadata = {}
+    if error_reason is not None:
+        metadata["error_reason"] = error_reason
+
+    backend.execute_mock.return_value = RenderResult(
+        status=RenderStatus.FAILED,
+        message="Simulated failure",
+        rendering_metadata=metadata
+    )
+    
+    service = RenderExecutionService(backend)
+    result = await service.execute_plan(
+        validated_plan=validated_plan,
+        output_destination="/tmp/output.mp4"
+    )
+    
+    assert result.status == RenderExecutionStatus.FAILED
+    assert result.diagnostics is not None
+    assert result.diagnostics.category == expected_category
+    assert result.diagnostics.message == "Simulated failure"
