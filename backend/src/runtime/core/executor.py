@@ -1,15 +1,18 @@
-import time
-from typing import Optional
+from datetime import datetime
+from types import MappingProxyType
 
 from .scheduling_model import SchedulingDecision
-from .execution_result_model import ExecutionResult, ExecutionStatus, ExecutionOutcome, ExecutionSummary
+
+from src.runtime.execution.runtime_execution_result import RuntimeExecutionResult
+from src.runtime.execution.runtime_execution_outcome import RuntimeExecutionOutcome
+from src.runtime.execution.runtime_execution_identity import RuntimeExecutionIdentity
 
 class RuntimeExecutor:
     """
     The canonical Runtime execution engine.
     
     Performs exactly one responsibility:
-    SchedulingDecision -> ExecutionResult
+    SchedulingDecision + RuntimeExecutionIdentity -> RuntimeExecutionResult
     
     It is NOT:
     - a Workflow Engine
@@ -25,50 +28,48 @@ class RuntimeExecutor:
     def __init__(self) -> None:
         pass
 
-    def execute(self, scheduling_decision: SchedulingDecision) -> ExecutionResult:
+    def _execute_attempt(self) -> None:
+        """
+        Placeholder for actual execution logic.
+        For now, we simulate execution success.
+        """
+        pass
+
+    def execute(
+        self, 
+        scheduling_decision: SchedulingDecision, 
+        identity: RuntimeExecutionIdentity
+    ) -> RuntimeExecutionResult:
         """
         Consumes SchedulingDecision.
-        Validates SchedulingDecision.
+        Validates input.
         Executes approved Runtime work.
-        Produces immutable ExecutionResult.
+        Produces immutable RuntimeExecutionResult.
         """
         if not scheduling_decision:
-            summary = ExecutionSummary(
-                summary="Execution failed: Missing SchedulingDecision",
-                reason="validation_failure",
-                failed_steps=1
-            )
-            return ExecutionResult(
-                execution_identity=None, # type: ignore
-                scheduling_identity=None, # type: ignore
-                status=ExecutionStatus.FAILED,
-                outcome=ExecutionOutcome.FAILURE,
-                summary=summary,
-            )
+            raise ValueError("scheduling_decision is required")
+        if not identity:
+            raise ValueError("identity is required")
 
-        started_at = time.time()
+        started_at = datetime.utcnow()
+        outcome = RuntimeExecutionOutcome.SUCCESS
+        failure_reason = None
         
-        # Placeholder for actual execution logic
-        # For now, we simulate execution success.
-        
-        completed_at = time.time()
-        duration = completed_at - started_at
+        try:
+            self._execute_attempt()
+        except Exception as e:
+            outcome = RuntimeExecutionOutcome.FAILED
+            failure_reason = f"Execution failed: {type(e).__name__} - {str(e)}"
+            
+        completed_at = datetime.utcnow()
+        duration_seconds = max(0.0, (completed_at - started_at).total_seconds())
 
-        summary = ExecutionSummary(
-            summary="Execution completed successfully.",
-            reason="success",
-            completed_steps=1,
-            failed_steps=0,
-            metadata={"simulated": True}
-        )
-
-        return ExecutionResult(
-            execution_identity=scheduling_decision.execution_identity,
-            scheduling_identity=scheduling_decision.identity,
-            status=ExecutionStatus.COMPLETED,
-            outcome=ExecutionOutcome.SUCCESS,
-            summary=summary,
+        return RuntimeExecutionResult(
+            identity=identity,
+            outcome=outcome,
             started_at=started_at,
             completed_at=completed_at,
-            duration=duration,
+            duration_seconds=duration_seconds,
+            failure_reason=failure_reason,
+            metadata=MappingProxyType({})
         )
