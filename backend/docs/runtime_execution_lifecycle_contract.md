@@ -137,3 +137,28 @@ Likewise, `RuntimeExecutionStatus.FAILED` represents a lifecycle that terminated
 - **Retry Semantics**: Automatic recovery and retry semantics are explicitly outside the scope of Sprint 6A.8.1.
 - **Cancellation Machinery**: The mechanisms for cancelling an execution attempt (cancellation tokens, queues, thread aborts) are not implemented. Only the semantic outcome (`CANCELLED`) is defined.
 - **State Machine Implementation**: The active transition engine and orchestrator for moving between these states is deferred to subsequent batches.
+
+## 8. Transition Validation Contract
+
+### Valid transitions
+- `PREPARED` → `READY`
+- `READY` → `EXECUTING`
+- `EXECUTING` → `COMPLETED`
+- `EXECUTING` → `FAILED`
+
+### Invalid transitions
+All other transitions are invalid under the current contract. This includes skipped transitions, backward regressions, and all self-transitions (e.g., `READY` → `READY`).
+
+### Terminal states
+- `COMPLETED`
+- `FAILED`
+- `ABORTED`
+
+### ABORTED
+> `ABORTED` is a structural/preparation reset status and is distinct from `CANCELLED`. The current architecture does not establish formal incoming lifecycle transitions into `ABORTED`; therefore 6A.8.2 does not certify any such transition.
+
+### Validation vs mutation
+> The transition validator answers whether a transition is valid. It does not perform, persist, or mutate the transition.
+
+### Initialization
+> Initialization to `PREPARED` is not represented as a transition by the validator.

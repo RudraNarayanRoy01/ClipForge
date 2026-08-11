@@ -7,6 +7,7 @@ from .runtime_execution import RuntimeExecution
 from .runtime_execution_outcome import RuntimeExecutionOutcome
 from .runtime_execution_result import RuntimeExecutionResult
 from .runtime_execution_validator import RuntimeExecutionValidator
+from .runtime_execution_transition_validator import RuntimeExecutionTransitionValidator
 from .execution_id_factory import ExecutionIdFactory
 from .execution_metadata_factory import ExecutionMetadataFactory
 from .execution_snapshot_factory import ExecutionSnapshotFactory
@@ -192,6 +193,7 @@ __all__ = [
     "RuntimeExecutionOutcome",
     "RuntimeExecutionResult",
     "RuntimeExecutionValidator",
+    "RuntimeExecutionTransitionValidator",
     "ExecutionIdFactory",
     "ExecutionMetadataFactory",
     "ExecutionSnapshotFactory",
