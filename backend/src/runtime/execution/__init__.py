@@ -179,6 +179,8 @@ from .execution_dispatcher_statistics_builder import ExecutionDispatcherStatisti
 from .execution_dispatcher_snapshot_factory import ExecutionDispatcherSnapshotFactory
 from .execution_dispatcher_factory import ExecutionDispatcherFactory
 from .runtime_execution_dispatcher_factory import RuntimeExecutionDispatcherFactory
+from .runtime_execution_coordinator import RuntimeExecutionCoordinator
+
 __all__ = [
     # Original identity artifacts
     "ExecutionStage",
@@ -370,5 +372,6 @@ __all__ = [
     "ExecutionDispatcherSnapshotFactory",
     "ExecutionDispatcherStatisticsBuilder",
     "ExecutionDispatcherFactory",
-    "RuntimeExecutionDispatcherFactory"
+    "RuntimeExecutionDispatcherFactory",
+    "RuntimeExecutionCoordinator"
 ]
