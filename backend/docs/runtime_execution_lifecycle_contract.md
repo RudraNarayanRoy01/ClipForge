@@ -14,7 +14,7 @@ The execution lifecycle explicitly isolates scheduling, preparation, execution, 
 | Execution eligibility | `RuntimeExecutionCoordinator` |
 | Execution identity | `RuntimeExecutionIdentity` |
 | Execution context | `RuntimeExecutionSession` |
-| Lifecycle position | `RuntimeExecutionState` (tracked by `RuntimeExecutionManager`) |
+| Lifecycle position | `RuntimeExecutionLifecycleState` |
 | Lifecycle transition semantics | Lifecycle contract (this document) |
 | Execution attempt | `RuntimeExecutor` |
 | Terminal execution record | `RuntimeExecutionResult` |
@@ -24,7 +24,7 @@ The execution lifecycle explicitly isolates scheduling, preparation, execution, 
 `RuntimeExecutionSession` is a purely passive, immutable structural artifact. It represents the execution context and bounds the execution, but it does **not** orchestrate transitions, invoke providers, schedule work, or construct execution results.
 
 ### 2.2. State Responsibility
-`RuntimeExecutionState` represents the immutable lifecycle position (`RuntimeExecutionStatus`). It describes where an execution is in its lifecycle conceptually but contains no behavioral transition logic.
+`RuntimeExecutionState` is a structural boundary that encapsulates `RuntimeExecutionStateIdentity`. The active position of an execution in the lifecycle is owned specifically by `RuntimeExecutionLifecycleState`, an immutable representation holding the current `RuntimeExecutionStatus`.
 
 ### 2.3. Coordinator Responsibility
 `RuntimeExecutionCoordinator` is strictly an eligibility and handoff boundary. It evaluates `SchedulingDecision.status == SchedulingStatus.READY`. If eligible, it invokes the `RuntimeExecutor` and propagates the returned result. It does **not** perform execution itself, manage state transitions, or classify failures.
@@ -188,3 +188,27 @@ The Transition Engine:
 Explicitly preserved:
 - `ABORTED` != `CANCELLED`
 - `COMPLETED` != `SUCCESS`
+
+## 10. State Application Contract
+
+### 10.1 Dedicated Component Justification
+The state-bearing component for lifecycle progression is `RuntimeExecutionLifecycleState`. It isolates the "what state am I in?" concern from the structural identity domains covered by `RuntimeExecutionState` and `RuntimeExecutionSession`. These latter structures are purely passive composite boundaries, whereas `RuntimeExecutionLifecycleState` exclusively captures the real-time position within the `RuntimeExecutionStatus` taxonomy.
+
+### 10.2 Immutability and State Replacement
+`RuntimeExecutionLifecycleState` is fully immutable. A state progression does not mutate the current state object in place. Instead, a legal transition triggers the creation of a *new* state instance encapsulating the transitioned `RuntimeExecutionStatus`.
+
+### 10.3 State Identity vs Dependency Identity
+A lifecycle state's semantic identity is defined exclusively by its `RuntimeExecutionStatus`. The component leverages `RuntimeExecutionTransitionEngine` purely as an injected implementation dependency. This engine's own object identity never bleeds into the conceptual equality or semantic definition of the lifecycle state.
+
+### 10.4 Initial State and Delegation
+The state boundary defaults intrinsically to `PREPARED`. From there, it delegates 100% of state transition application to the `RuntimeExecutionTransitionEngine`. It holds zero standalone validation logic and never mirrors or overrides the transition matrix managed by the validator.
+
+### 10.5 Strict Execution and Scheduling Disconnect
+The component has no awareness or dependency regarding execution outcomes (`RuntimeExecutionOutcome`) or scheduling decisions (`SchedulingStatus`). Its API strictly expects `RuntimeExecutionStatus`, reflecting its dedicated role in managing abstract lifecycle bounds.
+
+### 10.6 Non-Responsibilities
+The `RuntimeExecutionLifecycleState` boundary explicitly:
+- Does **not** constitute a fully-fledged executable workflow state machine.
+- Does **not** include or invoke any persistence/event sourcing logic.
+- Does **not** orchestrate scheduling or manage task queues.
+- Does **not** handle or cache a state transition history.
