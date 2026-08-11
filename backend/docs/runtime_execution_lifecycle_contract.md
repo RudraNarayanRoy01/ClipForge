@@ -212,3 +212,45 @@ The `RuntimeExecutionLifecycleState` boundary explicitly:
 - Does **not** include or invoke any persistence/event sourcing logic.
 - Does **not** orchestrate scheduling or manage task queues.
 - Does **not** handle or cache a state transition history.
+
+## 11. Terminal State & Result Consistency Contract
+
+### 11.1 Purpose
+This contract establishes the architectural boundary for observing semantic consistency between a `RuntimeExecutionLifecycleState` (lifecycle position) and a `RuntimeExecutionResult` (terminal execution outcome). 
+
+### 11.2 Consistency Rule
+A lifecycle state and a finalized execution result must not represent contradictory terminal semantics. If a `RuntimeExecutionResult` exists for a given execution identity, the active `RuntimeExecutionLifecycleState` MUST be a compatible terminal execution state.
+
+### 11.3 State vs Outcome Separation
+- **State (`RuntimeExecutionStatus`)**: Lifecycle position.
+- **Outcome (`RuntimeExecutionOutcome`)**: Terminal execution fact.
+- **Result (`RuntimeExecutionResult`)**: Immutable historical record of an execution attempt.
+- **Consistency**: Whether the State and Result can legitimately coexist.
+
+### 11.4 ABORTED Semantics
+`ABORTED` is a structural/reset state. It does not represent an execution outcome, and therefore currently has **no certified result mapping** under this contract. `ABORTED` != `CANCELLED`.
+
+### 11.5 CANCELLED Semantics
+`CANCELLED` is a valid terminal execution outcome. However, it currently has **no certified lifecycle-state mapping** under this contract.
+
+### 11.6 Scheduling Rejection Separation
+Scheduling rejections (e.g., `REJECTED`) occur prior to execution. They are completely separated from execution outcomes and do not create a `RuntimeExecutionResult` or factor into the consistency boundary.
+
+### 11.7 Canonical Compatibility Matrix
+The only certified valid relationships between lifecycle states and execution results are:
+
+| Lifecycle State | Result Outcome | Consistency |
+|----------------|---------------|-------------|
+| `COMPLETED`    | `SUCCESS`     | VALID       |
+| `FAILED`       | `FAILED`      | VALID       |
+
+All other combinations—including active states with any result, `ABORTED` with any result, and any state with `CANCELLED`—are considered invalid or unsupported under this contract.
+
+### 11.8 Immutability and Non-Responsibilities
+Consistency checking is strictly observational. Evaluating consistency does NOT mutate the lifecycle state or the result. It preserves exact object identity and never executes lifecycle transitions.
+
+The validator explicitly does **not**:
+- guarantee or check identity continuity;
+- create or reconstruct results;
+- act as a state machine;
+- perform lifecycle transitions.
