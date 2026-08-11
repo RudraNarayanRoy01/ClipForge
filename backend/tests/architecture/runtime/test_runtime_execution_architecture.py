@@ -10,7 +10,7 @@ from src.runtime.domain.runtime_execution_model import (
     RuntimeExecutionTrigger,
     RuntimeExecutionDecision,
     RuntimeExecutionInfo,
-    RuntimeExecutionResult,
+    RuntimeExecutionPreparationResult,
     RUNTIME_EXECUTION_POLICY
 )
 from src.runtime.core.runtime_execution_manager import RuntimeExecutionManager

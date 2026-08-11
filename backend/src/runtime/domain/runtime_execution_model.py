@@ -71,7 +71,7 @@ class RuntimeExecutionInfo:
 
 
 @dataclass(frozen=True)
-class RuntimeExecutionResult:
+class RuntimeExecutionPreparationResult:
     """
     Immutable artifact returned by execution preparation operations.
     

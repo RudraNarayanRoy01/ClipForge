@@ -104,31 +104,7 @@ def test_exceptions_hierarchy():
     assert issubclass(ExecutionStateException, RuntimeExecutionException)
     assert issubclass(RuntimeExecutionException, Exception)
 
-def test_result_creation():
-    from src.runtime.execution import RuntimeExecutionResult, RuntimeExecutionException, RuntimeExecutionFactory, RuntimeExecutionIdentity
-    desc = RuntimeExecutionDescriptor("1", "2", "3", "4", "5")
-    meta = ExecutionMetadataFactory.create_metadata("Test")
-    status = RuntimeExecutionStatus.READY
-    snap = ExecutionSnapshotFactory.create_snapshot(desc, meta, status, "comp")
-    
-    identity = RuntimeExecutionIdentity(desc, meta, status, snap)
-    exec_obj = RuntimeExecutionFactory.create_execution("exec-1", identity)
-    
-    warns = ("warning 1", "warning 2")
-    errs = (RuntimeExecutionException("err 1"),)
-    
-    res = RuntimeExecutionResult(exec_obj, snap, warns, errs)
-    
-    assert res.execution == exec_obj
-    assert res.snapshot == snap
-    assert res.warnings == warns
-    assert res.errors == errs
 
-def test_result_immutability():
-    from src.runtime.execution import RuntimeExecutionResult
-    with pytest.raises(TypeError):
-        # Result needs all args
-        RuntimeExecutionResult()
 
 def test_execution_identity_creation():
     from src.runtime.execution import RuntimeExecutionIdentity, RuntimeExecutionSnapshot

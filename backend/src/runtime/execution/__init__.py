@@ -4,6 +4,7 @@ from .runtime_execution_metadata import RuntimeExecutionMetadata
 from .runtime_execution_snapshot import RuntimeExecutionSnapshot
 from .runtime_execution_identity import RuntimeExecutionIdentity
 from .runtime_execution import RuntimeExecution
+from .runtime_execution_outcome import RuntimeExecutionOutcome
 from .runtime_execution_result import RuntimeExecutionResult
 from .runtime_execution_validator import RuntimeExecutionValidator
 from .execution_id_factory import ExecutionIdFactory
@@ -186,6 +187,7 @@ __all__ = [
     "RuntimeExecutionSnapshot",
     "RuntimeExecutionIdentity",
     "RuntimeExecution",
+    "RuntimeExecutionOutcome",
     "RuntimeExecutionResult",
     "RuntimeExecutionValidator",
     "ExecutionIdFactory",

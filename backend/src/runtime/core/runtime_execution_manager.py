@@ -6,7 +6,7 @@ from ..domain.runtime_execution_model import (
     RuntimeExecutionTrigger,
     RuntimeExecutionDecision,
     RuntimeExecutionInfo,
-    RuntimeExecutionResult,
+    RuntimeExecutionPreparationResult,
     RUNTIME_EXECUTION_POLICY
 )
 from .runtime_scheduling_manager import RuntimeSchedulingManager
@@ -50,7 +50,7 @@ class RuntimeExecutionManager:
             raise ValueError(f"Unknown execution trigger: {trigger.name}")
         return RUNTIME_EXECUTION_POLICY[trigger]
 
-    def register_provider(self, provider_id: str) -> RuntimeExecutionResult:
+    def register_provider(self, provider_id: str) -> RuntimeExecutionPreparationResult:
         """
         Register a new provider identity into the execution preparation tracking system.
         """
@@ -73,7 +73,7 @@ class RuntimeExecutionManager:
         )
         self._execution_records[provider_id] = info
         
-        return RuntimeExecutionResult(
+        return RuntimeExecutionPreparationResult(
             execution_info=info,
             operation_summary=f"Successfully registered execution preparation tracking for provider {provider_id}.",
             validation_result=True
@@ -98,7 +98,7 @@ class RuntimeExecutionManager:
         provider_id: str, 
         trigger: RuntimeExecutionTrigger,
         reason: str = ""
-    ) -> RuntimeExecutionResult:
+    ) -> RuntimeExecutionPreparationResult:
         """
         Core observational preparation logic. Evaluates trigger against policy to determine execution preparation state.
         This does NOT execute the work, create timers, sleep, or wait.
@@ -129,7 +129,7 @@ class RuntimeExecutionManager:
         
         self._execution_records[provider_id] = updated_info
         
-        return RuntimeExecutionResult(
+        return RuntimeExecutionPreparationResult(
             execution_info=updated_info,
             operation_summary=f"Successfully evaluated execution preparation for provider {provider_id} to {target_status.name}.",
             validation_result=True
@@ -140,7 +140,7 @@ class RuntimeExecutionManager:
         provider_id: str, 
         trigger: RuntimeExecutionTrigger,
         reason: str = ""
-    ) -> RuntimeExecutionResult:
+    ) -> RuntimeExecutionPreparationResult:
         """
         Records an explicit execution trigger that has been translated by a future Translation Layer.
         """
@@ -154,7 +154,7 @@ class RuntimeExecutionManager:
             return False
         return trigger in RUNTIME_EXECUTION_POLICY
 
-    def clear_execution(self, provider_id: str, reason: str = "Execution preparation cleared") -> RuntimeExecutionResult:
+    def clear_execution(self, provider_id: str, reason: str = "Execution preparation cleared") -> RuntimeExecutionPreparationResult:
         """
         Resets the execution preparation state structurally back to ABORTED.
         """
@@ -182,7 +182,7 @@ class RuntimeExecutionManager:
         
         self._execution_records[provider_id] = updated_info
         
-        return RuntimeExecutionResult(
+        return RuntimeExecutionPreparationResult(
             execution_info=updated_info,
             operation_summary=f"Successfully cleared execution preparation for {provider_id}.",
             validation_result=True

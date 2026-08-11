@@ -83,7 +83,7 @@ from .domain.runtime_execution_model import (
     RuntimeExecutionTrigger,
     RuntimeExecutionDecision,
     RuntimeExecutionInfo,
-    RuntimeExecutionResult,
+    RuntimeExecutionPreparationResult,
     RUNTIME_EXECUTION_POLICY
 )
 from .domain.runtime_intelligence_model import (
@@ -197,7 +197,7 @@ __all__ = [
     "RuntimeExecutionTrigger",
     "RuntimeExecutionDecision",
     "RuntimeExecutionInfo",
-    "RuntimeExecutionResult",
+    "RuntimeExecutionPreparationResult",
     "RuntimeIntelligenceState",
     "RUNTIME_INTELLIGENCE_POLICY",
     "RuntimeIntelligenceInfo",
