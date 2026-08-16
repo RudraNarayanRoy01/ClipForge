@@ -41,6 +41,29 @@ class RuntimeBootstrap:
         # In the future, this phase would involve discovering registries,
         # verifying config schemas, etc., but NOT executing AI.
         
+        # Safe idempotency guard: check if capability is already registered
+        # to support repeated startup invocations without violating the registry's
+        # strict duplicate rejection semantics.
+        from .capabilities import CapabilityDescriptor, CapabilityCategory
+        
+        registry = self._context.capability_registry
+        existing_identifiers = [d.identifier for d in registry.enumerate_descriptors()]
+        
+        if "campaign.summary.generate" not in existing_identifiers:
+            registry.register_descriptor(
+                CapabilityDescriptor(
+                    identifier="campaign.summary.generate",
+                    display_name="Generate Campaign Summary",
+                    description="Generates a structured campaign summary from extracted or provided rules text.",
+                    category=CapabilityCategory.LANGUAGE,
+                    metadata={
+                        "structured_output": True,
+                        "output_schema": "ExtractionSummarySchema"
+                    },
+                    version="1.0"
+                )
+            )
+
         # Transition from BOOTSTRAPPING -> INITIALIZED
         self._context.lifecycle.transition_to(RuntimeLifecycleState.INITIALIZED)
 
