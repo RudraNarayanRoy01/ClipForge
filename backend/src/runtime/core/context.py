@@ -1,14 +1,8 @@
 from typing import Dict, Optional
 
-from .execution_model import ExecutionRequest
-from .execution_result_model import ExecutionStatus
-from .scheduling_model import SchedulingDecision
 from .metadata import RuntimeMetadata
-from .lifecycle_model import LifecycleResult
 from .lifecycle import RuntimeLifecycleCoordinator, RuntimeLifecycle
-from .retry_model import RetryResult
 from .retry import RuntimeRetry
-from .observation_model import ObservationResult
 from .observation import RuntimeObservation
 from .extension import IRuntimeExtensionPoint
 from .capabilities import RuntimeCapabilityRegistry
@@ -118,13 +112,6 @@ class RuntimeContext:
         from .executor import RuntimeExecutor
         self._executor = RuntimeExecutor()
         
-        # Execution State (Passive References)
-        self.active_execution_request: Optional[ExecutionRequest] = None
-        self.active_execution_status: Optional[ExecutionStatus] = None
-        self.active_scheduling_decision: Optional[SchedulingDecision] = None
-        self.active_lifecycle_result: Optional[LifecycleResult] = None
-        self.active_retry_result: Optional[RetryResult] = None
-        self.active_observation_result: Optional[ObservationResult] = None
 
     @property
     def metadata(self) -> RuntimeMetadata:
@@ -136,35 +123,6 @@ class RuntimeContext:
         """Expose the canonical lifecycle coordinator for this Runtime instance."""
         return self._lifecycle_coordinator
 
-    @property
-    def runtime_lifecycle(self) -> RuntimeLifecycle:
-        """
-        Expose the canonical Runtime Lifecycle Engine for this Runtime instance.
-        
-        This handles execution lifecycle progression (ExecutionResult -> LifecycleResult).
-        It does NOT handle application startup/shutdown.
-        """
-        return self._runtime_lifecycle
-
-    @property
-    def runtime_retry(self) -> RuntimeRetry:
-        """
-        Expose the canonical Runtime Retry Evaluation Engine for this Runtime instance.
-        
-        This handles retry evaluation (LifecycleResult -> RetryResult).
-        It does NOT execute retries, recover state, or schedule work.
-        """
-        return self._runtime_retry
-
-    @property
-    def runtime_observation(self) -> RuntimeObservation:
-        """
-        Expose the canonical Runtime Observation Engine for this Runtime instance.
-        
-        This handles observation extraction (RetryResult -> ObservationResult).
-        It does NOT continuously monitor Runtime, collect telemetry, or stream events.
-        """
-        return self._runtime_observation
 
     @property
     def capability_registry(self) -> RuntimeCapabilityRegistry:
@@ -196,45 +154,6 @@ class RuntimeContext:
         """
         return self._provider_registry
 
-    @property
-    def ai_provider_registry(self) -> ProviderRegistry:
-        """
-        Expose the canonical metadata Provider Registry for this Runtime instance.
-        
-        This serves as the single source of truth for provider identity in Sprint 6.6.
-        RuntimeContext acts as a passive composition root and does not own registry behavior.
-        """
-        return self._ai_provider_registry
-
-    @property
-    def provider_capability_registry(self) -> ProviderCapabilityRegistry:
-        """
-        Expose the canonical metadata Provider Capability Registry for this Runtime instance.
-        
-        This serves as the single source of truth for provider capabilities in Sprint 6.6.
-        RuntimeContext acts as a passive composition root and does not own registry behavior.
-        """
-        return self._provider_capability_registry
-
-    @property
-    def model_registry(self) -> ModelRegistry:
-        """
-        Expose the canonical metadata Model Registry for this Runtime instance.
-        
-        This serves as the single source of truth for model metadata in Sprint 6.6.
-        RuntimeContext acts as a passive composition root and does not own registry behavior.
-        """
-        return self._model_registry
-
-    @property
-    def model_lifecycle_manager(self) -> ModelLifecycleManager:
-        """
-        Expose the canonical declarative Model Lifecycle Manager for this Runtime instance.
-        
-        This serves as the single source of truth for model lifecycle states in Sprint 6.6.
-        RuntimeContext acts as a passive composition root and does not own lifecycle behavior.
-        """
-        return self._model_lifecycle_manager
 
     @property
     def provider_health_manager(self) -> ProviderHealthManager:
@@ -266,15 +185,6 @@ class RuntimeContext:
         """
         return self._runtime_retry_manager
 
-    @property
-    def runtime_scheduling_manager(self) -> RuntimeSchedulingManager:
-        """
-        Expose the canonical observational Runtime Scheduling Manager for this Runtime instance.
-        
-        This serves as the single source of truth for structural execution eligibility in Sprint 6.6.
-        RuntimeContext acts as a passive composition root and does not own scheduling behavior.
-        """
-        return self._runtime_scheduling_manager
 
     @property
     def runtime_execution_manager(self) -> RuntimeExecutionManager:
@@ -299,16 +209,6 @@ class RuntimeContext:
         """
         return self._hardware_discovery
 
-    @property
-    def provider_selection(self) -> RuntimeProviderSelection:
-        """
-        Expose the canonical Provider Selection subsystem for this Runtime instance.
-        
-        This serves as the single source of truth for architectural provider eligibility.
-        Future Runtime systems should access Provider Selection through this context
-        rather than constructing independent matching engines.
-        """
-        return self._provider_selection
 
     @property
     def scheduler(self) -> RuntimeScheduler:
@@ -343,16 +243,6 @@ class RuntimeContext:
         """
         return self._execution_planner
 
-    @property
-    def execution_graph_builder(self) -> RuntimeExecutionGraphBuilder:
-        """
-        Expose the canonical Execution Graph Builder subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for dependency modeling.
-        Future Runtime components must obtain graph-building services through RuntimeContext 
-        rather than constructing independent RuntimeExecutionGraphBuilder instances.
-        """
-        return self._execution_graph_builder
 
     @property
     def resource_allocator(self) -> RuntimeResourceAllocator:
@@ -365,16 +255,6 @@ class RuntimeContext:
         """
         return self._resource_allocator
 
-    @property
-    def execution_context_factory(self) -> RuntimeExecutionContextFactory:
-        """
-        Expose the canonical Execution Context Factory subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for execution preparation.
-        Future Runtime components must obtain context creation services through RuntimeContext 
-        rather than constructing independent RuntimeExecutionContextFactory instances.
-        """
-        return self._execution_context_factory
 
     @property
     def orchestrator(self) -> RuntimeOrchestrator:
@@ -442,27 +322,6 @@ class RuntimeContext:
         """
         return self._runtime_health
 
-    @property
-    def runtime_diagnostics(self) -> RuntimeDiagnostics:
-        """
-        Expose the canonical Runtime Diagnostics subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for diagnostic reasoning.
-        Future Runtime components must obtain diagnostic services through RuntimeContext
-        rather than constructing independent RuntimeDiagnostics instances.
-        """
-        return self._runtime_diagnostics
-
-    @property
-    def runtime_optimization(self) -> RuntimeOptimization:
-        """
-        Expose the canonical Runtime Optimization subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for optimization reasoning.
-        Future Runtime components must obtain optimization services through RuntimeContext
-        rather than constructing independent RuntimeOptimization instances.
-        """
-        return self._runtime_optimization
 
     @property
     def runtime_learning(self) -> RuntimeLearning:
@@ -482,16 +341,6 @@ class RuntimeContext:
     # but does NOT own the decisions themselves (e.g. PlanningDecision, PolicyDecision).
     # RuntimeKnowledge remains an independent artifact consumed by this pipeline.
     
-    @property
-    def runtime_planning_strategy(self) -> RuntimePlanningStrategy:
-        """
-        Expose the canonical Runtime Planning Strategy subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for providing the planning philosophy.
-        Future Runtime components must obtain planning strategy services through RuntimeContext
-        rather than constructing independent RuntimePlanningStrategy instances.
-        """
-        return self._runtime_planning_strategy
 
     @property
     def runtime_planning(self) -> RuntimePlanning:
@@ -515,38 +364,6 @@ class RuntimeContext:
         """
         return self._runtime_policy
 
-    @property
-    def runtime_constraint_engine(self) -> RuntimeConstraintEngine:
-        """
-        Expose the canonical Runtime Constraint Engine subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for runtime constraint boundaries.
-        Future Runtime components must obtain constraint services through RuntimeContext
-        rather than constructing independent RuntimeConstraintEngine instances.
-        """
-        return self._runtime_constraint_engine
-
-    @property
-    def runtime_budget_planner(self) -> RuntimeBudgetPlanner:
-        """
-        Expose the canonical Runtime Budget Planner subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for runtime execution budgets.
-        Future Runtime components must obtain budget services through RuntimeContext
-        rather than constructing independent RuntimeBudgetPlanner instances.
-        """
-        return self._runtime_budget_planner
-
-    @property
-    def runtime_routing(self) -> RuntimeRouting:
-        """
-        Expose the canonical Runtime Routing subsystem for this Runtime instance.
-        
-        This serves as the single architectural authority for runtime execution routing decisions.
-        Future Runtime components must obtain routing services through RuntimeContext
-        rather than constructing independent RuntimeRouting instances.
-        """
-        return self._runtime_routing
 
     def register_extension_point(self, name: str, extension_point: IRuntimeExtensionPoint) -> None:
         """

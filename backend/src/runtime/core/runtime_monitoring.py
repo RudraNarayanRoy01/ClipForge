@@ -101,7 +101,7 @@ class RuntimeMonitoring:
     """
 
     def __init__(self) -> None:
-        pass
+        self.active_observation_result = None
 
     def observe_adaptation(self, adaptation_decision: AdaptationDecision) -> MonitoringResult:
         """

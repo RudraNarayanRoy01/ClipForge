@@ -58,7 +58,7 @@ def test_provider_selection_success_path():
     
     # 4. Request Selection without constraints
     request = ProviderSelectionRequest(requested_capability_id="vision.analysis")
-    result = context.provider_selection.select_provider(request)
+    result = context._provider_selection.select_provider(request)
     
     assert result.status == ProviderSelectionStatus.SUCCESS
     assert result.selected_provider_identity.identifier == "openai.vision"
@@ -67,7 +67,7 @@ def test_provider_selection_capability_not_supported():
     context = RuntimeContext()
     # Missing capability registration
     request = ProviderSelectionRequest(requested_capability_id="vision.analysis")
-    result = context.provider_selection.select_provider(request)
+    result = context._provider_selection.select_provider(request)
     
     assert result.status == ProviderSelectionStatus.CAPABILITY_NOT_SUPPORTED
     assert result.selected_provider_identity is None
@@ -85,7 +85,7 @@ def test_provider_selection_no_provider_found():
     
     # Capability exists, but no provider registered
     request = ProviderSelectionRequest(requested_capability_id="vision.analysis")
-    result = context.provider_selection.select_provider(request)
+    result = context._provider_selection.select_provider(request)
     
     assert result.status == ProviderSelectionStatus.NO_PROVIDER_FOUND
     assert result.selected_provider_identity is None
@@ -117,7 +117,7 @@ def test_provider_selection_constraints_not_satisfied():
         requested_capability_id="vision.analysis",
         hardware_constraints=["gpu.cuda0"]
     )
-    result = context.provider_selection.select_provider(request)
+    result = context._provider_selection.select_provider(request)
     
     assert result.status == ProviderSelectionStatus.CONSTRAINTS_NOT_SATISFIED
     assert result.selected_provider_identity is None

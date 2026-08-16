@@ -62,8 +62,8 @@ class TestProviderRegistryArchitecture:
         """
         context = RuntimeContext()
         
-        assert hasattr(context, 'ai_provider_registry')
-        assert isinstance(context.ai_provider_registry, ProviderRegistry)
+        assert hasattr(context, '_ai_provider_registry')
+        assert isinstance(context._ai_provider_registry, ProviderRegistry)
         
         # Verify Context doesn't expose proxy methods for registry behavior
         context_methods = [m for m in dir(context) if not m.startswith('_')]

@@ -56,11 +56,11 @@ def test_runtime_context_ownership():
     # We assert it should own executor, but we know it's a defect. We'll add it to context.
     assert hasattr(context, 'executor') or hasattr(context, '_executor'), "RuntimeContext must own RuntimeExecutor"
     
-    assert hasattr(context, 'runtime_lifecycle'), "RuntimeContext must own RuntimeLifecycle"
-    assert hasattr(context, 'runtime_retry'), "RuntimeContext must own RuntimeRetry"
-    assert hasattr(context, 'runtime_observation'), "RuntimeContext must own RuntimeObservation"
+    assert hasattr(context, '_runtime_lifecycle'), "RuntimeContext must own RuntimeLifecycle"
+    assert hasattr(context, '_runtime_retry'), "RuntimeContext must own RuntimeRetry"
+    assert hasattr(context, '_runtime_observation'), "RuntimeContext must own RuntimeObservation"
     assert hasattr(context, 'runtime_learning'), "RuntimeContext must own RuntimeLearning"
-    assert hasattr(context, 'runtime_optimization'), "RuntimeContext must own RuntimeOptimization"
+    assert hasattr(context, '_runtime_optimization'), "RuntimeContext must own RuntimeOptimization"
 
 def test_one_component_one_artifact_mapping():
     """Verify one component maps strictly to its one primary artifact return type."""

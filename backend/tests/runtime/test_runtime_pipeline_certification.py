@@ -42,21 +42,20 @@ class TestRuntimePipelineCertification:
             (RuntimeOptimization, OptimizationResult, 'optimize')
         ]
 
-        context_methods = [name for name, _ in inspect.getmembers(RuntimeContext, predicate=inspect.isdatadescriptor)]
-        
+        context_instance = RuntimeContext()
         expected_context_properties = [
             'execution_planner',
             'scheduler',
             'executor',
-            'runtime_lifecycle',
-            'runtime_retry',
-            'runtime_observation',
+            '_runtime_lifecycle',
+            '_runtime_retry',
+            '_runtime_observation',
             'runtime_learning',
-            'runtime_optimization'
+            '_runtime_optimization'
         ]
 
         for prop in expected_context_properties:
-            assert prop in context_methods, f"Pipeline missing expected stage property: {prop}"
+            assert hasattr(context_instance, prop), f"Pipeline missing expected stage property: {prop}"
             
         decision_types = set()
         for stage_cls, decision_cls, method_name in pipeline_stages:

@@ -62,7 +62,7 @@ def test_runtime_context_remains_passive():
     Verify RuntimeContext exposes ModelRegistry but does NOT 
     implement model registration methods itself.
     """
-    assert hasattr(RuntimeContext, 'model_registry'), "RuntimeContext must expose model_registry property"
+    assert hasattr(RuntimeContext(), '_model_registry'), "RuntimeContext must own model_registry"
     
     # Ensure it doesn't wrap registry methods
     assert not hasattr(RuntimeContext, 'register_model'), "RuntimeContext must not implement register_model"

@@ -14,19 +14,19 @@ from .provider_failover_manager import ProviderFailoverManager
 class RuntimeRetryManager:
     """
     The canonical observational Runtime Retry Manager for the AI Clipping Platform.
-    
+
     Responsibilities:
     - Permanently owns Retry State, Retry Validation, Retry Recording, and Retry Metadata.
     - Observes structural retry triggers and maps them to retry states using the domain policy.
-    
+
     Ownership:
     - Owns Runtime Retry State
     - Owns Runtime Retry Validation
     - Owns Runtime Retry Recording
-    
+
     MUST NOT:
     - Execute HTTP requests, perform retries, sleep, wait, or measure latency.
-    - Be a Retry Executor, Backoff Engine, Scheduler, Execution Engine, 
+    - Be a Retry Executor, Backoff Engine, Scheduler, Execution Engine,
       Provider Selector, Load Balancer, Network Monitor, or Runtime Intelligence.
     - Modify or duplicate Provider Failover.
     - Mutate retry rules (consumes immutable domain policy).
@@ -36,10 +36,12 @@ class RuntimeRetryManager:
         # Passively consumes ProviderFailoverManager for structural reference.
         # This dependency is strictly read-only.
         self._provider_failover_manager = provider_failover_manager
-        
-        # Temporary in-memory collection. 
+
+        # Temporary in-memory collection.
         # Future architecture will introduce RuntimeRetryStore for persistence.
         self._retry_records: Dict[str, RuntimeRetryInfo] = {}
+
+        self.active_retry_result = None
 
     def _validate_trigger(self, trigger: RuntimeRetryTrigger) -> RuntimeRetryState:
         """
@@ -55,7 +57,7 @@ class RuntimeRetryManager:
         """
         if provider_id in self._retry_records:
             raise ValueError(f"Provider retry tracking for '{provider_id}' is already registered.")
-        
+
         now = datetime.utcnow()
         info = RuntimeRetryInfo(
             provider_id=provider_id,
@@ -65,7 +67,7 @@ class RuntimeRetryManager:
             updated_at=now
         )
         self._retry_records[provider_id] = info
-        
+
         return RuntimeRetryResult(
             retry_info=info,
             operation_summary=f"Successfully registered retry tracking for provider {provider_id}.",
@@ -87,8 +89,8 @@ class RuntimeRetryManager:
         return self.get_retry(provider_id).current_state
 
     def evaluate_retry(
-        self, 
-        provider_id: str, 
+        self,
+        provider_id: str,
         trigger: RuntimeRetryTrigger,
         reason: str = ""
     ) -> RuntimeRetryResult:
@@ -98,11 +100,11 @@ class RuntimeRetryManager:
         """
         info = self.get_retry(provider_id)
         current_state = info.current_state
-        
-        # If we are already FAILED or EXHAUSTED and trigger isn't explicitly resetting, 
+
+        # If we are already FAILED or EXHAUSTED and trigger isn't explicitly resetting,
         # we might just log it, but the policy mapping is strict.
         target_state = self._validate_trigger(trigger)
-        
+
         now = datetime.utcnow()
         decision = RuntimeRetryDecision(
             provider_id=provider_id,
@@ -110,11 +112,11 @@ class RuntimeRetryManager:
             retry_attempt=info.retry_attempts + 1 if target_state in (RuntimeRetryState.ELIGIBLE, RuntimeRetryState.WAITING) else info.retry_attempts,
             timestamp=now
         )
-        
+
         new_attempts = decision.retry_attempt
         if target_state == RuntimeRetryState.ELIGIBLE and new_attempts > info.max_retry_attempts:
             target_state = RuntimeRetryState.EXHAUSTED
-        
+
         updated_info = RuntimeRetryInfo(
             provider_id=provider_id,
             current_state=target_state,
@@ -127,9 +129,9 @@ class RuntimeRetryManager:
             last_decision=decision,
             reason=reason
         )
-        
+
         self._retry_records[provider_id] = updated_info
-        
+
         return RuntimeRetryResult(
             retry_info=updated_info,
             operation_summary=f"Successfully evaluated retry for provider {provider_id} to {target_state.name}.",
@@ -137,8 +139,8 @@ class RuntimeRetryManager:
         )
 
     def record_retry(
-        self, 
-        provider_id: str, 
+        self,
+        provider_id: str,
         trigger: RuntimeRetryTrigger,
         reason: str = ""
     ) -> RuntimeRetryResult:
@@ -161,7 +163,7 @@ class RuntimeRetryManager:
         """
         info = self.get_retry(provider_id)
         current_state = info.current_state
-        
+
         now = datetime.utcnow()
         decision = RuntimeRetryDecision(
             provider_id=provider_id,
@@ -169,7 +171,7 @@ class RuntimeRetryManager:
             retry_attempt=0,
             timestamp=now
         )
-        
+
         updated_info = RuntimeRetryInfo(
             provider_id=provider_id,
             current_state=RuntimeRetryState.NOT_REQUIRED,
@@ -182,9 +184,9 @@ class RuntimeRetryManager:
             last_decision=decision,
             reason=reason
         )
-        
+
         self._retry_records[provider_id] = updated_info
-        
+
         return RuntimeRetryResult(
             retry_info=updated_info,
             operation_summary=f"Successfully cleared retry for {provider_id}.",

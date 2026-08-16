@@ -42,6 +42,7 @@ class RuntimeLifecycleCoordinator:
     def __init__(self) -> None:
         self._state = RuntimeLifecycleState.UNINITIALIZED
         self._components: List[ILifecycleAware] = []
+        self.active_lifecycle_result = None
 
     @property
     def current_state(self) -> RuntimeLifecycleState:

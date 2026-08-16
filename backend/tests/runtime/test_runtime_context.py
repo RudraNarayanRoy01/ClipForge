@@ -23,11 +23,11 @@ def test_runtime_context_is_composition_root():
     assert isinstance(context.execution_planner, RuntimeExecutionPlanner)
     assert isinstance(context.scheduler, RuntimeScheduler)
     assert isinstance(context.executor, RuntimeExecutor)
-    assert isinstance(context.runtime_lifecycle, RuntimeLifecycle)
-    assert isinstance(context.runtime_retry, RuntimeRetry)
-    assert isinstance(context.runtime_observation, RuntimeObservation)
+    assert isinstance(context._runtime_lifecycle, RuntimeLifecycle)
+    assert isinstance(context._runtime_retry, RuntimeRetry)
+    assert isinstance(context._runtime_observation, RuntimeObservation)
     assert isinstance(context.runtime_learning, RuntimeLearning)
-    assert isinstance(context.runtime_optimization, RuntimeOptimization)
+    assert isinstance(context._runtime_optimization, RuntimeOptimization)
 
 def test_runtime_decision_environment_encapsulation():
     """
@@ -41,11 +41,11 @@ def test_runtime_decision_environment_encapsulation():
         context.execution_planner,
         context.scheduler,
         context.executor,
-        context.runtime_lifecycle,
-        context.runtime_retry,
-        context.runtime_observation,
+        context._runtime_lifecycle,
+        context._runtime_retry,
+        context._runtime_observation,
         context.runtime_learning,
-        context.runtime_optimization
+        context._runtime_optimization
     ]
     
     for comp in pipeline_components:

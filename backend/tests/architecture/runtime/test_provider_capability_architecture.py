@@ -78,8 +78,8 @@ def test_registry_does_not_import_execution_components():
 def test_runtime_context_composes_registry_passively():
     """Verify RuntimeContext only composes ProviderCapabilityRegistry and never invokes behavior."""
     context = RuntimeContext()
-    assert hasattr(context, "provider_capability_registry")
-    assert isinstance(context.provider_capability_registry, ProviderCapabilityRegistry)
+    assert hasattr(context, "_provider_capability_registry")
+    assert isinstance(context._provider_capability_registry, ProviderCapabilityRegistry)
     
     file_path = inspect.getfile(RuntimeContext)
     with open(file_path, "r") as f:

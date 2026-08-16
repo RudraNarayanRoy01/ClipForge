@@ -53,8 +53,8 @@ def test_execution_graph_is_immutable():
 def test_runtime_context_exposes_builder():
     """Verify RuntimeContext acts as the composition root and exposes the builder."""
     context = RuntimeContext()
-    assert hasattr(context, 'execution_graph_builder')
-    assert isinstance(context.execution_graph_builder, RuntimeExecutionGraphBuilder)
+    assert hasattr(context, '_execution_graph_builder')
+    assert isinstance(context._execution_graph_builder, RuntimeExecutionGraphBuilder)
 
 
 def test_builder_consumes_plan_and_produces_graph():

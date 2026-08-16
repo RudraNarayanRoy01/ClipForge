@@ -40,7 +40,7 @@ class RuntimeScheduler:
     No mutation occurs.
     """
     def __init__(self) -> None:
-        pass
+        self.active_scheduling_decision: Optional[SchedulingDecision] = None
 
     def schedule(
         self, 

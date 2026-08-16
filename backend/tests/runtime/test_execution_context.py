@@ -52,11 +52,11 @@ def test_execution_context_immutability():
 def test_runtime_context_exposes_factory():
     """Verify RuntimeContext owns and exposes RuntimeExecutionContextFactory."""
     context = RuntimeContext()
-    assert hasattr(context, 'execution_context_factory')
+    assert hasattr(context, '_execution_context_factory')
     
-    factory = context.execution_context_factory
+    factory = context._execution_context_factory
     assert isinstance(factory, RuntimeExecutionContextFactory)
-    assert factory is context.execution_context_factory  # Should return the same instance
+    assert factory is context._execution_context_factory  # Should return the same instance
 
 
 def test_factory_consumes_allocation_result():
