@@ -1,13 +1,15 @@
 from dataclasses import dataclass
 from src.runtime.core.execution_target import ExecutionTarget
+from src.runtime.core.execution_workload import ExecutionWorkload
 
 @dataclass(frozen=True)
 class ExecutionAdmission:
     """
     Immutable representation of the Runtime's execution admission boundary.
-    
-    This contract establishes that an ExecutionTarget has been accepted and bound 
-    for execution. It explicitly represents the handoff to execution infrastructure, 
-    and does NOT represent the actual execution outcome or success state.
+
+    This explicitly normalized executable workload has been paired with an
+    explicitly routed execution target and is authorized to cross into the
+    execution domain.
     """
     execution_target: ExecutionTarget
+    execution_workload: ExecutionWorkload

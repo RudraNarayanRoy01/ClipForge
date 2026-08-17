@@ -6,6 +6,9 @@ from src.runtime.core.route_decision import RouteDecision
 from src.runtime.core.policy_decision import PolicyDecision
 from src.runtime.core.planning_result import PlanningResult
 from src.runtime.core.intent import ExecutionIntent
+from src.runtime.core.execution_workload import ExecutionWorkload
+from src.runtime.execution.workload_normalization_extension import WorkloadNormalizationExtensionPoint
+from unittest.mock import MagicMock
 
 def create_mock_target() -> ExecutionTarget:
     intent = ExecutionIntent(
@@ -38,29 +41,52 @@ def create_mock_target() -> ExecutionTarget:
     )
 
 def test_runtime_execution_boundary_construction():
-    boundary = RuntimeExecutionBoundary()
+    registry = MagicMock(spec=WorkloadNormalizationExtensionPoint)
+    boundary = RuntimeExecutionBoundary(normalizer_registry=registry)
     assert isinstance(boundary, RuntimeExecutionBoundary)
 
 def test_runtime_execution_boundary_produces_admission():
     """Verify that the boundary produces a pre-execution admission artifact, not an execution result."""
-    boundary = RuntimeExecutionBoundary()
+    registry = MagicMock(spec=WorkloadNormalizationExtensionPoint)
+    normalizer = MagicMock()
+    workload = MagicMock(spec=ExecutionWorkload)
+    
+    registry.get_normalizer.return_value = normalizer
+    normalizer.normalize.return_value = workload
+    boundary = RuntimeExecutionBoundary(normalizer_registry=registry)
+
     target = create_mock_target()
-    
-    result = boundary.execute(target)
-    
+    intent = target.route_decision.policy_decision.planning_result.intent
+
+    result = boundary.execute(target, intent)
+
     assert isinstance(result, ExecutionAdmission)
     assert not hasattr(result, 'is_success')  # Must not claim success
+    assert result.execution_workload is workload
+    registry.get_normalizer.assert_called_once_with(intent.capability_id)
+    normalizer.normalize.assert_called_once_with(intent)
 
 def test_runtime_execution_boundary_preserves_target_identity():
-    boundary = RuntimeExecutionBoundary()
+    registry = MagicMock(spec=WorkloadNormalizationExtensionPoint)
+    normalizer = MagicMock()
+    registry.get_normalizer.return_value = normalizer
+    boundary = RuntimeExecutionBoundary(normalizer_registry=registry)
+
     target = create_mock_target()
-    
-    result = boundary.execute(target)
-    
+    intent = target.route_decision.policy_decision.planning_result.intent
+
+    result = boundary.execute(target, intent)
+
     assert result.execution_target is target
 
 def test_runtime_execution_boundary_rejects_invalid_input():
-    boundary = RuntimeExecutionBoundary()
-    
+    boundary = RuntimeExecutionBoundary(normalizer_registry=MagicMock())
+
+    intent = ExecutionIntent(capability_id="c", payload="p")
+    target = create_mock_target()
+
     with pytest.raises(TypeError):
-        boundary.execute("not-a-target")
+        boundary.execute("not-a-target", intent) # type: ignore
+
+    with pytest.raises(TypeError):
+        boundary.execute(target, "not-an-intent") # type: ignore

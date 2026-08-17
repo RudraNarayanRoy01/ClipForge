@@ -1,6 +1,9 @@
 import ast
+import inspect
+import typing
 from pathlib import Path
-from src.runtime.execution.execution_engine import ExecutionEngine, AbstractExecutionMechanism
+from src.runtime.execution.execution_engine import ExecutionEngine
+from src.runtime.execution.execution_mechanism_registry import AbstractExecutionMechanism
 
 def test_authoritative_execution_engine_exists():
     """1. execution_engine.py exists. 2. Exactly one authoritative ExecutionEngine exists."""
@@ -16,11 +19,9 @@ def test_authoritative_execution_engine_exists():
     # 2. Exactly one authoritative ExecutionEngine class exists.
     assert "ExecutionEngine" in classes, "ExecutionEngine class must exist"
     
-    # 3. AbstractExecutionMechanism exists in the intended location.
-    assert "AbstractExecutionMechanism" in classes, "AbstractExecutionMechanism must be defined in execution_engine.py"
-    
     # No second execution orchestrator / Result abstraction
-    assert len(classes) == 2, f"Only AbstractExecutionMechanism and ExecutionEngine are allowed in this file. Found: {classes}"
+    allowed = {"ExecutionEngine", "WorkloadCompatibilityError"}
+    assert set(classes).issubset(allowed), f"Only {allowed} are allowed in this file. Found: {classes}"
 
 def test_provider_and_hardware_neutrality():
     """4-11, 16. No imports of specific providers, networking, hardware, telemetry, or schedulers."""
