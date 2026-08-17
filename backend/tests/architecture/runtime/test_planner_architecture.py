@@ -28,7 +28,8 @@ def test_execution_planner_architecture_neutrality():
         "ollama", "openai", "gemini", "provider", "provider_factory",
         "cuda", "gpu", "hardware", "resource", "scheduler", "queue",
         "executor", "runtime_execution", "fastapi", "pydantic",
-        "campaign_intelligence"
+        "campaign_intelligence", "telemetry", "metrics", "monitoring",
+        "adaptation"
     }
 
     class ImportVisitor(ast.NodeVisitor):

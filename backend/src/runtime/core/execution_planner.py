@@ -1,38 +1,50 @@
 from typing import Any, Dict, Tuple
 
 from .intent import ExecutionIntent
+from .planning_context import PlanningContext
 from .planning_result import PlanningResult
 
 
 class ExecutionPlanner:
     """
-    Transforms an ExecutionIntent into a PlanningResult.
+    Transforms an ExecutionIntent into a PlanningResult based on a PlanningContext.
 
     This Planner establishes the authoritative boundary between WHAT work is requested
-    (ExecutionIntent) and HOW the Runtime intends to execute it (PlanningResult).
+    (ExecutionIntent) and HOW the Runtime intends to execute it (PlanningResult),
+    influenced by declarative planning preferences (PlanningContext).
 
     It answers "HOW does the Runtime intend to satisfy this requested work?" in the most
     abstract possible sense. It explicitly does not answer WHO, WHERE, WHEN, WHICH provider,
     WHICH hardware, or HOW to schedule or execute.
     """
 
-    def plan(self, intent: ExecutionIntent) -> PlanningResult:
+    def plan(self, intent: ExecutionIntent, context: PlanningContext) -> PlanningResult:
         """
-        Produce a PlanningResult without modifying the input intent.
+        Produce a PlanningResult without modifying the input intent or context.
 
-        For this foundational batch, the strategy is explicitly the deterministic neutral marker
-        'default_planning_strategy', and requirements/constraints are intentionally empty.
-        Rich planning logic is deferred to future batches to prevent coupling with
-        infrastructure configuration at this layer.
+        Strategy is selected deterministically based on a strict precedence of
+        PlanningContext preferences: Quality > Latency > Cost > Locality.
+        
+        Requirements and constraints are intentionally empty, deferring richer 
+        constraint materialization to prevent hidden infrastructure coupling.
         """
-        # Preserves the exact object identity of intent.
-        # Deterministic, neutral default strategy as repository lacks rich routing rules.
-        strategy = "default_planning_strategy"
+        if context.quality_preference == "high":
+            strategy = "quality_first_planning"
+        elif context.latency_preference == "low":
+            strategy = "latency_first_planning"
+        elif context.cost_preference == "low":
+            strategy = "cost_aware_planning"
+        elif context.locality_preference == "local":
+            strategy = "locality_preferred_planning"
+        else:
+            strategy = "balanced_planning"
 
-        # Empty declarative requirements as instructed by Batch 6B.4.2 specifications.
+        # Requirements remain empty as no reliable provider-neutral requirements
+        # can be safely derived without inventing domain/infrastructure semantics.
         requirements: Tuple[str, ...] = ()
 
-        # Empty declarative constraints to prevent hidden configuration channels.
+        # Constraints remain empty as a safe default (Option B).
+        # PlanningContext.constraints are NOT converted into requirements or constraints.
         constraints: Dict[str, Any] = {}
 
         return PlanningResult(
