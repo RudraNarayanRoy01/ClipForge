@@ -22,7 +22,7 @@ def dummy_wav_path(tmp_path):
     return str(file_path)
 
 @pytest.mark.integration
-def test_real_transcription_execution(dummy_wav_path):
+def test_real_transcription_execution(dummy_wav_path, monkeypatch):
     """
     Proves truthful end-to-end local execution of the Whisper provider.
 
@@ -30,7 +30,15 @@ def test_real_transcription_execution(dummy_wav_path):
     1. Normalizer translates intent via the composed boundary.
     2. Registry correctly maps the capability/provider to the mechanism via the composed engine.
     3. Mechanism successfully bridges the async thread boundary and runs faster-whisper natively.
+
+    Note: The established Runtime Execution contract intentionally returns ONLY
+    execution status (ExecutionResult). Resulting payloads (e.g., Transcript)
+    are generated internally but are explicitly outside the scope of this boundary's propagation contract.
     """
+    # Configure the environment context for the CPU-baseline certification profile
+    monkeypatch.setenv("TRANSCRIPTION_MODEL", "tiny")
+    monkeypatch.setenv("TRANSCRIPTION_DEVICE", "cpu")
+
     # 1. Boot the actual container
     container = initialize_container()
 
@@ -74,7 +82,7 @@ def test_real_transcription_execution(dummy_wav_path):
     # This proves ExecutionEngine -> Registry -> Mechanism -> Provider path
     result = engine.execute(admission)
 
-    # 6. Assert genuine execution
+    # 6. Assert genuine execution status (Note: payload propagation is intentionally outside this contract)
     assert result.is_success is True, f"Whisper inference failed: {result.error_message}"
     assert result.error_message is None
     assert result.execution_target == target
