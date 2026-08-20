@@ -15,6 +15,9 @@ class RuntimeModule(DIModule):
     capabilities into the ExecutionEngine boundary without creating legacy side-effects.
     """
     def register(self, container: Container) -> None:
+        from src.runtime.composition.runtime_pipeline_factory import RuntimePipelineFactory
+        from src.runtime.invocation.runtime_pipeline import RuntimePipeline
+        from src.runtime.invocation.runtime_invocation_facade import RuntimeInvocationFacade
         # 1. Provision Registries
         registry = ExecutionMechanismRegistry()
         extension_point = WorkloadNormalizationExtensionPoint()
@@ -46,3 +49,9 @@ class RuntimeModule(DIModule):
 
         container.register_singleton(ExecutionEngine, ExecutionEngine)
         container.register_singleton(RuntimeExecutionBoundary, RuntimeExecutionBoundary)
+
+        # 5. Expose Runtime Invocation boundaries
+        pipeline_context = RuntimePipelineFactory.create()
+        pipeline = RuntimePipeline(pipeline_context)
+        container.register_singleton(RuntimePipeline, pipeline)
+        container.register_singleton(RuntimeInvocationFacade, RuntimeInvocationFacade)
