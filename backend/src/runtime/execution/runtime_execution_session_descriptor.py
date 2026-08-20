@@ -11,7 +11,6 @@ class RuntimeExecutionSessionDescriptor:
     builder_id: str
     lifecycle_id: str
     scheduler_id: str
-    engine_id: str
     session_id: str
     version: str
     schema_version: str

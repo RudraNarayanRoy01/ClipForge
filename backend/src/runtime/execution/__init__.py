@@ -128,20 +128,6 @@ from .execution_scheduler_snapshot_factory import ExecutionSchedulerSnapshotFact
 from .execution_scheduler_factory import ExecutionSchedulerFactory
 from .runtime_execution_scheduler_factory import RuntimeExecutionSchedulerFactory
 
-from .runtime_execution_engine_descriptor import RuntimeExecutionEngineDescriptor
-from .runtime_execution_engine_metadata import RuntimeExecutionEngineMetadata
-from .runtime_execution_engine_statistics import RuntimeExecutionEngineStatistics
-from .runtime_execution_engine_snapshot import RuntimeExecutionEngineSnapshot
-from .runtime_execution_engine_identity import RuntimeExecutionEngineIdentity
-from .runtime_execution_engine import RuntimeExecutionEngine
-from .runtime_execution_engine_validator import RuntimeExecutionEngineValidator
-from .execution_engine_descriptor_factory import ExecutionEngineDescriptorFactory
-from .execution_engine_metadata_factory import ExecutionEngineMetadataFactory
-from .execution_engine_statistics_builder import ExecutionEngineStatisticsBuilder
-from .execution_engine_snapshot_factory import ExecutionEngineSnapshotFactory
-from .execution_engine_factory import ExecutionEngineFactory
-from .runtime_execution_engine_factory import RuntimeExecutionEngineFactory
-
 from .runtime_execution_session_descriptor import RuntimeExecutionSessionDescriptor
 from .runtime_execution_session_metadata import RuntimeExecutionSessionMetadata
 from .runtime_execution_session_statistics import RuntimeExecutionSessionStatistics
@@ -321,21 +307,6 @@ __all__ = [
     "ExecutionSchedulerSnapshotFactory",
     "ExecutionSchedulerFactory",
     "RuntimeExecutionSchedulerFactory",
-    
-    # Engine artifacts in canonical order
-    "RuntimeExecutionEngineDescriptor",
-    "RuntimeExecutionEngineMetadata",
-    "RuntimeExecutionEngineStatistics",
-    "RuntimeExecutionEngineSnapshot",
-    "RuntimeExecutionEngineIdentity",
-    "RuntimeExecutionEngine",
-    "RuntimeExecutionEngineValidator",
-    "ExecutionEngineDescriptorFactory",
-    "ExecutionEngineMetadataFactory",
-    "ExecutionEngineStatisticsBuilder",
-    "ExecutionEngineSnapshotFactory",
-    "ExecutionEngineFactory",
-    "RuntimeExecutionEngineFactory",
     
     # Session artifacts in canonical order
     "RuntimeExecutionSessionDescriptor",

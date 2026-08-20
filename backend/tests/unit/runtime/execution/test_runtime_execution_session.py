@@ -17,15 +17,7 @@ from src.runtime.execution.execution_session_statistics_builder import Execution
 from src.runtime.execution.execution_session_snapshot_factory import ExecutionSessionSnapshotFactory
 from src.runtime.execution.runtime_execution_session_factory import RuntimeExecutionSessionFactory
 
-from src.runtime.execution.runtime_execution_engine import RuntimeExecutionEngine
-from src.runtime.execution.runtime_execution_engine_identity import RuntimeExecutionEngineIdentity
 
-class DummyEngine(RuntimeExecutionEngine):
-    pass
-
-@pytest.fixture
-def mock_engine():
-    return DummyEngine(identifier="eng-123", identity=None)
 
 @pytest.fixture
 def valid_descriptor():
@@ -39,7 +31,6 @@ def valid_descriptor():
         builder_id="build-123",
         lifecycle_id="life-123",
         scheduler_id="sched-123",
-        engine_id="eng-123",
         session_id="sess-123",
         version="1.0.0",
         schema_version="1.0.0"
@@ -54,36 +45,30 @@ def valid_metadata():
     )
 
 @pytest.fixture
-def valid_statistics(mock_engine):
+def valid_statistics():
     return ExecutionSessionStatisticsBuilder.build(
-        runtime_execution_engine=mock_engine,
-        engine_lookup=MappingProxyType({"eng-123": mock_engine}),
         descriptor_lookup=MappingProxyType({"sess-123": {}}),
         session_lookup=MappingProxyType({"sess-123": {}})
     )
 
 @pytest.fixture
-def valid_snapshot(valid_descriptor, valid_metadata, valid_statistics, mock_engine):
+def valid_snapshot(valid_descriptor, valid_metadata, valid_statistics):
     return ExecutionSessionSnapshotFactory.create(
         descriptor=valid_descriptor,
         metadata=valid_metadata,
         statistics=valid_statistics,
-        runtime_execution_engine=mock_engine,
-        engine_lookup=MappingProxyType({"eng-123": mock_engine}),
         descriptor_lookup=MappingProxyType({"sess-123": {}}),
         session_lookup=MappingProxyType({"sess-123": {}})
     )
 
 @pytest.fixture
-def valid_session(valid_descriptor, valid_metadata, valid_statistics, valid_snapshot, mock_engine):
+def valid_session(valid_descriptor, valid_metadata, valid_statistics, valid_snapshot):
     return ExecutionSessionFactory.create(
         identifier="sess-123",
         descriptor=valid_descriptor,
         metadata=valid_metadata,
         statistics=valid_statistics,
         snapshot=valid_snapshot,
-        runtime_execution_engine=mock_engine,
-        engine_lookup=MappingProxyType({"eng-123": mock_engine}),
         descriptor_lookup=MappingProxyType({"sess-123": {}}),
         session_lookup=MappingProxyType({"sess-123": {}})
     )
@@ -107,8 +92,6 @@ def test_identity_ownership(valid_session):
     assert isinstance(identity.metadata, RuntimeExecutionSessionMetadata)
     assert isinstance(identity.statistics, RuntimeExecutionSessionStatistics)
     assert isinstance(identity.snapshot, RuntimeExecutionSessionSnapshot)
-    assert isinstance(identity.runtime_execution_engine, RuntimeExecutionEngine)
-    assert isinstance(identity.engine_lookup, MappingProxyType)
     assert isinstance(identity.descriptor_lookup, MappingProxyType)
     assert isinstance(identity.session_lookup, MappingProxyType)
     
@@ -126,7 +109,6 @@ def test_descriptor_ownership(valid_descriptor):
     assert valid_descriptor.builder_id == "build-123"
     assert valid_descriptor.lifecycle_id == "life-123"
     assert valid_descriptor.scheduler_id == "sched-123"
-    assert valid_descriptor.engine_id == "eng-123"
     assert valid_descriptor.session_id == "sess-123"
     assert valid_descriptor.version == "1.0.0"
     assert valid_descriptor.schema_version == "1.0.0"
@@ -146,8 +128,6 @@ def test_metadata_ownership(valid_metadata):
     assert not hasattr(valid_metadata, "state")
 
 def test_statistics_ownership(valid_statistics):
-    assert valid_statistics.engine_count == 1
-    assert valid_statistics.engine_lookup_count == 1
     assert valid_statistics.descriptor_lookup_count == 1
     assert valid_statistics.session_lookup_count == 1
     
@@ -158,8 +138,6 @@ def test_statistics_ownership(valid_statistics):
 
 def test_snapshot_ownership(valid_snapshot):
     assert isinstance(valid_snapshot.descriptor_hash, str)
-    assert isinstance(valid_snapshot.engine_hash, str)
-    assert isinstance(valid_snapshot.engine_lookup_hash, str)
     assert isinstance(valid_snapshot.descriptor_lookup_hash, str)
     assert isinstance(valid_snapshot.session_lookup_hash, str)
     assert isinstance(valid_snapshot.metadata_hash, str)
@@ -168,30 +146,29 @@ def test_snapshot_ownership(valid_snapshot):
 
 def test_lookup_ownership(valid_session):
     identity = valid_session.identity
-    assert "eng-123" in identity.engine_lookup
     assert "sess-123" in identity.descriptor_lookup
     assert "sess-123" in identity.session_lookup
 
 # Hashing and Determinism Tests
-def test_snapshot_determinism(valid_descriptor, valid_metadata, valid_statistics, mock_engine):
+def test_snapshot_determinism(valid_descriptor, valid_metadata, valid_statistics):
     s1 = ExecutionSessionSnapshotFactory.create(
-        valid_descriptor, valid_metadata, valid_statistics, mock_engine,
-        MappingProxyType({"eng-123": mock_engine}), MappingProxyType({"sess-123": {}}), MappingProxyType({"sess-123": {}})
+        valid_descriptor, valid_metadata, valid_statistics,
+        MappingProxyType({"sess-123": {}}), MappingProxyType({"sess-123": {}})
     )
     s2 = ExecutionSessionSnapshotFactory.create(
-        valid_descriptor, valid_metadata, valid_statistics, mock_engine,
-        MappingProxyType({"eng-123": mock_engine}), MappingProxyType({"sess-123": {}}), MappingProxyType({"sess-123": {}})
+        valid_descriptor, valid_metadata, valid_statistics,
+        MappingProxyType({"sess-123": {}}), MappingProxyType({"sess-123": {}})
     )
     assert s1.session_hash == s2.session_hash
 
-def test_insertion_order_independence(valid_descriptor, valid_metadata, valid_statistics, mock_engine):
+def test_insertion_order_independence(valid_descriptor, valid_metadata, valid_statistics):
     s1 = ExecutionSessionSnapshotFactory.create(
-        valid_descriptor, valid_metadata, valid_statistics, mock_engine,
-        MappingProxyType({"a": 1, "b": 2}), MappingProxyType({"a": 1, "b": 2}), MappingProxyType({"a": 1, "b": 2})
+        valid_descriptor, valid_metadata, valid_statistics,
+        MappingProxyType({"a": 1, "b": 2}), MappingProxyType({"a": 1, "b": 2})
     )
     s2 = ExecutionSessionSnapshotFactory.create(
-        valid_descriptor, valid_metadata, valid_statistics, mock_engine,
-        MappingProxyType({"b": 2, "a": 1}), MappingProxyType({"b": 2, "a": 1}), MappingProxyType({"b": 2, "a": 1})
+        valid_descriptor, valid_metadata, valid_statistics,
+        MappingProxyType({"b": 2, "a": 1}), MappingProxyType({"b": 2, "a": 1})
     )
     assert s1.session_hash == s2.session_hash
 
@@ -222,7 +199,7 @@ def test_frozen_dataclass_metadata(valid_metadata):
 
 def test_frozen_dataclass_statistics(valid_statistics):
     with pytest.raises(Exception):
-        valid_statistics.engine_count = 0
+        valid_statistics.descriptor_lookup_count = 0
 
 def test_frozen_dataclass_snapshot(valid_snapshot):
     with pytest.raises(Exception):
@@ -249,44 +226,12 @@ def test_duplicate_identifier_detection(valid_session):
     with pytest.raises(ExecutionValidationException, match="Duplicate identifiers"):
         RuntimeExecutionSessionValidator.validate(invalid_session)
 
-def test_missing_engine_detection(valid_descriptor, valid_metadata, valid_statistics, valid_snapshot):
-    identity = RuntimeExecutionSessionIdentity(
-        descriptor=valid_descriptor,
-        metadata=valid_metadata,
-        statistics=valid_statistics,
-        snapshot=valid_snapshot,
-        runtime_execution_engine=None,
-        engine_lookup=MappingProxyType({}),
-        descriptor_lookup=MappingProxyType({"sess-123": {}}),
-        session_lookup=MappingProxyType({"sess-123": {}})
-    )
-    invalid = RuntimeExecutionSession(identifier="sess-123", identity=identity)
-    with pytest.raises(ExecutionValidationException, match="Missing engine"):
-        RuntimeExecutionSessionValidator.validate(invalid)
-
-def test_validator_missing_engine_lookup(valid_session):
-    invalid_identity = RuntimeExecutionSessionIdentity(
-        descriptor=valid_session.identity.descriptor,
-        metadata=valid_session.identity.metadata,
-        statistics=valid_session.identity.statistics,
-        snapshot=valid_session.identity.snapshot,
-        runtime_execution_engine=valid_session.identity.runtime_execution_engine,
-        engine_lookup=MappingProxyType({}), # Missing
-        descriptor_lookup=valid_session.identity.descriptor_lookup,
-        session_lookup=valid_session.identity.session_lookup
-    )
-    invalid = RuntimeExecutionSession(identifier="sess-123", identity=invalid_identity)
-    with pytest.raises(ExecutionValidationException, match="Engine not found in engine_lookup"):
-        RuntimeExecutionSessionValidator.validate(invalid)
-
 def test_validator_missing_session_lookup(valid_session):
     invalid_identity = RuntimeExecutionSessionIdentity(
         descriptor=valid_session.identity.descriptor,
         metadata=valid_session.identity.metadata,
         statistics=valid_session.identity.statistics,
         snapshot=valid_session.identity.snapshot,
-        runtime_execution_engine=valid_session.identity.runtime_execution_engine,
-        engine_lookup=valid_session.identity.engine_lookup,
         descriptor_lookup=valid_session.identity.descriptor_lookup,
         session_lookup=MappingProxyType({}) # Missing
     )
@@ -300,8 +245,6 @@ def test_validator_missing_descriptor_lookup(valid_session):
         metadata=valid_session.identity.metadata,
         statistics=valid_session.identity.statistics,
         snapshot=valid_session.identity.snapshot,
-        runtime_execution_engine=valid_session.identity.runtime_execution_engine,
-        engine_lookup=valid_session.identity.engine_lookup,
         descriptor_lookup=MappingProxyType({}), # Missing
         session_lookup=valid_session.identity.session_lookup
     )
@@ -311,7 +254,7 @@ def test_validator_missing_descriptor_lookup(valid_session):
 
 def test_validator_missing_snapshot_hash(valid_session):
     invalid_snapshot = RuntimeExecutionSessionSnapshot(
-        descriptor_hash="x", engine_hash="x", engine_lookup_hash="x",
+        descriptor_hash="x",
         descriptor_lookup_hash="x", session_lookup_hash="x",
         metadata_hash="x", statistics_hash="x", session_hash="" # Missing
     )
@@ -320,8 +263,6 @@ def test_validator_missing_snapshot_hash(valid_session):
         metadata=valid_session.identity.metadata,
         statistics=valid_session.identity.statistics,
         snapshot=invalid_snapshot,
-        runtime_execution_engine=valid_session.identity.runtime_execution_engine,
-        engine_lookup=valid_session.identity.engine_lookup,
         descriptor_lookup=valid_session.identity.descriptor_lookup,
         session_lookup=valid_session.identity.session_lookup
     )
@@ -381,8 +322,8 @@ def test_attr_presence_descriptor_lifecycle_id(valid_descriptor):
     assert hasattr(valid_descriptor, "lifecycle_id")
 def test_attr_presence_descriptor_scheduler_id(valid_descriptor):
     assert hasattr(valid_descriptor, "scheduler_id")
-def test_attr_presence_descriptor_engine_id(valid_descriptor):
-    assert hasattr(valid_descriptor, "engine_id")
+def test_negative_attr_presence_descriptor_engine_id(valid_descriptor):
+    assert not hasattr(valid_descriptor, "engine_id")
 def test_attr_presence_descriptor_session_id(valid_descriptor):
     assert hasattr(valid_descriptor, "session_id")
 def test_attr_presence_descriptor_version(valid_descriptor):
@@ -395,20 +336,20 @@ def test_attr_presence_metadata_annotations(valid_metadata):
     assert hasattr(valid_metadata, "annotations")
 def test_attr_presence_metadata_tags(valid_metadata):
     assert hasattr(valid_metadata, "tags")
-def test_attr_presence_statistics_engine_count(valid_statistics):
-    assert hasattr(valid_statistics, "engine_count")
-def test_attr_presence_statistics_engine_lookup_count(valid_statistics):
-    assert hasattr(valid_statistics, "engine_lookup_count")
+def test_negative_attr_presence_statistics_engine_count(valid_statistics):
+    assert not hasattr(valid_statistics, "engine_count")
+def test_negative_attr_presence_statistics_engine_lookup_count(valid_statistics):
+    assert not hasattr(valid_statistics, "engine_lookup_count")
 def test_attr_presence_statistics_descriptor_lookup_count(valid_statistics):
     assert hasattr(valid_statistics, "descriptor_lookup_count")
 def test_attr_presence_statistics_session_lookup_count(valid_statistics):
     assert hasattr(valid_statistics, "session_lookup_count")
 def test_attr_presence_snapshot_descriptor_hash(valid_snapshot):
     assert hasattr(valid_snapshot, "descriptor_hash")
-def test_attr_presence_snapshot_engine_hash(valid_snapshot):
-    assert hasattr(valid_snapshot, "engine_hash")
-def test_attr_presence_snapshot_engine_lookup_hash(valid_snapshot):
-    assert hasattr(valid_snapshot, "engine_lookup_hash")
+def test_negative_attr_presence_snapshot_engine_hash(valid_snapshot):
+    assert not hasattr(valid_snapshot, "engine_hash")
+def test_negative_attr_presence_snapshot_engine_lookup_hash(valid_snapshot):
+    assert not hasattr(valid_snapshot, "engine_lookup_hash")
 def test_attr_presence_snapshot_descriptor_lookup_hash(valid_snapshot):
     assert hasattr(valid_snapshot, "descriptor_lookup_hash")
 def test_attr_presence_snapshot_session_lookup_hash(valid_snapshot):
@@ -427,10 +368,6 @@ def test_attr_presence_identity_statistics(valid_session):
     assert hasattr(valid_session.identity, "statistics")
 def test_attr_presence_identity_snapshot(valid_session):
     assert hasattr(valid_session.identity, "snapshot")
-def test_attr_presence_identity_engine(valid_session):
-    assert hasattr(valid_session.identity, "runtime_execution_engine")
-def test_attr_presence_identity_engine_lookup(valid_session):
-    assert hasattr(valid_session.identity, "engine_lookup")
 def test_attr_presence_identity_descriptor_lookup(valid_session):
     assert hasattr(valid_session.identity, "descriptor_lookup")
 def test_attr_presence_identity_session_lookup(valid_session):

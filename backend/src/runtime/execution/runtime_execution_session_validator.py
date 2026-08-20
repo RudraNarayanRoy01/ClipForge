@@ -5,11 +5,9 @@ class RuntimeExecutionSessionValidator:
     """
     VALIDATES ONLY:
     - duplicate identifiers
-    - missing engine
     - lookup consistency
     - descriptor consistency
     - session identifier consistency
-    - parent engine consistency
     - snapshot consistency
     - structural integrity
     
@@ -51,15 +49,7 @@ class RuntimeExecutionSessionValidator:
         if session.identifier != identity.descriptor.session_id:
             raise ExecutionValidationException("Duplicate identifiers: identifier mismatch between wrapper and descriptor")
         
-        # Check parent consistency
-        if not hasattr(identity, 'runtime_execution_engine') or identity.runtime_execution_engine is None:
-            raise ExecutionValidationException("Missing engine")
-            
         # Check lookup consistency
-        engine_id = identity.runtime_execution_engine.identifier
-        
-        if engine_id not in identity.engine_lookup:
-            raise ExecutionValidationException("Engine not found in engine_lookup")
             
         if session.identifier not in identity.session_lookup:
             raise ExecutionValidationException("Session not found in session_lookup")

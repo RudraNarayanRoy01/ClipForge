@@ -12,7 +12,6 @@ class ExecutionSessionDescriptorFactory:
         builder_id: str,
         lifecycle_id: str,
         scheduler_id: str,
-        engine_id: str,
         session_id: str,
         version: str,
         schema_version: str
@@ -27,7 +26,6 @@ class ExecutionSessionDescriptorFactory:
             builder_id=builder_id,
             lifecycle_id=lifecycle_id,
             scheduler_id=scheduler_id,
-            engine_id=engine_id,
             session_id=session_id,
             version=version,
             schema_version=schema_version
