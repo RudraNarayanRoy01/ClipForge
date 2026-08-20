@@ -4,6 +4,7 @@ from typing import Optional, Tuple
 
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.execution.execution_mechanism_registry import AbstractExecutionMechanism
+from src.runtime.execution.execution_result import ExecutionOutcome
 from src.transcription.execution.workload import TranscriptionWorkload
 from src.transcription.interfaces import ITranscriptionService
 from src.transcription.exceptions import TranscriptionProcessingError, TranscriptionConfigurationError
@@ -19,7 +20,7 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
     def __init__(self, service: ITranscriptionService) -> None:
         self._service = service
 
-    def execute(self, target: ExecutionTarget, workload: TranscriptionWorkload) -> Tuple[bool, Optional[str]]:
+    def execute(self, target: ExecutionTarget, workload: TranscriptionWorkload) -> Tuple[ExecutionOutcome, Optional[str]]:
         # Target identity is preserved but dynamic model switching is bypassed
         # as WhisperTranscriptionService natively enforces configuration via TranscriptionSettings.
 
@@ -40,9 +41,9 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
 
         if exception:
             if isinstance(exception, (TranscriptionProcessingError, TranscriptionConfigurationError)):
-                return False, str(exception)
+                return ExecutionOutcome.FAILED, str(exception)
             # Unexpected errors propagate out of the mechanism
             raise exception
 
         # Success guarantees genuine local inference execution occurred
-        return True, None
+        return ExecutionOutcome.SUCCESS, None

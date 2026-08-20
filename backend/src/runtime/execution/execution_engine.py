@@ -1,9 +1,10 @@
+import traceback
 from typing import Protocol, Optional
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.core.execution_workload import ExecutionWorkload
 from src.runtime.execution.execution_admission import ExecutionAdmission
-from src.runtime.execution.execution_result import ExecutionResult
-from .execution_mechanism_registry import ExecutionMechanismRegistry
+from src.runtime.execution.execution_result import ExecutionResult, ExecutionOutcome
+from .execution_mechanism_registry import ExecutionMechanismRegistry, MechanismResolutionError
 
 class WorkloadCompatibilityError(Exception):
     """Raised when an execution workload fails runtime type compatibility validation."""
@@ -35,26 +36,41 @@ class ExecutionEngine:
         target = admission.execution_target
         workload = admission.execution_workload
 
-        # 1. Resolve mechanism
-        registration = self._mechanism_registry.resolve(
-            target.provider,
-            workload.capability_id
-        )
-
-        # 2. Generic runtime compatibility validation
-        if not isinstance(workload, registration.expected_workload_type):
-            raise WorkloadCompatibilityError(
-                f"Workload of type {type(workload).__name__} is incompatible with "
-                f"expected type {registration.expected_workload_type.__name__}."
+        try:
+            # 1. Resolve mechanism
+            registration = self._mechanism_registry.resolve(
+                target.provider,
+                workload.capability_id
             )
-        
-        # 3. Delegate execution
-        # Expected execution failures are handled gracefully by the mechanism
-        # and returned as a (False, error_message) tuple.
-        is_success, error_message = registration.mechanism.execute(target, workload)
-        
-        return ExecutionResult(
-            execution_target=target,
-            is_success=is_success,
-            error_message=error_message
-        )
+
+            # 2. Generic runtime compatibility validation
+            if not isinstance(workload, registration.expected_workload_type):
+                raise WorkloadCompatibilityError(
+                    f"Workload of type {type(workload).__name__} is incompatible with "
+                    f"expected type {registration.expected_workload_type.__name__}."
+                )
+        except (MechanismResolutionError, WorkloadCompatibilityError) as e:
+            return ExecutionResult(
+                execution_target=target,
+                outcome=ExecutionOutcome.REJECTED,
+                error_message=str(e)
+            )
+
+        try:
+            # 3. Delegate execution
+            # Expected execution failures are handled gracefully by the mechanism
+            # and returned as a (ExecutionOutcome, error_message) tuple.
+            outcome, error_message = registration.mechanism.execute(target, workload)
+            return ExecutionResult(
+                execution_target=target,
+                outcome=outcome,
+                error_message=error_message
+            )
+        except (Exception,) as e:
+            # Unexpected mechanism or provider exceptions are translated to FAILED
+            # rather than leaking out as raw exceptions.
+            return ExecutionResult(
+                execution_target=target,
+                outcome=ExecutionOutcome.FAILED,
+                error_message=f"Unhandled execution exception: {type(e).__name__}: {str(e)}"
+            )

@@ -24,6 +24,7 @@ def test_execution_admission_is_immutable():
 def test_execution_admission_contract():
     fields = inspect.signature(ExecutionAdmission).parameters
     assert "execution_target" in fields
+    assert "outcome" not in fields, "Admission artifact must not fake an outcome"
     assert "is_success" not in fields, "Admission artifact must not fake a success outcome"
     assert "error_message" not in fields
 
@@ -70,6 +71,8 @@ def test_execution_boundary_no_fake_success():
         
     for node in ast.walk(tree):
         if isinstance(node, ast.keyword):
+            if node.arg == 'outcome':
+                pytest.fail("RuntimeExecutionBoundary must not assert 'outcome' before actual execution")
             if node.arg == 'is_success':
                 pytest.fail("RuntimeExecutionBoundary must not assert 'is_success' before actual execution")
 

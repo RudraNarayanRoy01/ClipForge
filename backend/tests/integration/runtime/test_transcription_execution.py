@@ -83,6 +83,7 @@ def test_real_transcription_execution(dummy_wav_path, monkeypatch):
     result = engine.execute(admission)
 
     # 6. Assert genuine execution status (Note: payload propagation is intentionally outside this contract)
-    assert result.is_success is True, f"Whisper inference failed: {result.error_message}"
+    from src.runtime.execution.execution_result import ExecutionOutcome
+    assert result.outcome == ExecutionOutcome.SUCCESS, f"Whisper inference failed: {result.error_message}"
     assert result.error_message is None
     assert result.execution_target == target

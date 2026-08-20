@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar, Optional, Dict, Tuple, Type, Any
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.core.execution_workload import ExecutionWorkload
+from src.runtime.execution.execution_result import ExecutionOutcome
 
 TWorkload = TypeVar("TWorkload", bound=ExecutionWorkload)
 
@@ -13,10 +14,10 @@ class AbstractExecutionMechanism(Generic[TWorkload], ABC):
     Generic over the specific TWorkload it executes.
     Responsible for interpreting provider/environment-specific failures and 
     translating expected execution failures into the neutral execution-mechanism 
-    contract: (False, error_message).
+    contract: (ExecutionOutcome, error_message).
     """
     @abstractmethod
-    def execute(self, target: ExecutionTarget, workload: TWorkload) -> tuple[bool, Optional[str]]:
+    def execute(self, target: ExecutionTarget, workload: TWorkload) -> Tuple[ExecutionOutcome, Optional[str]]:
         ...
 
 @dataclass(frozen=True)

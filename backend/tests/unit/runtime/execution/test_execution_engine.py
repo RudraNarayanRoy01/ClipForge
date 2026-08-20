@@ -5,9 +5,9 @@ from typing import Optional, Any
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.core.execution_workload import ExecutionWorkload
 from src.runtime.execution.execution_admission import ExecutionAdmission
-from src.runtime.execution.execution_result import ExecutionResult
+from src.runtime.execution.execution_result import ExecutionResult, ExecutionOutcome
 from src.runtime.execution.execution_engine import ExecutionEngine, WorkloadCompatibilityError
-from src.runtime.execution.execution_mechanism_registry import ExecutionMechanismRegistry, MechanismRegistration, AbstractExecutionMechanism
+from src.runtime.execution.execution_mechanism_registry import ExecutionMechanismRegistry, MechanismRegistration, AbstractExecutionMechanism, MechanismResolutionError
 
 class DummyWorkload(ExecutionWorkload):
     @property
@@ -25,11 +25,11 @@ class FakeSuccessMechanism(AbstractExecutionMechanism[DummyWorkload]):
         self.received_workload: Optional[Any] = None
         self.invoked = False
 
-    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[bool, Optional[str]]:
+    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[ExecutionOutcome, Optional[str]]:
         self.received_target = target
         self.received_workload = workload
         self.invoked = True
-        return True, None
+        return ExecutionOutcome.SUCCESS, None
 
 class FakeFailureMechanism(AbstractExecutionMechanism[DummyWorkload]):
     def __init__(self) -> None:
@@ -37,14 +37,14 @@ class FakeFailureMechanism(AbstractExecutionMechanism[DummyWorkload]):
         self.received_workload: Optional[Any] = None
         self.invoked = False
 
-    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[bool, Optional[str]]:
+    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[ExecutionOutcome, Optional[str]]:
         self.received_target = target
         self.received_workload = workload
         self.invoked = True
-        return False, "external provider error"
+        return ExecutionOutcome.FAILED, "external provider error"
 
 class FakeExceptionMechanism(AbstractExecutionMechanism[DummyWorkload]):
-    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[bool, Optional[str]]:
+    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[ExecutionOutcome, Optional[str]]:
         raise KeyError("unexpected programming defect")
 
 def _create_target() -> ExecutionTarget:
@@ -79,7 +79,7 @@ def test_target_identity_end_to_end():
     assert mechanism.received_target is target
     assert mechanism.received_workload is workload
     assert result.execution_target is target
-    assert result.is_success is True
+    assert result.outcome == ExecutionOutcome.SUCCESS
     assert result.error_message is None
 
 def test_failure_translation():
@@ -93,7 +93,7 @@ def test_failure_translation():
     result = engine.execute(admission)
 
     assert result.execution_target is target
-    assert result.is_success is False
+    assert result.outcome == ExecutionOutcome.FAILED
     assert result.error_message == "external provider error"
 
 def test_unexpected_error_propagation():
@@ -104,8 +104,12 @@ def test_unexpected_error_propagation():
     registry = _setup_registry(mechanism)
     engine = ExecutionEngine(mechanism_registry=registry)
 
-    with pytest.raises(KeyError, match="unexpected programming defect"):
-        engine.execute(admission)
+    result = engine.execute(admission)
+
+    assert result.execution_target is target
+    assert result.outcome == ExecutionOutcome.FAILED
+    assert "unexpected programming defect" in result.error_message
+    assert "KeyError" in result.error_message
 
 def test_admission_type_enforcement():
     registry = ExecutionMechanismRegistry()
@@ -128,8 +132,23 @@ def test_workload_compatibility_enforcement():
     registry = _setup_registry(mechanism)
     engine = ExecutionEngine(mechanism_registry=registry)
 
-    with pytest.raises(WorkloadCompatibilityError, match="is incompatible with expected type"):
-        engine.execute(admission)
+    result = engine.execute(admission)
+    assert result.execution_target is target
+    assert result.outcome == ExecutionOutcome.REJECTED
+    assert "is incompatible with expected type" in result.error_message
+
+def test_mechanism_resolution_failure():
+    target = _create_target()
+    workload = DummyWorkload()
+    admission = ExecutionAdmission(execution_target=target, execution_workload=workload)
+    registry = ExecutionMechanismRegistry() # Empty registry
+    engine = ExecutionEngine(mechanism_registry=registry)
+
+    result = engine.execute(admission)
+
+    assert result.execution_target is target
+    assert result.outcome == ExecutionOutcome.REJECTED
+    assert "No mechanism registered for provider" in result.error_message
 
 def test_no_internal_registry_construction():
     with pytest.raises(TypeError):

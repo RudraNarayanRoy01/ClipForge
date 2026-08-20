@@ -61,7 +61,8 @@ def test_runtime_execution_boundary_produces_admission():
     result = boundary.execute(target, intent)
 
     assert isinstance(result, ExecutionAdmission)
-    assert not hasattr(result, 'is_success')  # Must not claim success
+    assert not hasattr(result, 'outcome')  # Must not claim success or outcome
+    assert not hasattr(result, 'is_success')
     assert result.execution_workload is workload
     registry.get_normalizer.assert_called_once_with(intent.capability_id)
     normalizer.normalize.assert_called_once_with(intent)
