@@ -115,8 +115,29 @@ def test_admission_type_enforcement():
     registry = ExecutionMechanismRegistry()
     engine = ExecutionEngine(mechanism_registry=registry)
 
-    with pytest.raises(TypeError, match="admission must be an instance of ExecutionAdmission"):
-        engine.execute("fake_admission") # type: ignore
+    result = engine.execute("fake_admission") # type: ignore
+    
+    assert isinstance(result, ExecutionResult)
+    assert result.outcome == ExecutionOutcome.REJECTED
+    assert result.execution_target is None
+    assert "must be an instance of ExecutionAdmission" in result.error_message
+
+
+class FakeMalformedMechanism(AbstractExecutionMechanism[DummyWorkload]):
+    def execute(self, target: ExecutionTarget, workload: DummyWorkload) -> tuple[ExecutionOutcome, Optional[str]]:
+        # Violate the contract by returning a single string
+        return "Not a tuple" # type: ignore
+
+def test_malformed_mechanism_result_raises_type_error():
+    target = _create_target()
+    workload = DummyWorkload()
+    admission = ExecutionAdmission(execution_target=target, execution_workload=workload)
+    mechanism = FakeMalformedMechanism()
+    registry = _setup_registry(mechanism)
+    engine = ExecutionEngine(mechanism_registry=registry)
+
+    with pytest.raises(TypeError, match="Mechanism contract violation"):
+        engine.execute(admission)
 
 class HackedWorkload(ExecutionWorkload):
     @property

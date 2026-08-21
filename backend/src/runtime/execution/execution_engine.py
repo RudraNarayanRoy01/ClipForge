@@ -31,7 +31,11 @@ class ExecutionEngine:
         at runtime, and delegates execution.
         """
         if not isinstance(admission, ExecutionAdmission):
-            raise TypeError("admission must be an instance of ExecutionAdmission")
+            return ExecutionResult(
+                execution_target=getattr(admission, 'execution_target', None),
+                outcome=ExecutionOutcome.REJECTED,
+                error_message="admission must be an instance of ExecutionAdmission"
+            )
             
         target = admission.execution_target
         workload = admission.execution_workload
@@ -60,12 +64,17 @@ class ExecutionEngine:
             # 3. Delegate execution
             # Expected execution failures are handled gracefully by the mechanism
             # and returned as a (ExecutionOutcome, error_message) tuple.
-            outcome, error_message = registration.mechanism.execute(target, workload)
+            result = registration.mechanism.execute(target, workload)
+            if not isinstance(result, tuple) or len(result) != 2:
+                raise TypeError(f"Mechanism contract violation: expected tuple of length 2, got {type(result).__name__}")
+            outcome, error_message = result
             return ExecutionResult(
                 execution_target=target,
                 outcome=outcome,
                 error_message=error_message
             )
+        except TypeError:
+            raise
         except (Exception,) as e:
             # Unexpected mechanism or provider exceptions are translated to FAILED
             # rather than leaking out as raw exceptions.

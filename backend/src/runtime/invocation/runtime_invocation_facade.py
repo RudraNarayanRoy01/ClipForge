@@ -6,7 +6,9 @@ from src.runtime.execution.execution_engine import ExecutionEngine
 from src.runtime.core.intent import ExecutionIntent
 from src.runtime.core.planning_context import PlanningContext
 from src.runtime.core.execution_target import TargetDescription
-from src.runtime.execution.execution_result import ExecutionResult
+from src.runtime.execution.execution_result import ExecutionResult, ExecutionOutcome
+from src.runtime.execution.workload_normalizer import WorkloadNormalizationError
+from src.runtime.execution.workload_normalization_extension import NormalizerResolutionError
 
 
 class RuntimeInvocationFacade:
@@ -50,12 +52,23 @@ class RuntimeInvocationFacade:
         )
 
         if target is None:
-            raise ValueError("No compatible execution target found by decision pipeline.")
+            return ExecutionResult(
+                execution_target=None,
+                outcome=ExecutionOutcome.REJECTED,
+                error_message="No compatible execution target found by decision pipeline."
+            )
 
-        admission = self._boundary.execute(
-            target=target,
-            intent=intent
-        )
+        try:
+            admission = self._boundary.execute(
+                target=target,
+                intent=intent
+            )
+        except (WorkloadNormalizationError, NormalizerResolutionError) as e:
+            return ExecutionResult(
+                execution_target=target,
+                outcome=ExecutionOutcome.REJECTED,
+                error_message=str(e)
+            )
 
         result = self._engine.execute(
             admission=admission

@@ -21,6 +21,6 @@ class ExecutionResult:
     This establishes the provider-neutral, hardware-neutral, and scheduler-neutral 
     contract for the result of an execution.
     """
-    execution_target: ExecutionTarget
+    execution_target: Optional[ExecutionTarget]
     outcome: ExecutionOutcome
     error_message: Optional[str] = None

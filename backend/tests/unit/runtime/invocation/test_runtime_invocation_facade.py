@@ -9,8 +9,9 @@ from src.runtime.core.intent import ExecutionIntent
 from src.runtime.core.planning_context import PlanningContext
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.execution.execution_admission import ExecutionAdmission
-from src.runtime.execution.execution_result import ExecutionResult
-
+from src.runtime.execution.execution_result import ExecutionResult, ExecutionOutcome
+from src.runtime.execution.workload_normalizer import WorkloadNormalizationError
+from src.runtime.execution.workload_normalization_extension import NormalizerResolutionError
 def test_facade_invokes_pipeline_boundary_and_engine_in_order():
     """Test that the facade passes the exact objects between boundaries in order."""
     # 1. Setup mocks
@@ -66,7 +67,7 @@ def test_facade_invokes_pipeline_boundary_and_engine_in_order():
     # Result is exact result from engine
     assert result is sentinel_result
 
-def test_facade_raises_value_error_if_pipeline_returns_no_target():
+def test_facade_returns_rejected_if_pipeline_returns_no_target():
     """Test that the facade rejects execution if decision pipeline yields no target."""
     mock_pipeline = Mock(spec=RuntimePipeline)
     mock_boundary = Mock(spec=RuntimeExecutionBoundary)
@@ -80,12 +81,74 @@ def test_facade_raises_value_error_if_pipeline_returns_no_target():
         engine=mock_engine
     )
     
-    with pytest.raises(ValueError, match="No compatible execution target found by decision pipeline."):
-        facade.invoke(
-            intent=Mock(spec=ExecutionIntent),
-            planning_context=Mock(spec=PlanningContext),
-            available_targets=[]
-        )
+    result = facade.invoke(
+        intent=Mock(spec=ExecutionIntent),
+        planning_context=Mock(spec=PlanningContext),
+        available_targets=[]
+    )
         
+    assert isinstance(result, ExecutionResult)
+    assert result.outcome == ExecutionOutcome.REJECTED
+    assert result.execution_target is None
+    assert "No compatible execution target" in result.error_message
+    
     mock_boundary.execute.assert_not_called()
+    mock_engine.execute.assert_not_called()
+
+
+def test_facade_returns_rejected_if_boundary_fails_normalization():
+    mock_pipeline = Mock(spec=RuntimePipeline)
+    mock_boundary = Mock(spec=RuntimeExecutionBoundary)
+    mock_engine = Mock(spec=ExecutionEngine)
+    
+    sentinel_target = Mock(spec=ExecutionTarget)
+    mock_pipeline.process.return_value = sentinel_target
+    mock_boundary.execute.side_effect = WorkloadNormalizationError("Bad workload")
+    
+    facade = RuntimeInvocationFacade(
+        pipeline=mock_pipeline,
+        boundary=mock_boundary,
+        engine=mock_engine
+    )
+    
+    result = facade.invoke(
+        intent=Mock(spec=ExecutionIntent),
+        planning_context=Mock(spec=PlanningContext),
+        available_targets=[]
+    )
+    
+    assert isinstance(result, ExecutionResult)
+    assert result.outcome == ExecutionOutcome.REJECTED
+    assert result.execution_target is sentinel_target
+    assert "Bad workload" in result.error_message
+    
+    mock_engine.execute.assert_not_called()
+
+
+def test_facade_returns_rejected_if_boundary_fails_resolution():
+    mock_pipeline = Mock(spec=RuntimePipeline)
+    mock_boundary = Mock(spec=RuntimeExecutionBoundary)
+    mock_engine = Mock(spec=ExecutionEngine)
+    
+    sentinel_target = Mock(spec=ExecutionTarget)
+    mock_pipeline.process.return_value = sentinel_target
+    mock_boundary.execute.side_effect = NormalizerResolutionError("No normalizer")
+    
+    facade = RuntimeInvocationFacade(
+        pipeline=mock_pipeline,
+        boundary=mock_boundary,
+        engine=mock_engine
+    )
+    
+    result = facade.invoke(
+        intent=Mock(spec=ExecutionIntent),
+        planning_context=Mock(spec=PlanningContext),
+        available_targets=[]
+    )
+    
+    assert isinstance(result, ExecutionResult)
+    assert result.outcome == ExecutionOutcome.REJECTED
+    assert result.execution_target is sentinel_target
+    assert "No normalizer" in result.error_message
+    
     mock_engine.execute.assert_not_called()
