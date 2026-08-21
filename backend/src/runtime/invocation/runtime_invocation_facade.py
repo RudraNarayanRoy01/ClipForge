@@ -9,6 +9,7 @@ from src.runtime.core.execution_target import TargetDescription
 from src.runtime.execution.execution_result import ExecutionResult, ExecutionOutcome
 from src.runtime.execution.workload_normalizer import WorkloadNormalizationError
 from src.runtime.execution.workload_normalization_extension import NormalizerResolutionError
+from src.runtime.core.providers import RuntimeProviderRegistry
 
 
 class RuntimeInvocationFacade:
@@ -26,25 +27,36 @@ class RuntimeInvocationFacade:
         self,
         pipeline: RuntimePipeline,
         boundary: RuntimeExecutionBoundary,
-        engine: ExecutionEngine
+        engine: ExecutionEngine,
+        provider_registry: RuntimeProviderRegistry
     ) -> None:
         self._pipeline = pipeline
         self._boundary = boundary
         self._engine = engine
+        self._provider_registry = provider_registry
 
     def invoke(
         self,
         intent: ExecutionIntent,
-        planning_context: PlanningContext,
-        available_targets: Sequence[TargetDescription]
+        planning_context: PlanningContext
     ) -> ExecutionResult:
         """
         Orchestrate the transition from decision to execution.
         
-        1. Pass intent to RuntimePipeline to yield an ExecutionTarget.
-        2. Pass target and intent to RuntimeExecutionBoundary to yield an ExecutionAdmission.
-        3. Pass admission to ExecutionEngine to yield an ExecutionResult.
+        1. Query provider registry for available execution targets.
+        2. Pass intent to RuntimePipeline to yield an ExecutionTarget.
+        3. Pass target and intent to RuntimeExecutionBoundary to yield an ExecutionAdmission.
+        4. Pass admission to ExecutionEngine to yield an ExecutionResult.
         """
+        available_targets = [
+            TargetDescription(
+                target_id=reg.descriptor.identity.identifier,
+                target_class=reg.descriptor.category.value,
+                provider=reg.descriptor.identity.identifier,
+            )
+            for reg in self._provider_registry.enumerate_providers()
+        ]
+
         target = self._pipeline.process(
             intent=intent,
             planning_context=planning_context,
