@@ -3,10 +3,13 @@ from src.bootstrap.modules import DIModule
 from src.runtime.execution.execution_mechanism_registry import ExecutionMechanismRegistry
 from src.runtime.execution.workload_normalization_extension import WorkloadNormalizationExtensionPoint
 from src.transcription.interfaces import ITranscriptionService
+from src.transcription.providers.whisper_provider import WhisperTranscriptionService
 from src.transcription.execution.workload import TranscriptionWorkload
 from src.transcription.execution.normalizer import TranscriptionNormalizer
 from src.transcription.execution.mechanism import WhisperExecutionMechanism
-
+from src.runtime.core.providers import RuntimeProviderRegistry, ProviderDescriptor, ProviderIdentity, ProviderCategory
+from src.intelligence.providers.capabilities import IAIProvider
+from src.runtime.execution.mechanisms.llm_execution_mechanism import LLMExecutionMechanism, LLMExecutionWorkload, LLMNormalizer
 class RuntimeModule(DIModule):
     """
     Bootstrap module for Runtime execution architecture.
@@ -21,10 +24,26 @@ class RuntimeModule(DIModule):
         # 1. Provision Registries
         registry = ExecutionMechanismRegistry()
         extension_point = WorkloadNormalizationExtensionPoint()
+        provider_registry = RuntimeProviderRegistry()
+
+        provider_registry.register_provider(ProviderDescriptor(
+            identity=ProviderIdentity("whisper"),
+            display_name="Whisper Transcription",
+            description="Local whisper model",
+            supported_capability_ids=["AUDIO_TRANSCRIPTION"],
+            category=ProviderCategory.AUDIO
+        ))
+
+        provider_registry.register_provider(ProviderDescriptor(
+            identity=ProviderIdentity("ollama"),
+            display_name="Ollama LLM",
+            description="Local reasoning models",
+            supported_capability_ids=["LLM_REASONING"],
+            category=ProviderCategory.REASONING
+        ))
 
         # 2. Wire Transcription (AUDIO_TRANSCRIPTION)
-        # Assumes ITranscriptionService is already registered by InfrastructureModule
-        transcription_service = container.resolve(ITranscriptionService)
+        transcription_service = container.resolve(WhisperTranscriptionService)
         
         from contextlib import asynccontextmanager
         
@@ -49,19 +68,36 @@ class RuntimeModule(DIModule):
             capability_id="AUDIO_TRANSCRIPTION",
             normalizer=TranscriptionNormalizer()
         )
+        
+        # 3. Wire Reasoning (LLM_REASONING)
+        llm_provider = container.resolve(IAIProvider)
+        llm_mechanism = LLMExecutionMechanism(llm_provider)
 
-        # 3. Expose resulting runtime dependencies
+        registry.register(
+            provider_id="ollama",
+            capability_id="LLM_REASONING",
+            expected_type=LLMExecutionWorkload,
+            mechanism=llm_mechanism
+        )
+
+        extension_point.register_normalizer(
+            capability_id="LLM_REASONING",
+            normalizer=LLMNormalizer()
+        )
+
+        # 4. Expose resulting runtime dependencies
         container.register_singleton(ExecutionMechanismRegistry, registry)
         container.register_singleton(WorkloadNormalizationExtensionPoint, extension_point)
+        container.register_singleton(RuntimeProviderRegistry, provider_registry)
 
-        # 4. Expose Runtime Core Execution boundaries
+        # 5. Expose Runtime Core Execution boundaries
         from src.runtime.execution.execution_engine import ExecutionEngine
         from src.runtime.execution.runtime_execution_boundary import RuntimeExecutionBoundary
 
         container.register_singleton(ExecutionEngine, ExecutionEngine)
         container.register_singleton(RuntimeExecutionBoundary, RuntimeExecutionBoundary)
 
-        # 5. Expose Runtime Invocation boundaries
+        # 6. Expose Runtime Invocation boundaries
         pipeline_context = RuntimePipelineFactory.create()
         pipeline = RuntimePipeline(pipeline_context)
         container.register_singleton(RuntimePipeline, pipeline)

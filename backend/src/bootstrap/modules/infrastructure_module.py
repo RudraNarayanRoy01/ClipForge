@@ -13,6 +13,7 @@ from src.infrastructure.ffmpeg_processor import FfmpegVideoProcessor
 from src.config.transcription_settings import TranscriptionSettings
 from src.transcription.interfaces import ITranscriptionService
 from src.transcription.providers.whisper_provider import WhisperTranscriptionService
+from src.infrastructure.runtime_adapters.runtime_transcription_adapter import RuntimeTranscriptionAdapter
 
 class InfrastructureModule(DIModule):
     def register(self, container: Container) -> None:
@@ -60,7 +61,8 @@ class InfrastructureModule(DIModule):
         container.register_singleton(IVideoProcessor, FfmpegVideoProcessor())
         
         # Register Transcription Service
-        def create_transcription_service(c: Container) -> ITranscriptionService:
+        def create_whisper_service(c: Container) -> WhisperTranscriptionService:
             return WhisperTranscriptionService(c.resolve(TranscriptionSettings))
             
-        container.register_factory(ITranscriptionService, create_transcription_service, singleton=True)
+        container.register_factory(WhisperTranscriptionService, create_whisper_service, singleton=True)
+        container.register_transient(ITranscriptionService, RuntimeTranscriptionAdapter)

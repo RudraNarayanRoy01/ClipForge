@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+from src.runtime.core.intent import ExecutionIntent
+from src.runtime.execution.workload_normalizer import WorkloadNormalizer, WorkloadNormalizationError
+
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.core.execution_workload import ExecutionWorkload
 from src.runtime.execution.execution_mechanism_registry import AbstractExecutionMechanism
@@ -45,3 +48,10 @@ class LLMExecutionMechanism(AbstractExecutionMechanism[LLMExecutionWorkload]):
         except Exception as e:
             workload.context.exception = e
             return ExecutionOutcome.FAILED, str(e)
+
+
+class LLMNormalizer(WorkloadNormalizer[LLMExecutionWorkload]):
+    def normalize(self, intent: ExecutionIntent) -> LLMExecutionWorkload:
+        if not isinstance(intent.payload, LLMExecutionWorkload):
+            raise WorkloadNormalizationError(f"Expected LLMExecutionWorkload, got {type(intent.payload)}")
+        return intent.payload

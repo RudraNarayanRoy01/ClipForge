@@ -4,7 +4,7 @@ from src.config.ai_settings import AISettings
 from src.intelligence.providers.capabilities import IAIProvider
 from src.intelligence.providers.ollama.provider import OllamaProvider
 from src.domain.ports import ILLMReasoningEngine
-from src.infrastructure.ai_adapter import AIProviderLLMEngineAdapter
+from src.infrastructure.runtime_adapters.runtime_reasoning_adapter import RuntimeReasoningAdapter
 from src.intelligence.services.campaign_intelligence import CampaignIntelligenceService
 from src.intelligence.interfaces.ai_service import IAIService
 from src.intelligence.orchestration.default_service import DefaultAIService
@@ -28,7 +28,7 @@ class IntelligenceModule(DIModule):
         container.register_factory(IAIProvider, create_provider, singleton=True)
         
         # Register Adapter to ILLMReasoningEngine
-        container.register_transient(ILLMReasoningEngine, AIProviderLLMEngineAdapter)
+        container.register_transient(ILLMReasoningEngine, RuntimeReasoningAdapter)
         
         # Register DefaultAIService
         # Assuming DefaultAIService requires PromptManager and ProviderFactory. 
