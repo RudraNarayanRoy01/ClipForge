@@ -1,21 +1,43 @@
 import pytest
-from unittest.mock import AsyncMock, patch
+import uuid
+from unittest.mock import AsyncMock, MagicMock
+from contextlib import asynccontextmanager
 
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.core.route_decision import RouteDecision
-from src.transcription.dtos import TranscriptionRequest
+from src.runtime.execution.execution_result import ExecutionOutcome
+from src.transcription.dtos import TranscriptionRequest, Transcript
 from src.transcription.execution.workload import TranscriptionWorkload
 from src.transcription.execution.mechanism import WhisperExecutionMechanism
 from src.transcription.exceptions import TranscriptionProcessingError, TranscriptionConfigurationError
-from src.transcription.interfaces import ITranscriptionService
+from src.transcription.interfaces import ITranscriptionService, ITranscriptRepository
 
 @pytest.fixture
 def mock_service():
     return AsyncMock(spec=ITranscriptionService)
 
 @pytest.fixture
+def mock_repo():
+    return AsyncMock(spec=ITranscriptRepository)
+
+@pytest.fixture
+def mock_repo_factory(mock_repo):
+    @asynccontextmanager
+    async def factory():
+        yield mock_repo
+    return factory
+
+@pytest.fixture
 def dummy_workload():
     req = TranscriptionRequest(media_path="dummy.wav")
+    return TranscriptionWorkload(request=req)
+
+@pytest.fixture
+def dummy_workload_with_video():
+    req = TranscriptionRequest(
+        media_path="dummy.wav",
+        video_asset_id=uuid.uuid4()
+    )
     return TranscriptionWorkload(request=req)
 
 @pytest.fixture
@@ -36,20 +58,61 @@ def dummy_target():
         provider="whisper"
     )
 
-def test_whisper_mechanism_success(mock_service, dummy_target, dummy_workload):
+def test_whisper_mechanism_success_with_persistence(mock_service, mock_repo_factory, mock_repo, dummy_target, dummy_workload_with_video):
     # Setup
-    mock_transcript = {"text": "Hello world"}
+    mock_transcript = Transcript(full_text="Hello world", segments=[])
     mock_service.transcribe.return_value = mock_transcript
 
-    mechanism = WhisperExecutionMechanism(mock_service)
+    mechanism = WhisperExecutionMechanism(mock_service, repo_factory=mock_repo_factory)
 
     # Execute
-    success, error = mechanism.execute(dummy_target, dummy_workload)
+    outcome, error = mechanism.execute(dummy_target, dummy_workload_with_video)
 
     # Assert
-    assert success is True
+    assert outcome == ExecutionOutcome.SUCCESS
+    assert error is None
+    mock_service.transcribe.assert_called_once_with(dummy_workload_with_video.request)
+    
+    # Verify EXACT object identity reaches persistence
+    mock_repo.save_transcript.assert_called_once_with(
+        dummy_workload_with_video.request.video_asset_id,
+        mock_transcript
+    )
+    
+    saved_transcript = mock_repo.save_transcript.call_args.args[1]
+    assert saved_transcript is mock_transcript
+
+def test_whisper_mechanism_success_missing_video_id(mock_service, mock_repo_factory, mock_repo, dummy_target, dummy_workload):
+    # Setup
+    mock_transcript = Transcript(full_text="Hello world", segments=[])
+    mock_service.transcribe.return_value = mock_transcript
+
+    mechanism = WhisperExecutionMechanism(mock_service, repo_factory=mock_repo_factory)
+
+    # Execute
+    outcome, error = mechanism.execute(dummy_target, dummy_workload)
+
+    # Assert
+    assert outcome == ExecutionOutcome.SUCCESS
     assert error is None
     mock_service.transcribe.assert_called_once_with(dummy_workload.request)
+    # Verify persistence skipped
+    mock_repo.save_transcript.assert_not_called()
+
+def test_whisper_mechanism_persistence_failure_translates_to_failed(mock_service, mock_repo_factory, mock_repo, dummy_target, dummy_workload_with_video):
+    # Setup
+    mock_transcript = Transcript(full_text="Hello world", segments=[])
+    mock_service.transcribe.return_value = mock_transcript
+    mock_repo.save_transcript.side_effect = ValueError("Database connection lost")
+
+    mechanism = WhisperExecutionMechanism(mock_service, repo_factory=mock_repo_factory)
+
+    # Execute
+    outcome, error = mechanism.execute(dummy_target, dummy_workload_with_video)
+
+    # Assert
+    assert outcome == ExecutionOutcome.FAILED
+    assert "Database connection lost" in error
 
 def test_whisper_mechanism_processing_error_translation(mock_service, dummy_target, dummy_workload):
     # Setup
@@ -57,10 +120,10 @@ def test_whisper_mechanism_processing_error_translation(mock_service, dummy_targ
     mechanism = WhisperExecutionMechanism(mock_service)
 
     # Execute
-    success, error = mechanism.execute(dummy_target, dummy_workload)
+    outcome, error = mechanism.execute(dummy_target, dummy_workload)
 
     # Assert
-    assert success is False
+    assert outcome == ExecutionOutcome.FAILED
     assert error == "Failed inference"
 
 def test_whisper_mechanism_configuration_error_translation(mock_service, dummy_target, dummy_workload):
@@ -69,10 +132,10 @@ def test_whisper_mechanism_configuration_error_translation(mock_service, dummy_t
     mechanism = WhisperExecutionMechanism(mock_service)
 
     # Execute
-    success, error = mechanism.execute(dummy_target, dummy_workload)
+    outcome, error = mechanism.execute(dummy_target, dummy_workload)
 
     # Assert
-    assert success is False
+    assert outcome == ExecutionOutcome.FAILED
     assert error == "Invalid model"
 
 def test_whisper_mechanism_unexpected_error_propagation(mock_service, dummy_target, dummy_workload):
@@ -80,6 +143,10 @@ def test_whisper_mechanism_unexpected_error_propagation(mock_service, dummy_targ
     mock_service.transcribe.side_effect = ValueError("Unexpected bug")
     mechanism = WhisperExecutionMechanism(mock_service)
 
-    # Execute and Assert
-    with pytest.raises(ValueError, match="Unexpected bug"):
-        mechanism.execute(dummy_target, dummy_workload)
+    # Execute
+    outcome, error = mechanism.execute(dummy_target, dummy_workload)
+
+    # Assert
+    assert outcome == ExecutionOutcome.FAILED
+    assert "Unexpected bug" in error
+

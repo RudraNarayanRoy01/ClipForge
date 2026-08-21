@@ -56,6 +56,7 @@ class TranscriptionRequest(BaseModel):
     language_hint: Optional[str] = None
     prompt: Optional[str] = Field(default=None, description="Optional prompt to guide transcription context")
     detect_speakers: bool = False
+    video_asset_id: Optional[uuid.UUID] = None
     
     class Config:
         frozen = True

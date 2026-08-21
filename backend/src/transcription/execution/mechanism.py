@@ -1,12 +1,12 @@
 import asyncio
 import threading
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Callable, AsyncContextManager
 
 from src.runtime.core.execution_target import ExecutionTarget
 from src.runtime.execution.execution_mechanism_registry import AbstractExecutionMechanism
 from src.runtime.execution.execution_result import ExecutionOutcome
 from src.transcription.execution.workload import TranscriptionWorkload
-from src.transcription.interfaces import ITranscriptionService
+from src.transcription.interfaces import ITranscriptionService, ITranscriptRepository
 from src.transcription.exceptions import TranscriptionProcessingError, TranscriptionConfigurationError
 
 class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload]):
@@ -17,8 +17,13 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
     Runtime execution boundary, executing fully decoupled from Runtime Core.
     """
 
-    def __init__(self, service: ITranscriptionService) -> None:
+    def __init__(
+        self,
+        service: ITranscriptionService,
+        repo_factory: Optional[Callable[[], AsyncContextManager[ITranscriptRepository]]] = None
+    ) -> None:
         self._service = service
+        self._repo_factory = repo_factory
 
     def execute(self, target: ExecutionTarget, workload: TranscriptionWorkload) -> Tuple[ExecutionOutcome, Optional[str]]:
         # Target identity is preserved but dynamic model switching is bypassed
@@ -31,7 +36,17 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
             nonlocal result, exception
             try:
                 # Bridge the async transcription call safely within a new thread
-                result = asyncio.run(self._service.transcribe(workload.request))
+                async def transcribe_and_persist():
+                    transcript = await self._service.transcribe(workload.request)
+                    
+                    # Optional persistence using mechanism-level domain sink
+                    if getattr(workload.request, "video_asset_id", None) and self._repo_factory:
+                        async with self._repo_factory() as repository:
+                            await repository.save_transcript(workload.request.video_asset_id, transcript)
+                            
+                    return transcript
+
+                result = asyncio.run(transcribe_and_persist())
             except Exception as e:
                 exception = e
 
@@ -42,8 +57,9 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
         if exception:
             if isinstance(exception, (TranscriptionProcessingError, TranscriptionConfigurationError)):
                 return ExecutionOutcome.FAILED, str(exception)
-            # Unexpected errors propagate out of the mechanism
-            raise exception
+            # Persistence errors or unexpected issues correctly translate to FAILED
+            # to strictly prevent false SUCCESS reporting when artifacts are lost.
+            return ExecutionOutcome.FAILED, str(exception)
 
-        # Success guarantees genuine local inference execution occurred
+        # Success guarantees genuine local inference and persistence occurred
         return ExecutionOutcome.SUCCESS, None

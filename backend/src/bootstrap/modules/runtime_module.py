@@ -25,7 +25,18 @@ class RuntimeModule(DIModule):
         # 2. Wire Transcription (AUDIO_TRANSCRIPTION)
         # Assumes ITranscriptionService is already registered by InfrastructureModule
         transcription_service = container.resolve(ITranscriptionService)
-        whisper_mechanism = WhisperExecutionMechanism(transcription_service)
+        
+        from contextlib import asynccontextmanager
+        
+        @asynccontextmanager
+        async def transcript_repository_factory():
+            from src.infrastructure.database import AsyncSessionLocal
+            from src.repositories.transcript_repository import TranscriptRepository
+            
+            async with AsyncSessionLocal() as session:
+                yield TranscriptRepository(session)
+                
+        whisper_mechanism = WhisperExecutionMechanism(transcription_service, repo_factory=transcript_repository_factory)
 
         registry.register(
             provider_id="whisper",
