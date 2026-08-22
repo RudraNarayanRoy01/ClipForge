@@ -62,7 +62,11 @@ class InfrastructureModule(DIModule):
         
         # Register Transcription Service
         def create_whisper_service(c: Container) -> WhisperTranscriptionService:
-            return WhisperTranscriptionService(c.resolve(TranscriptionSettings))
+            settings = c.resolve(TranscriptionSettings)
+            return WhisperTranscriptionService(
+                beam_size=settings.transcription_beam_size,
+                default_language=settings.transcription_language
+            )
             
         container.register_factory(WhisperTranscriptionService, create_whisper_service, singleton=True)
         container.register_transient(ITranscriptionService, RuntimeTranscriptionAdapter)

@@ -42,11 +42,10 @@ def test_real_transcription_execution(dummy_wav_path, monkeypatch):
     # 1. Boot the actual container
     container = initialize_container()
 
-    from src.runtime.execution.runtime_execution_boundary import RuntimeExecutionBoundary
-    from src.runtime.execution.execution_engine import ExecutionEngine
+    from src.runtime.invocation.runtime_invocation_facade import RuntimeInvocationFacade
+    from src.runtime.core.planning_context import PlanningContext
 
-    boundary = container.resolve(RuntimeExecutionBoundary)
-    engine = container.resolve(ExecutionEngine)
+    facade = container.resolve(RuntimeInvocationFacade)
 
     # 2. Formulate Intent
     intent = ExecutionIntent(
@@ -59,31 +58,35 @@ def test_real_transcription_execution(dummy_wav_path, monkeypatch):
         }
     )
 
-    # 3. Construct target routing decisions (Runtime Core planning output mock)
-    from src.runtime.core.planning_result import PlanningResult
-    from src.runtime.core.policy_decision import PolicyDecision
-
-    planning = PlanningResult(intent, "direct")
-    policy = PolicyDecision(planning, True, "default", True)
-    route = RouteDecision(policy, "local", True, True)
-
-    target = ExecutionTarget(
-        route_decision=route,
-        target_id="local_whisper_1",
-        target_class="local",
-        provider="whisper"
+    # 3. Construct PlanningContext
+    planning_context = PlanningContext(
+        quality_preference="balanced",
+        latency_preference="balanced",
+        cost_preference="balanced",
+        locality_preference="local",
+        constraints=tuple()
     )
 
-    # 4. Invoke the composed Runtime Execution Boundary
-    # This allows the boundary to resolve the normalizer and construct ExecutionAdmission
-    admission = boundary.execute(target, intent)
+    # 4. Invoke the complete Runtime Invocation Facade
+    # This automatically processes the TargetDescription metadata created by RuntimeModule
+    result = facade.invoke(intent, planning_context)
 
-    # 5. Execute through the actual composed Runtime Engine
-    # This proves ExecutionEngine -> Registry -> Mechanism -> Provider path
-    result = engine.execute(admission)
-
-    # 6. Assert genuine execution status (Note: payload propagation is intentionally outside this contract)
+    # 5. Assert genuine execution status and configuration transport
     from src.runtime.execution.execution_result import ExecutionOutcome
     assert result.outcome == ExecutionOutcome.SUCCESS, f"Whisper inference failed: {result.error_message}"
     assert result.error_message is None
-    assert result.execution_target == target
+    
+    # Prove the configuration flow reached the ExecutionTarget
+    target = result.execution_target
+    assert target is not None
+    assert target.model == "tiny"
+    assert target.device == "cpu"
+    # compute_class defaults to None if not specified in env for the default settings, or 'default'
+    # We just ensure it was carried through.
+    
+    # 6. Prove the concrete provider no longer has the global settings object
+    from src.transcription.providers.whisper_provider import WhisperTranscriptionService
+    whisper_service = container.resolve(WhisperTranscriptionService)
+    assert not hasattr(whisper_service, '_settings'), "Provider must not own global settings"
+    assert whisper_service._current_model == "tiny", "Provider must have loaded the explicitly requested model"
+    assert whisper_service._current_device == "cpu", "Provider must have loaded on the explicitly requested device"

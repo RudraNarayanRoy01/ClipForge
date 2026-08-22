@@ -42,7 +42,11 @@ class LLMExecutionMechanism(AbstractExecutionMechanism[LLMExecutionWorkload]):
         try:
             # We run the async generate call within a synchronous wrapper.
             # This aligns with the ExecutionEngine's synchronous dispatch.
-            response = asyncio.run(self._provider.generate(workload.context.request))
+            response = asyncio.run(self._provider.generate(
+                workload.context.request,
+                model=target.model,
+                timeout_seconds=target.timeout_seconds
+            ))
             workload.context.response = response
             return ExecutionOutcome.SUCCESS, None
         except Exception as e:

@@ -17,6 +17,8 @@ class TargetDescription:
     provider: str
     model: Optional[str] = None
     compute_class: Optional[str] = None
+    device: Optional[str] = None
+    timeout_seconds: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -40,3 +42,5 @@ class ExecutionTarget:
     provider: str
     model: Optional[str] = None
     compute_class: Optional[str] = None
+    device: Optional[str] = None
+    timeout_seconds: Optional[int] = None

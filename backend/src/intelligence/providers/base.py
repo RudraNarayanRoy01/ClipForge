@@ -1,6 +1,7 @@
 import time
 import logging
 from abc import ABC, abstractmethod
+from typing import Any
 
 from src.intelligence.schemas.ai_models import AIRequest, AIResponse
 
@@ -22,7 +23,7 @@ class BaseProvider(ABC):
         pass
 
     @abstractmethod
-    async def _do_generate(self, request: AIRequest) -> AIResponse:
+    async def _do_generate(self, request: AIRequest, **kwargs: Any) -> AIResponse:
         """
         Inner method implemented by concrete providers.
         Responsible for translating AIRequest -> API payload -> AIResponse.
@@ -30,25 +31,25 @@ class BaseProvider(ABC):
         pass
         
     @abstractmethod
-    def _translate_exception(self, e: Exception) -> Exception:
+    def _translate_exception(self, e: Exception, **kwargs: Any) -> Exception:
         """
         Hook for concrete providers to translate SDK/HTTP exceptions 
         into standard AIExceptions defined in src.intelligence.exceptions.ai.
         """
         pass
 
-    async def generate(self, request: AIRequest) -> AIResponse:
+    async def generate(self, request: AIRequest, **kwargs: Any) -> AIResponse:
         """Wrapper method that handles timing, logging, and exception translation."""
         start_time = time.time()
         success = False
         error_msg = None
         
         try:
-            response = await self._do_generate(request)
+            response = await self._do_generate(request, **kwargs)
             success = True
             return response
         except Exception as e:
-            translated_e = self._translate_exception(e)
+            translated_e = self._translate_exception(e, **kwargs)
             error_msg = str(translated_e)
             raise translated_e from e
         finally:

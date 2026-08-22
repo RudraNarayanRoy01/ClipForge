@@ -37,7 +37,12 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
             try:
                 # Bridge the async transcription call safely within a new thread
                 async def transcribe_and_persist():
-                    transcript = await self._service.transcribe(workload.context.request)
+                    transcript = await self._service.transcribe(
+                        workload.context.request,
+                        model=target.model,
+                        device=target.device,
+                        compute_class=target.compute_class
+                    )
                     
                     # Optional persistence using mechanism-level domain sink
                     if getattr(workload.context.request, "video_asset_id", None) and self._repo_factory:

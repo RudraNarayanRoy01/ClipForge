@@ -29,5 +29,5 @@ class IAIProvider(Protocol):
     Unified contract for all future AI Providers.
     Replaces fragmented modality interfaces by operating exclusively on AIRequest -> AIResponse.
     """
-    async def generate(self, request: AIRequest) -> AIResponse:
+    async def generate(self, request: AIRequest, **kwargs: Any) -> AIResponse:
         ...

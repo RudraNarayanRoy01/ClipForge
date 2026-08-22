@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import uuid
-from typing import List, Optional
+from typing import List, Optional, Any
 from .dtos import TranscriptionRequest, Transcript, TranscriptSearchResult
 
 class ITranscriptRepository(ABC):
@@ -46,7 +46,7 @@ class ITranscriptionService(ABC):
     """
     
     @abstractmethod
-    async def transcribe(self, request: TranscriptionRequest) -> Transcript:
+    async def transcribe(self, request: TranscriptionRequest, **kwargs: Any) -> Transcript:
         """
         Process media and return a unified transcript.
         

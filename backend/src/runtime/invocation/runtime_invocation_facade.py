@@ -51,8 +51,12 @@ class RuntimeInvocationFacade:
         available_targets = [
             TargetDescription(
                 target_id=reg.descriptor.identity.identifier,
-                target_class=reg.descriptor.category.value,
+                target_class=reg.descriptor.metadata.get("target_class", "local") if not hasattr(reg.descriptor.category, 'value') else reg.descriptor.metadata.get("target_class", reg.descriptor.category.value),
                 provider=reg.descriptor.identity.identifier,
+                model=reg.descriptor.metadata.get("model"),
+                device=reg.descriptor.metadata.get("device"),
+                compute_class=reg.descriptor.metadata.get("compute_class"),
+                timeout_seconds=reg.descriptor.metadata.get("timeout_seconds"),
             )
             for reg in self._provider_registry.enumerate_providers()
         ]

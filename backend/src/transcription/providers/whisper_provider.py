@@ -1,6 +1,6 @@
 import os
 import asyncio
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Any
 
 if TYPE_CHECKING:
     from faster_whisper import WhisperModel  # type: ignore
@@ -17,7 +17,7 @@ from src.transcription.exceptions import (
     TranscriptionProcessingError,
     TranscriptionConfigurationError
 )
-from src.config.transcription_settings import TranscriptionSettings
+
 
 
 class WhisperTranscriptionService(ITranscriptionService):
@@ -25,22 +25,36 @@ class WhisperTranscriptionService(ITranscriptionService):
     Concrete implementation of ITranscriptionService using Faster-Whisper.
     """
     
-    def __init__(self, settings: TranscriptionSettings):
-        self._settings = settings
+    def __init__(self, beam_size: int, default_language: str):
+        self._beam_size = beam_size
+        self._default_language = default_language
+        
         self._model: Optional["WhisperModel"] = None
         self._model_lock = asyncio.Lock()
         
-    async def _ensure_model_loaded(self) -> None:
+        # Track currently loaded configuration
+        self._current_model: Optional[str] = None
+        self._current_device: Optional[str] = None
+        self._current_compute_class: Optional[str] = None
+        
+    async def _ensure_model_loaded(self, model: str, device: str, compute_class: str) -> None:
         """
         Lazily load the Whisper model once. 
-        Reuse it for subsequent requests to avoid high loading overhead.
+        Reuse it for subsequent requests to avoid high loading overhead,
+        but reload if the Runtime requests a different model/device/compute configuration.
         """
-        if self._model is not None:
+        if (self._model is not None and 
+            self._current_model == model and 
+            self._current_device == device and 
+            self._current_compute_class == compute_class):
             return
             
         async with self._model_lock:
             # Double-check pattern to prevent race conditions
-            if self._model is not None:
+            if (self._model is not None and 
+                self._current_model == model and 
+                self._current_device == device and 
+                self._current_compute_class == compute_class):
                 return
                 
             try:
@@ -48,11 +62,16 @@ class WhisperTranscriptionService(ITranscriptionService):
                 def load_model() -> "WhisperModel":
                     from faster_whisper import WhisperModel  # type: ignore
                     return WhisperModel(
-                        model_size_or_path=self._settings.transcription_model,
-                        device=self._settings.transcription_device,
-                        compute_type=self._settings.transcription_compute_type,
+                        model_size_or_path=model,
+                        device=device,
+                        compute_type=compute_class,
                     )
                 self._model = await asyncio.to_thread(load_model)
+                
+                # Update tracked state
+                self._current_model = model
+                self._current_device = device
+                self._current_compute_class = compute_class
             except ValueError as e:
                 # Typically happens if device or compute_type are invalid
                 raise TranscriptionConfigurationError(
@@ -64,17 +83,21 @@ class WhisperTranscriptionService(ITranscriptionService):
                     f"Failed to load Faster-Whisper model: {str(e)}"
                 ) from e
 
-    async def transcribe(self, request: TranscriptionRequest) -> Transcript:
+    async def transcribe(self, request: TranscriptionRequest, **kwargs: Any) -> Transcript:
         """
         Transcribe the provided media file.
         """
         if not os.path.isfile(request.media_path):
             raise TranscriptionProcessingError(f"Media file not found: {request.media_path}")
             
-        await self._ensure_model_loaded()
+        model = kwargs.get("model", "base")
+        device = kwargs.get("device", "cpu")
+        compute_class = kwargs.get("compute_class", "default")
+            
+        await self._ensure_model_loaded(model, device, compute_class)
         
-        language = request.language_hint or self._settings.transcription_language
-        beam_size = self._settings.transcription_beam_size
+        language = request.language_hint or self._default_language
+        beam_size = self._beam_size
         
         try:
             # Both transcribe() and iterating over the segments block the thread.
@@ -129,7 +152,7 @@ class WhisperTranscriptionService(ITranscriptionService):
                     "language_probability": getattr(info, "language_probability", None),
                     "duration": getattr(info, "duration", None),
                     "provider": "faster-whisper",
-                    "model": self._settings.transcription_model
+                    "model": model
                 }
                 
                 return Transcript(

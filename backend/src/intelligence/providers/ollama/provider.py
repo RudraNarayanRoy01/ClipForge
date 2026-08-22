@@ -3,7 +3,7 @@ import httpx
 from typing import Any
 from pydantic import ValidationError
 
-from src.config.ai_settings import AISettings
+
 from src.intelligence.schemas.ai_models import AIRequest, AIResponse
 from src.intelligence.providers.base import BaseProvider
 from src.intelligence.providers.ollama.client import OllamaClient
@@ -21,21 +21,23 @@ class OllamaProvider(BaseProvider):
     Acts purely as an adapter, translating AIRequest to Ollama API payloads
     and translating responses/exceptions.
     """
-    def __init__(self, settings: AISettings, http_client: httpx.AsyncClient):
-        self._settings = settings
-        self._base_url = self._settings.ollama_host.rstrip('/')
+    def __init__(self, host: str, default_temperature: float, http_client: httpx.AsyncClient):
+        self._host = host.rstrip('/')
+        self._default_temperature = default_temperature
         self._client = OllamaClient(http_client)
 
     @property
     def provider_id(self) -> str:
         return "ollama"
 
-    async def _do_generate(self, request: AIRequest) -> AIResponse:
-        url = f"{self._base_url}/api/generate"
+    async def _do_generate(self, request: AIRequest, **kwargs: Any) -> AIResponse:
+        url = f"{self._host}/api/generate"
+        
+        model = kwargs.get("model", "llama3") # fallback if missing
         
         # Build payload mapping AIRequest to Ollama API
         payload: dict[str, Any] = {
-            "model": self._settings.ollama_model,
+            "model": model,
             "prompt": request.prompt,
             "stream": False,
             "options": {}
@@ -44,7 +46,7 @@ class OllamaProvider(BaseProvider):
         if request.system_prompt:
             payload["system"] = request.system_prompt
             
-        temperature = request.temperature if request.temperature is not None else self._settings.ai_temperature
+        temperature = request.temperature if request.temperature is not None else self._default_temperature
         if temperature is not None:
             payload["options"]["temperature"] = temperature
             
@@ -55,7 +57,7 @@ class OllamaProvider(BaseProvider):
         if request.response_schema is not None:
             payload["format"] = request.response_schema.schema()
 
-        timeout = self._settings.ai_timeout_seconds
+        timeout = kwargs.get("timeout_seconds", 60)
         
         # Execute request (measuring latency for AIResponse)
         start_time = time.time()
@@ -77,7 +79,7 @@ class OllamaProvider(BaseProvider):
             text=text,
             structured_output=structured_output,
             provider=self.provider_id,
-            model=self._settings.ollama_model,
+            model=model,
             latency_ms=latency_ms,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
@@ -85,17 +87,18 @@ class OllamaProvider(BaseProvider):
             raw_response=raw_response
         )
 
-    def _translate_exception(self, e: Exception) -> Exception:
+    def _translate_exception(self, e: Exception, **kwargs: Any) -> Exception:
         """
         Translates native httpx and pydantic exceptions to standard AI exceptions.
         """
+        model = kwargs.get("model", "unknown")
         if isinstance(e, httpx.TimeoutException):
             return AITimeoutError(f"Ollama request timed out: {e}")
         elif isinstance(e, httpx.ConnectError):
-            return AIConnectionError(f"Failed to connect to Ollama at {self._settings.ollama_host}: {e}")
+            return AIConnectionError(f"Failed to connect to Ollama at {self._host}: {e}")
         elif isinstance(e, httpx.HTTPStatusError):
             if e.response.status_code == 404:
-                return ModelNotAvailableError(f"Model '{self._settings.ollama_model}' not found in Ollama: {e.response.text}")
+                return ModelNotAvailableError(f"Model '{model}' not found in Ollama: {e.response.text}")
             return AIProviderError(f"Ollama returned HTTP {e.response.status_code}: {e.response.text}")
         elif isinstance(e, ValidationError):
             return AIResponseValidationError(f"Ollama failed to return valid JSON matching the requested schema: {e}")

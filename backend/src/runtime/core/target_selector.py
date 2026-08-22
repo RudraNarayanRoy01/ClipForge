@@ -55,5 +55,7 @@ class TargetSelector:
             target_class=target.target_class,
             provider=target.provider,
             model=target.model,
-            compute_class=target.compute_class
+            compute_class=target.compute_class,
+            device=target.device,
+            timeout_seconds=target.timeout_seconds
         )

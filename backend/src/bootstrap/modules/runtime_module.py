@@ -26,12 +26,24 @@ class RuntimeModule(DIModule):
         extension_point = WorkloadNormalizationExtensionPoint()
         provider_registry = RuntimeProviderRegistry()
 
+        from src.config.ai_settings import AISettings
+        from src.config.transcription_settings import TranscriptionSettings
+        
+        ai_settings = container.resolve(AISettings)
+        transcription_settings = container.resolve(TranscriptionSettings)
+
         provider_registry.register_provider(ProviderDescriptor(
             identity=ProviderIdentity("whisper"),
             display_name="Whisper Transcription",
             description="Local whisper model",
             supported_capability_ids=["AUDIO_TRANSCRIPTION"],
-            category=ProviderCategory.AUDIO
+            category=ProviderCategory.AUDIO,
+            metadata={
+                "target_class": "local",
+                "model": transcription_settings.transcription_model,
+                "device": transcription_settings.transcription_device,
+                "compute_class": transcription_settings.transcription_compute_type,
+            }
         ))
 
         provider_registry.register_provider(ProviderDescriptor(
@@ -39,7 +51,12 @@ class RuntimeModule(DIModule):
             display_name="Ollama LLM",
             description="Local reasoning models",
             supported_capability_ids=["LLM_REASONING"],
-            category=ProviderCategory.REASONING
+            category=ProviderCategory.REASONING,
+            metadata={
+                "target_class": "local",
+                "model": ai_settings.ollama_model,
+                "timeout_seconds": ai_settings.ai_timeout_seconds,
+            }
         ))
 
         # 2. Wire Transcription (AUDIO_TRANSCRIPTION)
