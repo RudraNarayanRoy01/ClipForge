@@ -21,10 +21,9 @@ class OllamaProvider(BaseProvider):
     Acts purely as an adapter, translating AIRequest to Ollama API payloads
     and translating responses/exceptions.
     """
-    def __init__(self, host: str, default_temperature: float, http_client: httpx.AsyncClient):
+    def __init__(self, host: str, default_temperature: float):
         self._host = host.rstrip('/')
         self._default_temperature = default_temperature
-        self._client = OllamaClient(http_client)
 
     @property
     def provider_id(self) -> str:
@@ -61,7 +60,11 @@ class OllamaProvider(BaseProvider):
         
         # Execute request (measuring latency for AIResponse)
         start_time = time.time()
-        raw_response = await self._client.generate(url, payload, timeout)
+        
+        async with httpx.AsyncClient(timeout=timeout) as http_client:
+            ollama_client = OllamaClient(http_client)
+            raw_response = await ollama_client.generate(url, payload, timeout)
+            
         latency_ms = int((time.time() - start_time) * 1000)
 
         # Parse response

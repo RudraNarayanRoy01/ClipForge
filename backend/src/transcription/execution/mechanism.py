@@ -59,7 +59,11 @@ class WhisperExecutionMechanism(AbstractExecutionMechanism[TranscriptionWorkload
 
         t = threading.Thread(target=_runner)
         t.start()
-        t.join()
+        t.join(timeout=target.timeout_seconds)
+
+        if t.is_alive():
+            # Thread is orphaned due to timeout
+            return ExecutionOutcome.FAILED, f"Whisper transcription timed out after {target.timeout_seconds}s"
 
         if exception:
             if isinstance(exception, (TranscriptionProcessingError, TranscriptionConfigurationError)):

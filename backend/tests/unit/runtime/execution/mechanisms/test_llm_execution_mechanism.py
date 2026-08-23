@@ -15,7 +15,7 @@ def test_llm_execution_mechanism_success():
     mock_response = Mock(spec=AIResponse)
     
     # Provider generate is async
-    async def mock_generate(request):
+    async def mock_generate(request, model=None, timeout_seconds=None):
         return mock_response
     mock_provider.generate = mock_generate
     
@@ -37,7 +37,7 @@ def test_llm_execution_mechanism_success():
 def test_llm_execution_mechanism_failure():
     mock_provider = Mock(spec=IAIProvider)
     
-    async def mock_generate(request):
+    async def mock_generate(request, model=None, timeout_seconds=None):
         raise ValueError("Provider error")
     mock_provider.generate = mock_generate
     

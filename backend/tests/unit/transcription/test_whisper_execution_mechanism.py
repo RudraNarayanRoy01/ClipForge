@@ -71,7 +71,12 @@ def test_whisper_mechanism_success_with_persistence(mock_service, mock_repo_fact
     # Assert
     assert outcome == ExecutionOutcome.SUCCESS
     assert error is None
-    mock_service.transcribe.assert_called_once_with(dummy_workload_with_video.request)
+    mock_service.transcribe.assert_called_once_with(
+        dummy_workload_with_video.request,
+        model=dummy_target.model,
+        device=dummy_target.device,
+        compute_class=dummy_target.compute_class
+    )
     
     # Verify EXACT object identity reaches persistence
     mock_repo.save_transcript.assert_called_once_with(
@@ -95,7 +100,12 @@ def test_whisper_mechanism_success_missing_video_id(mock_service, mock_repo_fact
     # Assert
     assert outcome == ExecutionOutcome.SUCCESS
     assert error is None
-    mock_service.transcribe.assert_called_once_with(dummy_workload.request)
+    mock_service.transcribe.assert_called_once_with(
+        dummy_workload.request,
+        model=dummy_target.model,
+        device=dummy_target.device,
+        compute_class=dummy_target.compute_class
+    )
     # Verify persistence skipped
     mock_repo.save_transcript.assert_not_called()
 
@@ -150,3 +160,68 @@ def test_whisper_mechanism_unexpected_error_propagation(mock_service, dummy_targ
     assert outcome == ExecutionOutcome.FAILED
     assert "Unexpected bug" in error
 
+def test_whisper_mechanism_timeout_enforcement(mock_service, dummy_workload):
+    from src.runtime.core.execution_target import ExecutionTarget
+    from src.runtime.core.route_decision import RouteDecision
+    from src.runtime.core.intent import ExecutionIntent
+    from src.runtime.core.planning_result import PlanningResult
+    from src.runtime.core.policy_decision import PolicyDecision
+    
+    intent = ExecutionIntent(capability_id="AUDIO_TRANSCRIPTION", payload={})
+    planning = PlanningResult(intent, "direct")
+    policy = PolicyDecision(planning, True, "default", True)
+    route = RouteDecision(policy, "local", True, True)
+
+    target_with_timeout = ExecutionTarget(
+        route_decision=route,
+        target_id="target_1",
+        target_class="local",
+        provider="whisper",
+        timeout_seconds=0.1
+    )
+    
+    import asyncio
+    async def slow_transcribe(*args, **kwargs):
+        await asyncio.sleep(0.3)
+        return Transcript(full_text="Late", segments=[])
+        
+    mock_service.transcribe.side_effect = slow_transcribe
+    mechanism = WhisperExecutionMechanism(mock_service)
+
+    outcome, error = mechanism.execute(target_with_timeout, dummy_workload)
+
+    assert outcome == ExecutionOutcome.FAILED
+    assert "timed out after 0.1s" in error
+
+def test_whisper_mechanism_timeout_success(mock_service, dummy_workload):
+    from src.runtime.core.execution_target import ExecutionTarget
+    from src.runtime.core.route_decision import RouteDecision
+    from src.runtime.core.intent import ExecutionIntent
+    from src.runtime.core.planning_result import PlanningResult
+    from src.runtime.core.policy_decision import PolicyDecision
+    
+    intent = ExecutionIntent(capability_id="AUDIO_TRANSCRIPTION", payload={})
+    planning = PlanningResult(intent, "direct")
+    policy = PolicyDecision(planning, True, "default", True)
+    route = RouteDecision(policy, "local", True, True)
+
+    target_with_timeout = ExecutionTarget(
+        route_decision=route,
+        target_id="target_1",
+        target_class="local",
+        provider="whisper",
+        timeout_seconds=0.5
+    )
+    
+    import asyncio
+    async def fast_transcribe(*args, **kwargs):
+        await asyncio.sleep(0.1)
+        return Transcript(full_text="Fast", segments=[])
+        
+    mock_service.transcribe.side_effect = fast_transcribe
+    mechanism = WhisperExecutionMechanism(mock_service)
+
+    outcome, error = mechanism.execute(target_with_timeout, dummy_workload)
+
+    assert outcome == ExecutionOutcome.SUCCESS
+    assert error is None

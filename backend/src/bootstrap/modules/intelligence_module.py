@@ -25,8 +25,7 @@ class IntelligenceModule(DIModule):
         def create_provider(c: Container) -> IAIProvider:
             return OllamaProvider(
                 host=ai_settings.ollama_host,
-                default_temperature=ai_settings.ai_temperature,
-                http_client=c.resolve(httpx.AsyncClient)
+                default_temperature=ai_settings.ai_temperature
             )
             
         container.register_factory(IAIProvider, create_provider, singleton=True)

@@ -90,3 +90,10 @@ def test_real_transcription_execution(dummy_wav_path, monkeypatch):
     assert not hasattr(whisper_service, '_settings'), "Provider must not own global settings"
     assert whisper_service._current_model == "tiny", "Provider must have loaded the explicitly requested model"
     assert whisper_service._current_device == "cpu", "Provider must have loaded on the explicitly requested device"
+    
+    # 7. PROVE R-001 CORRECTION (Repeated execution safe)
+    # The second execution must use the same provider and mechanism without
+    # encountering a cross-loop `RuntimeError: Event loop is closed`.
+    result_2 = facade.invoke(intent, planning_context)
+    assert result_2.outcome == ExecutionOutcome.SUCCESS, f"Repeated Whisper inference failed: {result_2.error_message}"
+    assert result_2.error_message is None

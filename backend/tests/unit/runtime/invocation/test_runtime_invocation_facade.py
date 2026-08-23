@@ -17,14 +17,15 @@ from src.runtime.core.providers import RuntimeProviderRegistry
 def _create_mock_registry():
     mock_registry = Mock(spec=RuntimeProviderRegistry)
     
-    # Create two dummy provider registrations
     reg1 = Mock()
     reg1.descriptor.identity.identifier = "provider_a"
     reg1.descriptor.category.value = "local"
+    reg1.descriptor.metadata = {}
     
     reg2 = Mock()
     reg2.descriptor.identity.identifier = "provider_b"
     reg2.descriptor.category.value = "remote"
+    reg2.descriptor.metadata = {}
     
     mock_registry.enumerate_providers.return_value = [reg1, reg2]
     return mock_registry

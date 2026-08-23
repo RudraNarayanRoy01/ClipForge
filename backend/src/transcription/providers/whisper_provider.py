@@ -1,5 +1,6 @@
 import os
 import asyncio
+import threading
 from typing import TYPE_CHECKING, List, Optional, Any
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ class WhisperTranscriptionService(ITranscriptionService):
         self._default_language = default_language
         
         self._model: Optional["WhisperModel"] = None
-        self._model_lock = asyncio.Lock()
+        self._model_lock = threading.Lock()
         
         # Track currently loaded configuration
         self._current_model: Optional[str] = None
@@ -49,39 +50,39 @@ class WhisperTranscriptionService(ITranscriptionService):
             self._current_compute_class == compute_class):
             return
             
-        async with self._model_lock:
-            # Double-check pattern to prevent race conditions
-            if (self._model is not None and 
-                self._current_model == model and 
-                self._current_device == device and 
-                self._current_compute_class == compute_class):
-                return
-                
-            try:
-                # Loading the model is CPU intensive and blocking, so we run it in a thread
-                def load_model() -> "WhisperModel":
+        def _sync_ensure_loaded() -> None:
+            with self._model_lock:
+                # Double-check pattern to prevent race conditions
+                if (self._model is not None and 
+                    self._current_model == model and 
+                    self._current_device == device and 
+                    self._current_compute_class == compute_class):
+                    return
+                    
+                try:
                     from faster_whisper import WhisperModel  # type: ignore
-                    return WhisperModel(
+                    self._model = WhisperModel(
                         model_size_or_path=model,
                         device=device,
                         compute_type=compute_class,
                     )
-                self._model = await asyncio.to_thread(load_model)
-                
-                # Update tracked state
-                self._current_model = model
-                self._current_device = device
-                self._current_compute_class = compute_class
-            except ValueError as e:
-                # Typically happens if device or compute_type are invalid
-                raise TranscriptionConfigurationError(
-                    f"Invalid Faster-Whisper configuration: {str(e)}"
-                ) from e
-            except Exception as e:
-                # General failures (e.g., model file not found, missing dependencies)
-                raise TranscriptionError(
-                    f"Failed to load Faster-Whisper model: {str(e)}"
-                ) from e
+                    
+                    # Update tracked state
+                    self._current_model = model
+                    self._current_device = device
+                    self._current_compute_class = compute_class
+                except ValueError as e:
+                    # Typically happens if device or compute_type are invalid
+                    raise TranscriptionConfigurationError(
+                        f"Invalid Faster-Whisper configuration: {str(e)}"
+                    ) from e
+                except Exception as e:
+                    # General failures (e.g., model file not found, missing dependencies)
+                    raise TranscriptionError(
+                        f"Failed to load Faster-Whisper model: {str(e)}"
+                    ) from e
+                    
+        await asyncio.to_thread(_sync_ensure_loaded)
 
     async def transcribe(self, request: TranscriptionRequest, **kwargs: Any) -> Transcript:
         """
