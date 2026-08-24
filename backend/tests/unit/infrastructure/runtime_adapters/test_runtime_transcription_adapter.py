@@ -26,7 +26,7 @@ async def test_runtime_transcription_adapter_success():
         
     facade.invoke.side_effect = side_effect
     
-    request = TranscriptionRequest(video_asset_id=uuid.uuid4(), storage_path="s3://test")
+    request = TranscriptionRequest(video_asset_id=uuid.uuid4(), media_path="test_audio.wav")
     
     transcript = await adapter.transcribe(request)
     
@@ -43,7 +43,7 @@ async def test_runtime_transcription_adapter_failure():
     facade.invoke.return_value = facade_result
     
     adapter = RuntimeTranscriptionAdapter(facade=facade)
-    request = TranscriptionRequest(video_asset_id=uuid.uuid4(), storage_path="s3://test")
+    request = TranscriptionRequest(video_asset_id=uuid.uuid4(), media_path="test_audio.wav")
     
     with pytest.raises(TranscriptionProcessingError) as exc:
         await adapter.transcribe(request)
@@ -65,7 +65,7 @@ async def test_runtime_transcription_adapter_context_exception():
         
     facade.invoke.side_effect = side_effect
     
-    request = TranscriptionRequest(video_asset_id=uuid.uuid4(), storage_path="s3://test")
+    request = TranscriptionRequest(video_asset_id=uuid.uuid4(), media_path="test_audio.wav")
     
     with pytest.raises(ValueError) as exc:
         await adapter.transcribe(request)

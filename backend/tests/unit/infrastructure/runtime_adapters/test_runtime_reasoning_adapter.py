@@ -78,10 +78,7 @@ def test_runtime_reasoning_adapter_generate_clips_success():
     
     context = TimelineContext(
         video_asset_id=uuid.uuid4(),
-        words=[],
-        duration=10.0,
-        project_id=uuid.uuid4(),
-        topic_segments=[]
+        words=[]
     )
     clips = adapter.generate_clips(context)
     
