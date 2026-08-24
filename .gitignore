@@ -11,7 +11,9 @@ htmlcov/
 
 # Virtual environments
 .venv/
+.venv-*/
 venv/
+env/
 
 # SQLite
 *.db
