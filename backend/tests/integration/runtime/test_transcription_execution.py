@@ -39,6 +39,13 @@ def test_real_transcription_execution(dummy_wav_path, monkeypatch):
     monkeypatch.setenv("TRANSCRIPTION_MODEL", "tiny")
     monkeypatch.setenv("TRANSCRIPTION_DEVICE", "cpu")
 
+    # 0. Isolate Configuration State
+    # Ensure the DI container does not retain cached configurations/singletons from previous tests
+    from src.bootstrap.startup import _global_container
+    _global_container._singletons.clear()
+    _global_container._factories.clear()
+    _global_container._transients.clear()
+
     # 1. Boot the actual container
     container = initialize_container()
 

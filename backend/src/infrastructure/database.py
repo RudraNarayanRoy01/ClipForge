@@ -3,8 +3,18 @@ from sqlalchemy.orm import declarative_base
 
 from src.config.system_settings import SystemSettings
 
+import os
+from pathlib import Path
+
 # Local SQLite Database for the AI Clipping Platform
-DB_PATH = SystemSettings().db_path
+_db_path_str = SystemSettings().db_path
+_db_path = Path(_db_path_str)
+
+if not _db_path.is_absolute():
+    _backend_dir = Path(__file__).resolve().parent.parent.parent
+    _db_path = _backend_dir / _db_path
+
+DB_PATH = str(_db_path)
 # Note the use of aiosqlite for async database drivers
 DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
 

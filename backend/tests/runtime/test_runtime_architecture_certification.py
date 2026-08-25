@@ -9,6 +9,7 @@ from src.runtime.core.scheduling_model import SchedulingDecision
 from src.runtime.core.scheduler import RuntimeScheduler
 
 from src.runtime.core.execution_result_model import ExecutionResult
+from src.runtime.execution.runtime_execution_result import RuntimeExecutionResult
 from src.runtime.core.executor import RuntimeExecutor
 
 from src.runtime.core.lifecycle_model import LifecycleResult
@@ -71,7 +72,7 @@ def test_one_component_one_artifact_mapping():
 
     # Executor
     executor_sig = inspect.signature(RuntimeExecutor.execute)
-    assert executor_sig.return_annotation == ExecutionResult
+    assert executor_sig.return_annotation == RuntimeExecutionResult
     assert executor_sig.parameters['scheduling_decision'].annotation == SchedulingDecision
 
     # Lifecycle

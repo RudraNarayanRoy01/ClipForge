@@ -15,6 +15,7 @@ from src.application.render_execution_service import RenderExecutionService
 from src.application.execution_models import RenderExecutionRequest, RenderFailureCategory
 from src.domain.ports import IRenderBackend
 from src.domain.models.render_result import RenderResult, RenderStatus
+from src.domain.render_plan import RenderPlan
 
 class DummyRenderingBackend(IRenderBackend):
     """
@@ -37,7 +38,6 @@ class DummyRenderingBackend(IRenderBackend):
             rendered_duration=1.0,
             rendered_output_location=output_path
         )
-from src.domain.render_plan import RenderPlan
 from src.domain.models.render_profile import RenderProfile
 from src.domain.entities import Resolution
 from src.domain.value_objects import AspectRatio

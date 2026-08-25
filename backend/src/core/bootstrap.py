@@ -11,14 +11,14 @@ async def validate_startup(app: FastAPI):
     Raises RuntimeError if any critical component fails, preventing silent failures.
     """
     logger.info("Initializing Backend Startup Validation...")
-    
+
     # 1. Configuration
     try:
         from src.config.system_settings import SystemSettings
         from src.config.ai_settings import AISettings
         from src.config.media_settings import MediaSettings
         from src.config.transcription_settings import TranscriptionSettings
-        
+
         SystemSettings()
         AISettings()
         MediaSettings()
@@ -35,19 +35,23 @@ async def validate_startup(app: FastAPI):
         from alembic.runtime.migration import MigrationContext
         import sqlalchemy as sa
         from src.infrastructure.database import DATABASE_URL
-        
+
         # Using a sync engine specifically for checking Alembic status
         sync_url = DATABASE_URL.replace("+aiosqlite", "")
         sync_engine = sa.create_engine(sync_url)
-        
-        alembic_cfg = Config("alembic.ini")
+
+        from pathlib import Path
+        backend_dir = Path(__file__).resolve().parent.parent.parent
+        alembic_ini_path = backend_dir / "alembic.ini"
+
+        alembic_cfg = Config(str(alembic_ini_path))
         script = ScriptDirectory.from_config(alembic_cfg)
-        
+
         with sync_engine.begin() as conn:
             context = MigrationContext.configure(conn)
             current_rev = context.get_current_revision()
             head_rev = script.get_current_head()
-            
+
             if current_rev != head_rev:
                 raise RuntimeError(
                     f"Database schema out of date.\n"
@@ -93,5 +97,5 @@ async def validate_startup(app: FastAPI):
     # Mocking the ML model load checks for now
     logger.info("[SUCCESS] Whisper model ready.")
     logger.info("[SUCCESS] Gemma model ready.")
-    
+
     logger.info("Startup Validation Complete. All components are operational.")

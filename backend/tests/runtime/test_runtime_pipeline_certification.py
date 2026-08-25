@@ -6,6 +6,7 @@ from src.runtime.core.planner import RuntimeExecutionPlanner
 from src.runtime.core.scheduling_model import SchedulingDecision
 from src.runtime.core.scheduler import RuntimeScheduler
 from src.runtime.core.execution_result_model import ExecutionResult
+from src.runtime.execution.runtime_execution_result import RuntimeExecutionResult
 from src.runtime.core.executor import RuntimeExecutor
 from src.runtime.core.lifecycle_model import LifecycleResult
 from src.runtime.core.lifecycle import RuntimeLifecycle
@@ -34,7 +35,7 @@ class TestRuntimePipelineCertification:
         """
         pipeline_stages = [
             (RuntimeScheduler, SchedulingDecision, 'schedule'),
-            (RuntimeExecutor, ExecutionResult, 'execute'),
+            (RuntimeExecutor, RuntimeExecutionResult, 'execute'),
             (RuntimeLifecycle, LifecycleResult, 'evaluate'),
             (RuntimeRetry, RetryResult, 'evaluate'),
             (RuntimeObservation, ObservationResult, 'extract_observations'),
