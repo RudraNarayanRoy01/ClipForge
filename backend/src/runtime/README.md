@@ -29,6 +29,36 @@ It is responsible for:
 - **Application Layer**: Calls the Runtime via abstract interfaces. It does not know *how* or *where* the model runs.
 - **Providers/Hardware**: Plug into the Runtime's lower boundary. They know how to execute, but not *why* they are executing.
 
+## Current Runtime Execution Architecture (Sprint 6C)
+
+The `runtime` package is the canonical orchestrator for AI execution. In Sprint 6C, the architecture was simplified to a deterministic, registry-based execution engine, bypassing the historical multi-stage planning pipelines and state machines.
+
+### Execution Boundary & Normalization
+The `RuntimeExecutionBoundary` serves as the entry point, receiving abstract domain intents and normalizing them into an `ExecutionAdmission`.
+
+### Execution Engine & Mechanism Registry
+The `ExecutionEngine` owns the execution workflow. It receives the `ExecutionAdmission`, queries the `ExecutionMechanismRegistry`, and resolves the specific mechanism required.
+
+### Concrete Mechanisms & Provider Boundary
+Concrete mechanisms (e.g., `WhisperExecutionMechanism`) implement the actual execution logic. They are responsible for preparing the provider-specific request, invoking the provider, and mapping provider errors. This isolates the `Provider` perfectly from the domain layer.
+
+### Result Semantics
+The execution resolves into an immutable `ExecutionResult`.
+The outcome is strictly classified via `ExecutionOutcome`, which consists of exactly four terminal facts:
+- `SUCCESS`
+- `FAILED`
+- `REJECTED`
+- `CANCELLED`
+
+### Configuration and DI Ownership
+The active components are instantiated and wired via the `RuntimeModule` dependency injection framework. 
+
+---
+
+## Historical Note: Sprint 6A/6B Legacy Architecture
+
+> **Important**: The documentation below this point (describing BOOTSTRAPPING, multi-stage state machines, RuntimePlanning, RuntimePolicy, RuntimeExecutionSession, and legacy coordination) represents the historical 6A/6B architecture. These components exist in the repository for historical/certification purposes but are **not part of the current production execution path**.
+
 ## Runtime Sprint Evolution (Milestone 6)
 
 The Runtime is designed to evolve progressively without requiring major structural refactoring:
@@ -42,9 +72,9 @@ The Runtime is designed to evolve progressively without requiring major structur
 - **Sprint 6.7:** Adaptive Optimization
 - **Sprint 6.8:** Runtime Certification
 
-## Runtime State Machine
+## Legacy Runtime State Machine
 
-The Runtime operates on a deterministic, immutable state machine initialized by the Bootstrap Engine:
+The legacy Runtime operated on a deterministic, immutable state machine initialized by the Bootstrap Engine:
 1. `CREATED`
 2. `BOOTSTRAPPING`
 3. `INITIALIZING`
@@ -55,7 +85,7 @@ The Runtime operates on a deterministic, immutable state machine initialized by 
 
 A `FAILED` state exists for unrecoverable errors. Illegal transitions are explicitly blocked and enforced via `InvalidRuntimeStateTransitionException`.
 
-## Runtime Component Registry
+## Legacy Component Registry
 
 The Runtime Component Registry is the single source of truth for all Runtime Components. It answers the question: *"What Components exist inside the Runtime?"*
 

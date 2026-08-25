@@ -2,91 +2,61 @@
 
 ## 1. Purpose
 
-The purpose of this contract is to establish the canonical architectural boundaries, states, outcomes, and transitions of the Runtime Execution Lifecycle. This document formally dictates "what the lifecycle means" structurally, entirely separate from the execution machinery that performs the work. 
+The purpose of this contract is to establish the canonical architectural boundaries, states, outcomes, and transitions of the Runtime Execution Lifecycle. This document formally dictates "what the lifecycle means" structurally for the current verified 6C execution architecture.
 
 ## 2. Component Boundaries and Ownership Matrix
 
-The execution lifecycle explicitly isolates scheduling, preparation, execution, and terminalization into distinct concepts owned by distinct components.
+The execution lifecycle explicitly isolates workload normalization, mechanism resolution, execution dispatch, and terminalization into distinct concepts owned by distinct components.
 
 | Concern | Owner |
 |---------|-------|
-| Scheduling disposition | Scheduling layer |
-| Execution eligibility | `RuntimeExecutionCoordinator` |
-| Execution identity | `RuntimeExecutionIdentity` |
-| Execution context | `RuntimeExecutionSession` |
-| Lifecycle position | `RuntimeExecutionLifecycleState` |
-| Lifecycle transition semantics | Lifecycle contract (this document) |
-| Execution attempt | `RuntimeExecutor` |
-| Terminal execution record | `RuntimeExecutionResult` |
-| Terminal outcome taxonomy | `RuntimeExecutionOutcome` |
+| Workload normalization | `RuntimeExecutionBoundary` |
+| Execution admission | `RuntimeExecutionBoundary` (yields `ExecutionAdmission`) |
+| Mechanism resolution | `ExecutionEngine` (via `ExecutionMechanismRegistry`) |
+| Execution attempt | `Concrete Execution Mechanism` |
+| Provider invocation | `Concrete Execution Mechanism` |
+| Terminal execution record | `ExecutionResult` |
+| Terminal outcome taxonomy | `ExecutionOutcome` |
 
-### 2.1. Session Responsibility
-`RuntimeExecutionSession` is a purely passive, immutable structural artifact. It represents the execution context and bounds the execution, but it does **not** orchestrate transitions, invoke providers, schedule work, or construct execution results.
+### 2.1. Boundary Responsibility
+`RuntimeExecutionBoundary` is strictly an entry boundary. It normalizes an `ExecutionIntent` into an `ExecutionAdmission` to ensure that execution requests are structurally valid before they reach the engine. It does **not** perform execution itself.
 
-### 2.2. State Responsibility
-`RuntimeExecutionState` is a structural boundary that encapsulates `RuntimeExecutionStateIdentity`. The active position of an execution in the lifecycle is owned specifically by `RuntimeExecutionLifecycleState`, an immutable representation holding the current `RuntimeExecutionStatus`.
+### 2.2. Engine Responsibility
+`ExecutionEngine` is the authoritative orchestrator for the runtime domain. It takes the `ExecutionAdmission`, resolves the appropriate mechanism via the `ExecutionMechanismRegistry`, and delegates the execution attempt to the concrete mechanism. It constructs the final `ExecutionResult`. 
 
-### 2.3. Coordinator Responsibility
-`RuntimeExecutionCoordinator` is strictly an eligibility and handoff boundary. It evaluates `SchedulingDecision.status == SchedulingStatus.READY`. If eligible, it invokes the `RuntimeExecutor` and propagates the returned result. It does **not** perform execution itself, manage state transitions, or classify failures.
+### 2.3. Mechanism Responsibility
+A concrete `ExecutionMechanism` (e.g., `WhisperExecutionMechanism`) owns the actual execution attempt, provider invocation, and translation of provider-specific exceptions. It defines the mapping to `ExecutionOutcome` based on the success or failure of the execution attempt, returning it to the engine.
 
-### 2.4. Executor Responsibility
-`RuntimeExecutor` owns the actual execution attempt, the execution timing, the exception boundary, and the construction of the terminal `RuntimeExecutionResult`. It owns the mapping to `RuntimeExecutionOutcome` based on the success or failure of the execution attempt.
+### 2.4. Result Responsibility
+`ExecutionResult` is an immutable, terminal record of an actual execution attempt. It contains the `target`, the `outcome`, and an `error_message` if applicable.
 
-### 2.5. Result Responsibility
-`RuntimeExecutionResult` is an immutable, historical, terminal record of an actual execution attempt. It cannot exist if execution was not attempted (e.g., due to scheduling rejection).
-
-### 2.6. Identity Continuity
-`RuntimeExecutionIdentity` remains the sole, canonical identity mechanism throughout the lifecycle. No secondary identifiers (e.g., lifecycle ID, result ID, or scheduling replacement ID) are permitted to override or duplicate it.
-
-## 3. Semantic Vocabularies
-
-The contract enforces strict separation between Scheduling, Lifecycle Status, and Terminal Outcome.
-
-### 3.1. Scheduling vs Execution Distinction
-`SchedulingStatus` answers: *"What is the scheduling disposition of this work?"*
-It represents scheduling decisions **before** execution.
-
-Vocabulary:
-- `READY`
-- `QUEUED`
-- `DEFERRED`
-- `BLOCKED`
-- `REJECTED`
-
-### 3.2. Status vs Outcome Distinction
-`RuntimeExecutionStatus` answers: *"Where is this execution in its lifecycle?"*
-It represents the ongoing lifecycle position of the execution structurally.
-
-Vocabulary:
-- `PREPARED`
-- `READY`
-- `EXECUTING`
-- `COMPLETED`
-- `FAILED`
-- `ABORTED`
-
-`RuntimeExecutionOutcome` answers: *"What was the factual terminal outcome of an execution attempt?"*
-It represents the historical, terminal fact evaluated by the executor.
-
-Vocabulary:
+### 2.5. Outcome Taxonomy
+`ExecutionOutcome` represents the historical, terminal fact evaluated during the attempt. It contains exactly:
 - `SUCCESS`
 - `FAILED`
+- `REJECTED`
 - `CANCELLED`
 
-**Crucial Distinction**: `RuntimeExecutionStatus` describes the state of the lifecycle machinery, while `RuntimeExecutionOutcome` describes the result of the domain work attempted.
+---
 
-## 4. Lifecycle Conceptual Phases and Transition Matrix
+## 3. Historical Note: Legacy Execution Lifecycle (Sprint 6B)
 
-The conceptual lifecycle spans four phases:
-1. **Preparation**: Organizing metadata and context (`PREPARED`, `READY`). Execution has not begun. No result exists.
-2. **Eligibility**: `RuntimeExecutionCoordinator` evaluates the `SchedulingDecision`.
-3. **Execution**: The attempt begins in `RuntimeExecutor` (`EXECUTING`).
-4. **Terminalization**: The attempt concludes (`COMPLETED`, `FAILED`, `ABORTED`).
+> **Important**: The components, lifecycle states, and transition engines documented below (`RuntimeExecutionSession`, `RuntimeExecutionCoordinator`, `RuntimeExecutor`, `RuntimeExecutionResult`, `RuntimeExecutionLifecycleState`) represent the multi-stage 6B architectural design. They are **not part of the current production execution path** and have been superseded by the `ExecutionEngine` orchestrator model detailed in Section 2. They are preserved here strictly as historical architectural context.
 
-### 4.1. Transition Matrix
-**Note on Machinery:** This transition matrix defines the architectural lifecycle semantics and serves as the canonical transition contract. Transition legality is enforced by `RuntimeExecutionTransitionValidator`, while `RuntimeExecutionTransitionEngine` applies valid transitions. `RuntimeExecutionLifecycleState` owns the immutable current lifecycle position and delegates transition application to the certified engine. The matrix itself remains declarative documentation and is not duplicated as executable logic inside the state boundary.
+### 3.1. Legacy Component Boundaries
 
-Based on the existing repository contract, the following transitions represent conceptual progression:
+- **Session Responsibility**: `RuntimeExecutionSession` was a purely passive, immutable structural artifact.
+- **State Responsibility**: `RuntimeExecutionState` was a structural boundary holding the current `RuntimeExecutionStatus`.
+- **Coordinator Responsibility**: `RuntimeExecutionCoordinator` acted as an eligibility and handoff boundary.
+- **Executor Responsibility**: `RuntimeExecutor` owned the execution attempt and construction of the `RuntimeExecutionResult`.
+- **Identity Continuity**: `RuntimeExecutionIdentity` was the sole identity mechanism.
+
+### 3.2. Legacy Semantic Vocabularies
+- **Scheduling vs Execution Distinction**: `SchedulingStatus` answered "What is the scheduling disposition of this work?" (`READY`, `QUEUED`, `DEFERRED`, `BLOCKED`, `REJECTED`).
+- **Status vs Outcome Distinction**: `RuntimeExecutionStatus` answered "Where is this execution in its lifecycle?" (`PREPARED`, `READY`, `EXECUTING`, `COMPLETED`, `FAILED`, `ABORTED`). `RuntimeExecutionOutcome` answered "What was the factual terminal outcome?" (`SUCCESS`, `FAILED`, `CANCELLED`).
+
+### 3.3. Lifecycle Conceptual Phases and Transition Matrix
+The conceptual lifecycle spanned four phases: Preparation, Eligibility, Execution, and Terminalization.
 
 | Current Status | Target Status | Transition Meaning | Terminal? | Execution Begun? | Result Exists? |
 |----------------|---------------|---------------------|-----------|------------------|----------------|
@@ -97,34 +67,13 @@ Based on the existing repository contract, the following transitions represent c
 | `EXECUTING` | `FAILED` | Execution attempt encountered an error | Yes | Yes | Yes (`FAILED`) |
 | (Unknown) | `ABORTED` | Structural preparation cleared/aborted | Yes | Varies | No (for structural reset) |
 
-*Note on ABORTED*: The exact legal source states for transitioning to `ABORTED` cannot be conclusively established from the current implementation machinery because `ABORTED` is enacted through a structural reset via `RuntimeExecutionManager.clear_execution()`. It acts as a termination of the lifecycle preparation rather than a targeted state transition.
+### 3.4. Critical Distinctions and Ambiguities
+- **Execution-Attempt Boundary and Rejection Semantics**: No `RuntimeExecutionResult` was constructed for a scheduling rejection (`REJECTED`).
+- **ABORTED vs CANCELLED Distinction**: `ABORTED` represented a structural termination/reset of execution preparation. `CANCELLED` represented the outcome of an actual execution attempt.
+- **COMPLETED vs SUCCESS Distinction**: `COMPLETED` meant the lifecycle machinery reached a terminal state; `SUCCESS` meant the execution attempt succeeded.
+- **FAILED Status vs FAILED Outcome**: `FAILED` status meant abrupt lifecycle termination; `FAILED` outcome meant the execution attempt threw an error.
 
-*Forbidden Transitions*:
-- Terminal states (`COMPLETED`, `FAILED`, `ABORTED`) **cannot** regress to active states (`PREPARED`, `READY`, `EXECUTING`) unless a new identity/attempt is structurally established (Retry is currently out of scope).
-
-### 4.2. Terminal State Semantics
-A terminal lifecycle state means normal lifecycle progression has ended. No further transitions are possible. Current terminal states are `COMPLETED`, `FAILED`, and `ABORTED`. 
-
-## 5. Critical Distinctions and Ambiguities
-
-### 5.1. Execution-Attempt Boundary and Rejection Semantics
-A `SchedulingStatus.REJECTED` (or `QUEUED`, `DEFERRED`, `BLOCKED`) means the work was deemed ineligible *before* execution.
-**Contract Rule**: No execution attempt occurs for non-READY decisions. Therefore, **no `RuntimeExecutionResult` may be constructed for a scheduling rejection**. `REJECTED` is strictly a scheduling concept and does not exist in `RuntimeExecutionOutcome`.
-
-### 5.2. ABORTED vs CANCELLED Distinction
-- `RuntimeExecutionStatus.ABORTED` represents an existing structural termination/reset of execution *preparation* as evidenced by `RuntimeExecutionManager.clear_execution()`. It is currently a lifecycle/preparation termination concept.
-- `RuntimeExecutionOutcome.CANCELLED` represents the terminal factual outcome of an *actual execution attempt* that was interrupted or cancelled.
-**Contract Rule**: `ABORTED` and `CANCELLED` represent distinct concepts. `ABORTED` != `CANCELLED`. `ABORTED` does not automatically imply an execution attempt occurred, nor does it imply a `RuntimeExecutionResult` exists. There is **NO AUTOMATIC EQUIVALENCE** or mapping between them in this contract.
-
-### 5.3. COMPLETED vs SUCCESS Distinction
-- `RuntimeExecutionStatus.COMPLETED` indicates that the lifecycle machinery reached its completed terminal state.
-- `RuntimeExecutionOutcome.SUCCESS` indicates that the execution attempt itself succeeded.
-**Contract Rule**: `COMPLETED` and `SUCCESS` are distinct semantic dimensions. They are related but are not enum aliases or intrinsically identical concepts. A successfully completed execution attempt may result in `RuntimeExecutionStatus.COMPLETED` + `RuntimeExecutionOutcome.SUCCESS`, but the two values belong to different semantic dimensions. There is no mandatory `COMPLETED == SUCCESS` mapping.
-
-### 5.4. FAILED Status vs FAILED Outcome
-Likewise, `RuntimeExecutionStatus.FAILED` represents a lifecycle that terminated abruptly, whereas `RuntimeExecutionOutcome.FAILED` represents the factual outcome that the execution attempt threw an error. 
-
-## 6. Lifecycle Invariants
+### 3.5. Lifecycle Invariants
 1. `SchedulingStatus` != `RuntimeExecutionStatus`.
 2. `RuntimeExecutionStatus` != `RuntimeExecutionOutcome`.
 3. `RuntimeExecutionOutcome` contains exactly `SUCCESS`, `FAILED`, and `CANCELLED`.
@@ -133,181 +82,18 @@ Likewise, `RuntimeExecutionStatus.FAILED` represents a lifecycle that terminated
 6. Terminal lifecycle states cannot transition back to active lifecycle states.
 7. `RuntimeExecutionResult` remains immutable and untouchable after construction.
 
-## 7. Future / Out-of-Scope Functionality
-- **Retry Semantics:** Automatic recovery and retry semantics are explicitly outside the scope of Sprint 6A.8.
-- **Cancellation Machinery**: The mechanisms for cancelling an execution attempt (cancellation tokens, queues, thread aborts) are not implemented. Only the semantic outcome (`CANCELLED`) is defined.
-- **State Machine Implementation**: While the transition engine is implemented, a full automated state-machine orchestrator for progressing between these states without external invocation is deferred to subsequent batches.
+### 3.6. Transition Validation & Application Contracts
+The transition engine (`RuntimeExecutionTransitionEngine`) validated and applied legal transitions (`PREPARED` -> `READY` -> `EXECUTING` -> `COMPLETED`/`FAILED`). It was stateless, did not persist state, and did not execute workloads. The state-bearing component for lifecycle progression was `RuntimeExecutionLifecycleState`, which was fully immutable.
 
-## 8. Transition Validation Contract
+### 3.7. Terminal State & Result Consistency Contract
+A lifecycle state and a finalized execution result were not permitted to represent contradictory terminal semantics. 
+- `COMPLETED` mapped to `SUCCESS`.
+- `FAILED` mapped to `FAILED`.
+Consistency checking was strictly observational (via `RuntimeExecutionTerminalConsistencyValidator`).
 
-### Valid transitions
-- `PREPARED` → `READY`
-- `READY` → `EXECUTING`
-- `EXECUTING` → `COMPLETED`
-- `EXECUTING` → `FAILED`
-
-### Invalid transitions
-All other transitions are invalid under the current contract. This includes skipped transitions, backward regressions, and all self-transitions (e.g., `READY` → `READY`).
-
-### Terminal states
-- `COMPLETED`
-- `FAILED`
-- `ABORTED`
-
-### ABORTED
-> `ABORTED` is a structural/preparation reset status and is distinct from `CANCELLED`. The current architecture does not establish formal incoming lifecycle transitions into `ABORTED`; therefore 6A.8.2 does not certify any such transition.
-
-### Validation vs mutation
-> The transition validator answers whether a transition is valid. It does not perform, persist, or mutate the transition.
-
-### Initialization
-> Initialization to `PREPARED` is not represented as a transition by the validator.
-
-## 9. Transition Application Contract
-
-### Validation vs Application
-> **TransitionValidator**: Determines whether a transition is legal.
-> **TransitionEngine**: Applies a legal transition and returns the target status.
-
-The Transition Engine does not own lifecycle state. It produces the resulting `RuntimeExecutionStatus` for a requested transition and does not mutate `RuntimeExecutionState`.
-
-### Engine Constraints
-The Transition Engine:
-- is stateless;
-- does not own lifecycle state;
-- does not persist state;
-- does not execute workloads;
-- does not orchestrate;
-- does not schedule;
-- does not manage providers;
-- does not implement cancellation;
-- does not implement retry;
-- does not duplicate the transition matrix.
-
-### Immutable Semantics
-Explicitly preserved:
-- `ABORTED` != `CANCELLED`
-- `COMPLETED` != `SUCCESS`
-
-## 10. State Application Contract
-
-### 10.1 Dedicated Component Justification
-The state-bearing component for lifecycle progression is `RuntimeExecutionLifecycleState`. It isolates the "what state am I in?" concern from the structural identity domains covered by `RuntimeExecutionState` and `RuntimeExecutionSession`. These latter structures are purely passive composite boundaries, whereas `RuntimeExecutionLifecycleState` exclusively captures the real-time position within the `RuntimeExecutionStatus` taxonomy.
-
-### 10.2 Immutability and State Replacement
-`RuntimeExecutionLifecycleState` is fully immutable. A state progression does not mutate the current state object in place. Instead, a legal transition triggers the creation of a *new* state instance encapsulating the transitioned `RuntimeExecutionStatus`.
-
-### 10.3 State Identity vs Dependency Identity
-A lifecycle state's semantic identity is defined exclusively by its `RuntimeExecutionStatus`. The component leverages `RuntimeExecutionTransitionEngine` purely as an injected implementation dependency. This engine's own object identity never bleeds into the conceptual equality or semantic definition of the lifecycle state.
-
-### 10.4 Initial State and Delegation
-The state boundary defaults intrinsically to `PREPARED`. From there, it delegates 100% of state transition application to the `RuntimeExecutionTransitionEngine`. It holds zero standalone validation logic and never mirrors or overrides the transition matrix managed by the validator.
-
-### 10.5 Strict Execution and Scheduling Disconnect
-The component has no awareness or dependency regarding execution outcomes (`RuntimeExecutionOutcome`) or scheduling decisions (`SchedulingStatus`). Its API strictly expects `RuntimeExecutionStatus`, reflecting its dedicated role in managing abstract lifecycle bounds.
-
-### 10.6 Non-Responsibilities
-The `RuntimeExecutionLifecycleState` boundary explicitly:
-- Does **not** constitute a fully-fledged executable workflow state machine.
-- Does **not** include or invoke any persistence/event sourcing logic.
-- Does **not** orchestrate scheduling or manage task queues.
-- Does **not** handle or cache a state transition history.
-
-## 11. Terminal State & Result Consistency Contract
-
-### 11.1 Purpose
-This contract establishes the architectural boundary for observing semantic consistency between a `RuntimeExecutionLifecycleState` (lifecycle position) and a `RuntimeExecutionResult` (terminal execution outcome). 
-
-### 11.2 Consistency Rule
-A lifecycle state and a finalized execution result must not represent contradictory terminal semantics. If a `RuntimeExecutionResult` exists for a given execution identity, the active `RuntimeExecutionLifecycleState` MUST be a compatible terminal execution state.
-
-### 11.3 State vs Outcome Separation
-- **State (`RuntimeExecutionStatus`)**: Lifecycle position.
-- **Outcome (`RuntimeExecutionOutcome`)**: Terminal execution fact.
-- **Result (`RuntimeExecutionResult`)**: Immutable historical record of an execution attempt.
-- **Consistency**: Whether the State and Result can legitimately coexist.
-
-### 11.4 ABORTED Semantics
-`ABORTED` is a structural/reset state. It does not represent an execution outcome, and therefore currently has **no certified result mapping** under this contract. `ABORTED` != `CANCELLED`.
-
-### 11.5 CANCELLED Semantics
-`CANCELLED` is a valid terminal execution outcome. However, it currently has **no certified lifecycle-state mapping** under this contract.
-
-### 11.6 Scheduling Rejection Separation
-Scheduling rejections (e.g., `REJECTED`) occur prior to execution. They are completely separated from execution outcomes and do not create a `RuntimeExecutionResult` or factor into the consistency boundary.
-
-### 11.7 Canonical Compatibility Matrix
-The only certified valid relationships between lifecycle states and execution results are:
-
-| Lifecycle State | Result Outcome | Consistency |
-|----------------|---------------|-------------|
-| `COMPLETED`    | `SUCCESS`     | VALID       |
-| `FAILED`       | `FAILED`      | VALID       |
-
-All other combinations—including active states with any result, `ABORTED` with any result, and any state with `CANCELLED`—are considered invalid or unsupported under this contract.
-
-### 11.8 Immutability and Non-Responsibilities
-Consistency checking is strictly observational. Evaluating consistency does NOT mutate the lifecycle state or the result. It preserves exact object identity and never executes lifecycle transitions.
-
-The validator explicitly does **not**:
-- guarantee or check identity continuity;
-- create or reconstruct results;
-- act as a state machine;
-- perform lifecycle transitions.
-
-## 12. Lifecycle Failure Semantics Contract
-
-### 12.1 Failure Taxonomy
-The runtime formally distinguishes between four separate failure categories:
-1. **Scheduling rejection**: Execution was not eligible to begin (e.g., `REJECTED`).
-2. **Lifecycle contract violation**: An illegal lifecycle transition was requested (e.g., `COMPLETED` → `EXECUTING`).
-3. **Execution failure**: An actual execution attempt failed.
-4. **Terminal consistency violation**: Lifecycle state and execution result are semantically incompatible.
-
-These categories must not be collapsed into a single generic `FAILED` concept.
-
-### 12.2 Scheduling Rejection Semantics
-A `SchedulingStatus.REJECTED` decision occurs before any execution attempt. The `RuntimeExecutionCoordinator` intercepts this and prevents the `RuntimeExecutor` from executing. 
-- A scheduling rejection does not create a `RuntimeExecutionResult`.
-- A scheduling rejection is distinct from `RuntimeExecutionOutcome.FAILED`.
-
-### 12.3 Lifecycle Contract Violation Semantics
-An invalid lifecycle transition violates the structural contract.
-- Invalid transitions are rejected by the `RuntimeExecutionTransitionEngine`, which strictly raises a standard `ValueError`.
-- A lifecycle contract violation leaves the `RuntimeExecutionLifecycleState` unmodified.
-- A lifecycle contract violation does NOT synthesize a `RuntimeExecutionResult`.
-
-### 12.4 Execution Failure Semantics
-Execution failure belongs strictly to the domain of the `RuntimeExecutor`.
-- When an execution attempt fails, the `RuntimeExecutor` catches the domain error and produces a `RuntimeExecutionResult` with `outcome=RuntimeExecutionOutcome.FAILED`.
-- The `failure_reason` is populated with the domain exception details.
-- Architecturally, this is the only authorized mechanism for generating a `FAILED` execution result.
-
-### 12.5 Terminal Consistency Violation Semantics
-The `RuntimeExecutionTerminalConsistencyValidator` observes the compatibility between the lifecycle position and the terminal outcome. See Section 11 for the full consistency contract.
-
-### 12.6 Ownership Boundaries
-- **Scheduling**: Owns eligibility/rejection.
-- **Lifecycle Transition Engine**: Owns lifecycle transition legality.
-- **Lifecycle State**: Owns the immutable lifecycle position.
-- **RuntimeExecutor**: Owns the execution attempt behavior and failure translation.
-- **RuntimeExecutionResult**: Owns the historical execution result.
-- **TerminalConsistencyValidator**: Owns state/result compatibility observation.
-
-### 12.7 ValueError Semantics
-`ValueError` is the established, certified mechanism for rejecting invalid lifecycle transitions. No custom `LifecycleFailureException` or `RecoveryException` is authorized. The `ValueError` must never be translated into an execution result by the lifecycle machinery.
-
-### 12.8 Result Creation Boundary
-- **Lifecycle contract violations** must never fabricate an execution result.
-- Architecturally, **actual execution attempts** (via `RuntimeExecutor`) are the only authorized source of execution results. Python does not physically prevent manual construction of a result, but doing so outside of the executor violates the contract.
-
-### 12.9 Terminal State Protection & Duplicate Terminalization
-The certified transition matrix explicitly prevents terminal states (`COMPLETED`, `FAILED`, `ABORTED`) from regressing to active states or re-transitioning into themselves (e.g., `COMPLETED` → `COMPLETED` is invalid and raises `ValueError`). This provides strict lifecycle semantic protection.
-
-### 12.10 ABORTED vs CANCELLED
-As documented in Section 5.2, `RuntimeExecutionStatus.ABORTED` is distinct from `RuntimeExecutionOutcome.CANCELLED`. A lifecycle violation does not map these together. `CANCELLED` remains an execution outcome, while `ABORTED` remains a structural lifecycle state.
-
-### 12.11 Recovery Boundary & Non-Responsibilities
-This failure semantics contract describes **observation and constraint**, not recovery.
-- Automatic recovery, retry, restart, resume, rollback, retry queues, and backoff policies are explicitly **out of scope**.
-- A lifecycle violation terminates the attempted transition operation via exception (`ValueError`). There must be no implication that the lifecycle automatically retries or repairs itself.
+### 3.8. Lifecycle Failure Semantics Contract
+The legacy runtime distinguished between four failure categories: Scheduling rejection, Lifecycle contract violation, Execution failure, and Terminal consistency violation.
+- **Lifecycle Contract Violation**: Rejected by the engine, raising a standard `ValueError`. Did not synthesize a result.
+- **Execution Failure**: Caught by the `RuntimeExecutor`, producing a `RuntimeExecutionResult` with `FAILED` outcome.
+- **Result Creation Boundary**: Actual execution attempts (via `RuntimeExecutor`) were the only authorized source of execution results.
+- **Recovery Boundary**: Automatic recovery, retry, restart, resume, rollback, retry queues, and backoff policies were explicitly out of scope.

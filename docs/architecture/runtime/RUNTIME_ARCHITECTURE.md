@@ -19,9 +19,36 @@ The Adaptive AI Runtime is a first-class subsystem designed to orchestrate AI co
 - **Upper Boundary (Application Layer)**: Exposes abstract AI interfaces. The Application layer requests "Reasoning" or "Transcription" without knowing how it runs.
 - **Lower Boundary (Infrastructure/Hardware)**: Integrates with specific Provider SDKs (Ollama, Gemini) and discovers hardware constraints (CUDA, VRAM).
 
-## Runtime Planning Governance
+## Current Runtime Execution Architecture (Sprint 6C)
 
-This section forms the canonical architectural contract governing the Runtime Decision Pipeline. It defines declarative rules that must be structurally certified by architecture tests. 
+The current verified production architecture relies on a deterministic Execution Engine rather than a multi-stage decision pipeline.
+
+### Execution Boundaries and Ownership
+- **Workload Normalization**: `RuntimeExecutionBoundary` normalizes incoming `ExecutionIntent` into `ExecutionAdmission`.
+- **Mechanism Resolution**: `ExecutionEngine` dynamically resolves the correct mechanism via the `ExecutionMechanismRegistry`.
+- **Execution & Dispatch**: A concrete `ExecutionMechanism` (e.g., `WhisperExecutionMechanism`) executes the workload and isolates the Provider.
+- **Result Creation**: `ExecutionEngine` yields the final `ExecutionResult` and `ExecutionOutcome`.
+
+### Current Execution Flow
+```text
+Application
+    ↓
+RuntimeExecutionBoundary
+    ↓
+ExecutionEngine
+    ↓
+ExecutionMechanismRegistry
+    ↓
+Concrete Execution Mechanism
+    ↓
+Provider
+    ↓
+ExecutionResult / ExecutionOutcome
+```
+
+## Historical Note: Sprint 6B Runtime Planning Governance
+
+This section forms the canonical architectural contract governing the historical Runtime Decision Pipeline. It defines declarative rules that must be structurally certified by architecture tests. 
 
 ### Runtime Invariants
 
@@ -117,11 +144,11 @@ Defines "What execution produced."
 - **ExecutionStatus**: Represents Runtime execution state (e.g. `PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`).
 - **ExecutionSummary**: A mandatory immutable component of ExecutionResult detailing execution steps, reason, and summary.
 
-### RuntimeExecutor Service
+### ExecutionEngine Service
 
-The `RuntimeExecutor` is the canonical Runtime execution engine.
-It performs exactly **one responsibility**: `SchedulingDecision` -> `ExecutionResult`.
-It defines "How execution is performed" and owns `ExecutionResult`, `ExecutionStatus`, `ExecutionOutcome`, and `ExecutionSummary`.
+The `ExecutionEngine` is the canonical Runtime orchestrator.
+It performs exactly **one responsibility**: `ExecutionAdmission` -> `ExecutionResult`.
+It defines "How execution is performed" by dynamically resolving mechanisms through the `ExecutionMechanismRegistry` and yields `ExecutionResult` and `ExecutionOutcome`.
 
 It is explicitly **NOT**:
 - A Workflow Engine
@@ -131,7 +158,6 @@ It is explicitly **NOT**:
 - An Observation Service
 - An Optimization Engine
 - A Resource Manager
-- An Orchestrator
 
 ### Execution Ownership & Contracts
 
@@ -139,12 +165,12 @@ It is explicitly **NOT**:
 | :--- | :--- | :--- |
 | **ExecutionIdentity** | Owned by Runtime Execution Model | Consumed by all execution artifacts |
 | **ExecutionRequest** | Produced by Runtime Execution Model | Consumed by RuntimeScheduler |
-| **ExecutionStatus** | Produced by RuntimeExecutor | Consumed by Observation, Lifecycle |
-| **ExecutionResult** | Produced by RuntimeExecutor | Consumed by Retry, Observation, Learning, Optimization |
+| **ExecutionStatus** | Produced by ExecutionEngine | Consumed by Observation, Lifecycle |
+| **ExecutionResult** | Produced by ExecutionEngine | Consumed by Retry, Observation, Learning, Optimization |
 
 ### Execution Dependency Rules
 
-- The dependency direction strictly flows: `Execution Request Domain` -> `Runtime Scheduler` -> `Scheduling Domain` -> `Runtime Executor` -> `Execution Result Domain` -> `Runtime Lifecycle` -> `Lifecycle Domain` -> `Retry` -> `Observation` -> `Learning` -> `Optimization`.
+- The dependency direction strictly flows: `Execution Request Domain` -> `Runtime Scheduler` -> `Scheduling Domain` -> `ExecutionEngine` -> `Execution Result Domain` -> `Runtime Lifecycle` -> `Lifecycle Domain` -> `Retry` -> `Observation` -> `Learning` -> `Optimization`.
 - Runtime Decisions must NEVER depend upon Execution artifacts. Dependency direction must never reverse.
 
 ## Runtime Lifecycle Domain Model
@@ -620,7 +646,9 @@ Subsystems (e.g., Runtime Foundation, Capability Registry, Monitoring & Telemetr
 - **Scheduler**: Determines *when* and *where* to execute the plan.
 - **Registry**: The catalog of available Capabilities and Providers.
 
-## Runtime Core Composition
+## Historical Note: Sprint 6B Runtime Core Composition
+
+> **Important**: The `RuntimeContext` and the multi-stage pipeline described below are historical 6B architectural concepts and are **not part of the current production execution path**. The active 6C production runtime composes its dependencies deterministically via `RuntimeModule` (DI) and orchestrates execution directly through `ExecutionEngine`.
 
 The Runtime is structured around a stable `core` package, which defines the foundational architectural framework. 
 The `RuntimeContext` serves as the canonical Runtime Decision Environment for the AI Clipping Platform.

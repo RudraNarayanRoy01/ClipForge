@@ -1,5 +1,7 @@
 # Runtime Core
 
+> **Note**: The `runtime/core` package contains legacy architectural structures that are not part of the current 6C production execution path.
+
 ## Purpose
 
 The `core` package defines the fundamental internal architectural framework of the Adaptive AI Runtime. 
