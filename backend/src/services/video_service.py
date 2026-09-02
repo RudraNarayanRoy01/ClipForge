@@ -89,7 +89,16 @@ class VideoService:
             storage_path=storage_path
         )
         
-        await self.video_repo.save_video(video_asset)
+        try:
+            await self.video_repo.save_video(video_asset)
+        except Exception:
+            try:
+                if os.path.exists(storage_path):
+                    os.remove(storage_path)
+            except Exception:
+                pass
+            raise
+            
         return video_asset
 
     async def list_videos(self, project_id: str) -> List[VideoAsset]:
